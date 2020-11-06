@@ -288,16 +288,16 @@ class GoalTrackerTests(unittest.TestCase):
         r, s, h = self.post("/api/v1.0/tokens", basic_auth="john.doe@gmail.com:789",)
         self.assertEqual(s, 401)
 
-        # Access the token-restricted resource.
+        # Access a token-restricted resource.
         r, s, h = self.get(
-            "/welcome",
+            "/api/v1.0/goals",
             token_auth=token,  # TODO: consider renaming this kwarg to `bearer_token`
         )
         self.assertEqual(s, 200)
 
         # Verify that a JWS token, which contains a non-existent user ID, is invalid.
         with patch("flask_sqlalchemy.BaseQuery.get_or_404", return_value=None) as m:
-            r, s, h = self.get("welcome", token_auth=token)
+            r, s, h = self.get("/api/v1.0/goals", token_auth=token)
             self.assertEqual(s, 401)
 
         # Verify that a JWS token, which has expired, is invalid.
@@ -305,7 +305,7 @@ class GoalTrackerTests(unittest.TestCase):
             "goal_tracker.Serializer.loads",
             side_effect=SignatureExpired("forced via mocking/patching"),
         ):
-            r, s, h = self.get("welcome", token_auth=token)
+            r, s, h = self.get("/api/v1.0/goals", token_auth=token)
             self.assertEqual(s, 401)
 
         # Verify that a JWS token, whose signature has been tampered with, is invalid.
@@ -313,8 +313,170 @@ class GoalTrackerTests(unittest.TestCase):
             "goal_tracker.Serializer.loads",
             side_effect=BadSignature("forced via mocking/patching"),
         ):
-            r, s, h = self.get("welcome", token_auth=token)
+            r, s, h = self.get("/api/v1.0/goals", token_auth=token)
             self.assertEqual(s, 401)
+
+    def test_goals_with_one_user(self):
+        # Create a user and issue a corresponding access token.
+        r, s, h = self.post(
+            "/api/v1.0/users",
+            data={"email": "john.doe@gmail.com", "password": "123456"},
+        )
+        r, s, h = self.post("/api/v1.0/tokens", basic_auth="john.doe@gmail.com:123456")
+        token_4_john_doe = r["token"]
+
+        # Access all of the user's goals.
+        r, s, h = self.get("/api/v1.0/goals", token_auth=token_4_john_doe)
+        self.assertEqual(s, 200)
+        self.assertEqual(len(r["goals"]), 0)
+
+        # Create a goal.
+        r, s, h = self.post(
+            "/api/v1.0/goals",
+            data={"description": "Read a book about blockchain technology"},
+            token_auth=token_4_john_doe,
+        )
+        self.assertEqual(s, 201)
+        url_4_john_doe_goal_1 = h["Location"]
+        john_doe_goal_1_description = r["description"]
+
+        # Ensure that a user cannot create a duplicate of a goal that they already have.
+        r, s, h = self.post(
+            "/api/v1.0/goals",
+            data={"description": john_doe_goal_1_description},
+            token_auth=token_4_john_doe,
+        )
+        self.assertEqual(s, 403)
+
+        # Attempt to create an incomplete goal.
+        r, s, h = self.post(
+            "/api/v1.0/goals",
+            data={"irrelevant key": "irrelevant value"},
+            token_auth=token_4_john_doe,
+        )
+        self.assertEqual(s, 400)
+
+        # Create a goal in an invalid way, by providing an invalid description.
+        r, s, h = self.post(
+            "/api/v1.0/goals", data={"description": 17}, token_auth=token_4_john_doe
+        )
+        self.assertEqual(s, 400)
+
+        # Retrieve a single one of the user's goals.
+        r, s, h = self.get(url_4_john_doe_goal_1, token_auth=token_4_john_doe)
+        self.assertEqual(s, 200)
+
+        # Retrieve all of the user's goals.
+        r, s, h = self.get("/api/v1.0/goals", token_auth=token_4_john_doe)
+        self.assertEqual(s, 200)
+        self.assertEqual(len(r["goals"]), 1)
+
+        # Edit a goal.
+        r, s, h = self.put(
+            url_4_john_doe_goal_1,
+            data={"description": "Listen to an audiobook about blockchain technology"},
+            token_auth=token_4_john_doe,
+        )
+        self.assertEqual(s, 200)
+        john_doe_goal_1_description_edited = r["description"]
+
+        # Edit a goal in an invalid way, by providing an invalid description.
+        r, s, h = self.put(
+            url_4_john_doe_goal_1,
+            data={"description": 17},
+            token_auth=token_4_john_doe,
+        )
+        self.assertEqual(s, 400)
+
+        # Edit a goal in an invalid way, by providing a duplicate description.
+        r, s, h = self.put(
+            url_4_john_doe_goal_1,
+            data={"description": john_doe_goal_1_description_edited},
+            token_auth=token_4_john_doe,
+        )
+        self.assertEqual(s, 403)
+
+        # Delete a goal.
+        r, s, h = self.delete(url_4_john_doe_goal_1, token_auth=token_4_john_doe)
+        self.assertEqual(s, 204)
+
+    def test_goals_with_two_users(self):
+        # Create two users and issue corresponding access tokens.
+        r, s, h = self.post(
+            "/api/v1.0/users",
+            data={"email": "john.doe@gmail.com", "password": "123456"},
+        )
+        r, s, h = self.post("/api/v1.0/tokens", basic_auth="john.doe@gmail.com:123456")
+        token_4_john_doe = r["token"]
+
+        r, s, h = self.post(
+            "/api/v1.0/users",
+            data={"email": "mary.smith@yahoo.com", "password": "123456"},
+        )
+        r, s, h = self.post(
+            "/api/v1.0/tokens", basic_auth="mary.smith@yahoo.com:123456"
+        )
+        token_4_mary_smith = r["token"]
+
+        # Create 2 goals for the first user.
+        r, s, h = self.post(
+            "/api/v1.0/goals",
+            data={"description": "Read a book about blockchain technology"},
+            token_auth=token_4_john_doe,
+        )
+        self.assertEqual(s, 201)
+        url_4_john_doe_goal_1 = h["Location"]
+
+        r, s, h = self.post(
+            "/api/v1.0/goals",
+            data={"description": "Take a course in self-defense"},
+            token_auth=token_4_john_doe,
+        )
+        self.assertEqual(s, 201)
+        url_4_john_doe_goal_2 = h["Location"]
+        john_doe_goal_2_description = r["description"]
+
+        # Ensure that different users MAY have goals with identical descriptions.
+        r, s, h = self.post(
+            "/api/v1.0/goals",
+            data={"description": john_doe_goal_2_description},
+            token_auth=token_4_mary_smith,
+        )
+        self.assertEqual(s, 201)
+        url_4_mary_smith_goal_1 = h["Location"]
+
+        # Retrieve all the goals that belong to the first user.
+        r, s, h = self.get("/api/v1.0/goals", token_auth=token_4_john_doe)
+        self.assertEqual(s, 200)
+        self.assertEqual(len(r["goals"]), 2)
+        john_doe_goal_ids = {g["id"] for g in r["goals"]}
+
+        # Retrieve all the goals that belong to the second user.
+        r, s, h = self.get("/api/v1.0/goals", token_auth=token_4_mary_smith)
+        self.assertEqual(s, 200)
+        self.assertEqual(len(r["goals"]), 1)
+        mary_smith_goal_ids = {g["id"] for g in r["goals"]}
+
+        # Ensure that distrinct users don't have any goal( resource/record)s in common.
+        common_goal_ids = john_doe_goal_ids.intersection(mary_smith_goal_ids)
+        self.assertEqual(common_goal_ids, set())
+
+        # Ensure that
+        # the first user MAY NOT retrieve a goal belonging to the second user.
+        r, s, h = self.get(url_4_mary_smith_goal_1, token_auth=token_4_john_doe)
+        self.assertEqual(s, 403)
+
+        # Ensure that the first user MAY NOT edit a goal belonging to the second user.
+        r, s, h = self.put(
+            url_4_mary_smith_goal_1,
+            data={"description": "This request SHOULD fail."},
+            token_auth=token_4_john_doe,
+        )
+        self.assertEqual(s, 400)
+
+        # Ensure that the first user MAY NOT delete a goal belonging to the second user.
+        r, s, h = self.delete(url_4_mary_smith_goal_1, token_auth=token_4_john_doe)
+        self.assertEqual(s, 400)
 
 
 if __name__ == "__main__":
