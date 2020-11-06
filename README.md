@@ -71,3 +71,26 @@ There are a few more useful commands that work with the migration history:
 # 7. 
 (venv) $ flask db current
 ```
+
+All commands from the previous section continue to work (without modification). The only
+difference is that executing those commands is, of course, going to modify the database
+(instead of an in-memory structure).
+
+# `04/backend/securing-the-RESTful-web-service`
+
+```
+$ curl -v -H "Content-Type: application/json" http://localhost:5000/api/v1.0/users
+$ curl -X POST -v -H "Content-Type: application/json" -d '{"email": "john.doe@gmail.com", "password": "123456"}' http://localhost:5000/api/v1.0/users
+$ curl -X POST -v -H "Content-Type: application/json" -d '{"email": "mary.smith@yahoo.com", "password": "123456"}' http://localhost:5000/api/v1.0/users
+$ curl -v -H "Content-Type: application/json" http://localhost:5000/api/v1.0/users
+
+$ curl -v -X POST -H "Content-Type: application/json" -d '{"email": "testing@example.com", "password": "testing"}' http://localhost:5000/api/v1.0/users
+
+$ curl --verbose --request PUT --header "Content-Type: application/json" --data '{"email": "testing@testing.com"}' http://localhost:5000/api/v1.0/users/3
+$ curl --verbose --request PUT --header "Content-Type: application/json" --data '{"email": "testing@testing.com"}' --user testing@example.com:testing http://localhost:5000/api/v1.0/users/2
+$ curl --verbose --request PUT --header "Content-Type: application/json" --data '{"email": "testing@testing.com"}' --user testing@example.com:testing http://localhost:5000/api/v1.0/users/3
+
+$ curl --verbose --request DELETE --header "Content-Type: application/json" http://localhost:5000/api/v1.0/users/2
+$ curl --verbose --request DELETE --header "Content-Type: application/json" --user testing@testing.com:testing http://localhost:5000/api/v1.0/users/2
+$ curl --verbose --request DELETE --header "Content-Type: application/json" --user testing@testing.com:testing http://localhost:5000/api/v1.0/users/3
+```
