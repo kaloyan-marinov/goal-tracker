@@ -1,6 +1,7 @@
 import os
 
-from flask import Flask, abort, request, jsonify, url_for
+from flask import Flask, request, jsonify, url_for
+from werkzeug.http import HTTP_STATUS_CODES
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -17,7 +18,9 @@ db_file = os.path.join(basedir, "goal_tracker.db")
 
 app = Flask(__name__)
 app.config["DEBUG"] = True
-app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{db_file}"
+app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get(
+    "DATABASE_URL", f"sqlite:///{db_file}"
+)
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY") or "my-secret"
 
@@ -57,6 +60,16 @@ def verify_password(email, password):
     return user
 
 
+@basic_auth.error_handler
+def basic_auth_error():
+    """Return a 401 error to the client."""
+    # To avoid login prompts in the browser, use the "Bearer" realm.
+    r = jsonify({"error": "authentication required"})
+    r.status_code = 401
+    r.headers["WWW-Authenticate"] = 'Bearer realm="Authentication Required"'
+    return r
+
+
 token_serializer = Serializer(app.config["SECRET_KEY"], expires_in=3600)
 
 token_auth = HTTPTokenAuth(scheme="Bearer")
@@ -77,6 +90,15 @@ def verify_token(token):
     return None
 
 
+@token_auth.error_handler
+def token_auth_error():
+    """Return a 401 error to the client."""
+    r = jsonify({"error": "authentication required"})
+    r.status_code = 401
+    r.headers["WWW-Authenticate"] = 'Bearer realm="Authentication Required"'
+    return r
+
+
 @app.route("/api/v1.0/users", methods=["GET"])
 def get_users():
     users = User.query.all()
@@ -87,7 +109,13 @@ def get_users():
 def get_user(user_id):
     user = User.query.get(user_id)
     if user is None:
-        abort(404)  # Content-Type: text/html; charset=utf-8
+        payload = {
+            "error": HTTP_STATUS_CODES.get(404),
+            "message": "There does not exist a user with the provided user ID.",
+        }
+        r = jsonify(payload)
+        r.status_code = 404
+        return r
     return {"id": user.id, "email": user.email}
 
 
@@ -95,16 +123,37 @@ def get_user(user_id):
 def create_user():
     # Check whether the client supplied all required arguments.
     if not request.json:
-        abort(400)  # Content-Type: text/html; charset=utf-8
+        payload = {
+            "error": HTTP_STATUS_CODES.get(400),
+            "message": (
+                'Your request did not include a "Content-Type: application/json"'
+                " header."
+            ),
+        }
+        r = jsonify(payload)
+        r.status_code = 400
+        return r
 
     email = request.json.get("email")
     password = request.json.get("password")
     if email is None or password is None:
-        abort(400)
+        payload = {
+            "error": HTTP_STATUS_CODES.get(400),
+            "message": "The request body must include both an email and a password.",
+        }
+        r = jsonify(payload)
+        r.status_code = 400
+        return r
 
     # Prevent the to-be-created user from using the email of any existing user.
     if User.query.filter_by(email=email).first() is not None:
-        abort(400)
+        payload = {
+            "error": HTTP_STATUS_CODES.get(400),
+            "message": "There already exists a user with the provided email.",
+        }
+        r = jsonify(payload)
+        r.status_code = 400
+        return r
 
     # Create a new user.
     user = User(email=email)
@@ -121,19 +170,46 @@ def create_user():
 @app.route("/api/v1.0/users/<int:user_id>", methods=["PUT"])
 @basic_auth.login_required
 def update_user(user_id):
-    user = User.query.get_or_404(user_id)  # Content-Type: text/html; charset=utf-8
+    user = User.query.get_or_404(user_id)  # NB! Content-Type: text/html; charset=utf-8
     if user != basic_auth.current_user():
-        abort(403)  # Content-Type: text/html; charset=utf-8
+        payload = {
+            "error": HTTP_STATUS_CODES.get(403),
+            "message": "You may not update any user's account other than your own.",
+        }
+        r = jsonify(payload)
+        r.status_code = 403
+        return r
 
     # Check whether the client supplied admissible arguments.
     if not request.json:
-        abort(400)  # Content-Type: text/html; charset=utf-8
+        payload = {
+            "error": HTTP_STATUS_CODES.get(400),
+            "message": (
+                'Your request did not include a "Content-Type: application/json"'
+                " header."
+            ),
+        }
+        r = jsonify(payload)
+        r.status_code = 400
+        return r
 
     email = request.json.get("email")
     if email and type(email) is not str:
-        abort(400)
+        payload = {
+            "error": HTTP_STATUS_CODES.get(400),
+            "message": "If an email is provided in the request body, it must be a string.",
+        }
+        r = jsonify(payload)
+        r.status_code = 400
+        return r
     if User.query.filter_by(email=email).first() is not None:
-        abort(400)
+        payload = {
+            "error": HTTP_STATUS_CODES.get(400),
+            "message": "There already exists a user with the provided email.",
+        }
+        r = jsonify(payload)
+        r.status_code = 400
+        return r
 
     # Update the user.
     user.email = email or user.email
@@ -145,9 +221,15 @@ def update_user(user_id):
 @app.route("/api/v1.0/users/<int:user_id>", methods=["DELETE"])
 @basic_auth.login_required
 def delete_user(user_id):
-    user = User.query.get_or_404(user_id)  # Content-Type: text/html; charset=utf-8
+    user = User.query.get_or_404(user_id)  # NB! Content-Type: text/html; charset=utf-8
     if user != basic_auth.current_user():
-        abort(403)  # Content-Type: text/html; charset=utf-8
+        payload = {
+            "error": HTTP_STATUS_CODES.get(403),
+            "message": "You may not delete any user's account other than your own.",
+        }
+        r = jsonify(payload)
+        r.status_code = 403
+        return r
 
     db.session.delete(user)
     db.session.commit()

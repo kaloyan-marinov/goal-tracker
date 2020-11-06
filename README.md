@@ -110,3 +110,21 @@ $ export T2=<the_returned_JWS_token>
 $ curl -v -H "Authorization: Bearer $T2" http://localhost:5000/welcome
 $ curl -v -H "Authorization: Bearer <any_tampering_of_T2_no_matter_how_small> http://localhost:5000/welcome
 ```
+
+# `06/backend/unit-tests`
+
+Executing the following command creates an `htmlcov` directory:
+```
+(venv) $ python tests.py
+```
+but neither does executing the tests through VS Code, nor does executing
+```
+(venv) $ python -m unittest discover -v .
+```
+
+To get a report of unittest coverage, first issue
+```
+$ coverage run -m unittest tests.py 
+$ coverage html --omit="venv/*",tests.py,"__pycache__/*"
+```
+and then go on to open `htmlcov/goal_tracker.py.html`.
