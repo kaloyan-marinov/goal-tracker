@@ -94,3 +94,19 @@ $ curl --verbose --request DELETE --header "Content-Type: application/json" http
 $ curl --verbose --request DELETE --header "Content-Type: application/json" --user testing@testing.com:testing http://localhost:5000/api/v1.0/users/2
 $ curl --verbose --request DELETE --header "Content-Type: application/json" --user testing@testing.com:testing http://localhost:5000/api/v1.0/users/3
 ```
+
+# `05/backend/securing-with-jws-tokens`
+
+```
+$ curl -v -X POST http://localhost:5000/api/v1.0/tokens
+
+$ curl -v -X POST --user john.doe@gmail.com:123456 http://localhost:5000/api/v1.0/tokens
+$ export T1=<the_returned_JWS_token>
+$ curl -v -H "Authorization: Bearer $T1" http://localhost:5000/welcome
+$ curl -v -H "Authorization: Bearer <any_tampering_of_T1_no_matter_how_small> http://localhost:5000/welcome
+
+$ curl -v -X POST --user mary.smith@yahoo.com:123456 http://localhost:5000/api/v1.0/tokens
+$ export T2=<the_returned_JWS_token>
+$ curl -v -H "Authorization: Bearer $T2" http://localhost:5000/welcome
+$ curl -v -H "Authorization: Bearer <any_tampering_of_T2_no_matter_how_small> http://localhost:5000/welcome
+```

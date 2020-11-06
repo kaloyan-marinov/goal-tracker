@@ -4,7 +4,12 @@ from flask import Flask, abort, request, jsonify, url_for
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask_httpauth import HTTPBasicAuth
+from flask_httpauth import HTTPBasicAuth, HTTPTokenAuth
+from itsdangerous import (
+    TimedJSONWebSignatureSerializer as Serializer,
+    BadSignature,
+    SignatureExpired,
+)
 
 
 basedir = os.path.abspath(os.path.dirname(__file__))
@@ -14,6 +19,7 @@ app = Flask(__name__)
 app.config["DEBUG"] = True
 app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{db_file}"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY") or "my-secret"
 
 db = SQLAlchemy(app)
 
@@ -35,6 +41,10 @@ class User(db.Model):
     def __repr__(self):
         return f"<User {self.email}>"
 
+    def generate_token(self):
+        token = token_serializer.dumps({"user_id": self.id}).decode("utf-8")
+        return token
+
 
 basic_auth = HTTPBasicAuth()
 
@@ -45,6 +55,26 @@ def verify_password(email, password):
     if user is None or not user.check_password(password):
         return False
     return user
+
+
+token_serializer = Serializer(app.config["SECRET_KEY"], expires_in=3600)
+
+token_auth = HTTPTokenAuth(scheme="Bearer")
+
+
+@token_auth.verify_token
+def verify_token(token):
+    try:
+        token_payload = token_serializer.loads(token)
+    except SignatureExpired:
+        return None  # valid token, but expired
+    except BadSignature:
+        return None  # invalid token
+
+    user = User.query.get_or_404(token_payload["user_id"])
+    if user is not None:
+        return user
+    return None
 
 
 @app.route("/api/v1.0/users", methods=["GET"])
@@ -122,6 +152,20 @@ def delete_user(user_id):
     db.session.delete(user)
     db.session.commit()
     return "", 204
+
+
+@app.route("/api/v1.0/tokens", methods=["POST"])
+@basic_auth.login_required
+def new_token():
+    """Request a user token."""
+    token = basic_auth.current_user().generate_token()
+    return {"token": token}
+
+
+@app.route("/welcome", methods=["GET"])
+@token_auth.login_required
+def welcome():
+    return {"welcome": f"Hello, {token_auth.current_user()}"}
 
 
 if __name__ == "__main__":
