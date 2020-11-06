@@ -1,40 +1,95 @@
-from flask import Flask
+from flask import Flask, abort, request, jsonify, url_for
 
 
 app = Flask(__name__)
 app.config["DEBUG"] = True
 
 
-@app.route("/")
-def index():
-    # fmt: off
-    '''
-    Objective: show one thing specific to the debugger that does not work well,
-               which is due to a long-time bug in Flask
+users = [
+    {"id": 1, "name": "John Doe", "email_address": "john.doe@gmail.com"},
+    {"id": 2, "name": "Mary Smith", "email_address": "mary.smith@yahoo.com"},
+]
 
-    When you run your application and something crashes,
-    if you're running in debug mode, you get the debugger on the web browser.
 
-    Since now we want to use the VS Code debugger,
-    what we would like to do is that (instead of getting the Flask in-browser debugger)
-    we would like the crash to be reported in the VS Code debugger.
-    (That's actually what's broken and it's been broken for ages in Flask.)
+@app.route("/api/v1.0/users", methods=["GET"])
+def get_users():
+    return {"users": users}
 
-    The reason: `flask run` does not properly tell an external debugger
-                that there's been an error
 
-    The resolution: switch to "the old way" of running Flask applications,
-                    which is by using the `app.run()` method
-                    (thus making the current module into an executable one
-                    that will start the application when it's run from VS Code)
-    '''
-    # fmt: on
-    a = 17 / 2
-    a = b / 2  # Uncommenting this raises a NameError - in the VS Code debugger!
-    return {"data": "Hello world!"}
+@app.route("/api/v1.0/users/<int:user_id>", methods=["GET"])
+def get_user(user_id):
+    idx = None
+    for i, u_i in enumerate(users):
+        if u_i["id"] == user_id:
+            idx = i
+            break
+    if idx is None:
+        abort(404)  # Content-Type: text/html; charset=utf-8
+    return users[idx]
+
+
+@app.route("/api/v1.0/users", methods=["POST"])
+def create_user():
+    if (
+        not request.json
+        or not "name" in request.json
+        or not "email_address" in request.json
+    ):
+        abort(400)  # Content-Type: text/html; charset=utf-8
+    user = {
+        "id": len(users) + 1,
+        "name": request.json["name"],
+        "email_address": request.json["email_address"],
+    }
+    users.append(user)
+
+    r = jsonify(user)
+    r.status_code = 201
+    r.headers["Location"] = url_for("get_user", user_id=user["id"])
+    return r
+
+
+@app.route("/api/v1.0/users/<int:user_id>", methods=["PUT"])
+def update_user(user_id):
+    idx = None
+    for i, u_i in enumerate(users):
+        if u_i["id"] == user_id:
+            idx = i
+            break
+    if idx is None:
+        abort(404)  # Content-Type: text/html; charset=utf-8
+
+    if not request.json:
+        abort(400)
+    if "name" in request.json and type(request.json["name"]) is not str:
+        abort(400)
+    if (
+        "email_address" in request.json
+        and type(request.json["email_address"]) is not str
+    ):
+        abort(400)
+
+    users[idx]["name"] = request.json.get("name", users[idx]["name"])
+    users[idx]["email_address"] = request.json.get(
+        "email_address", users[idx]["email_address"]
+    )
+    return users[idx]
+
+
+@app.route("/api/v1.0/users/<int:user_id>", methods=["DELETE"])
+def delete_user(user_id):
+    idx = None
+    for i, u_i in enumerate(users):
+        if u_i["id"] == user_id:
+            idx = i
+            break
+    if idx is None:
+        abort(404)  # Content-Type: text/html; charset=utf-8
+
+    users.remove(users[idx])
+
+    return "", 204
 
 
 if __name__ == "__main__":
-    # Setting `passthrough_errors=True` causes errors to bubble up in an external
-    # debugger.
     app.run(use_debugger=False, use_reloader=False, passthrough_errors=True)
