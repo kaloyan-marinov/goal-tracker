@@ -1,93 +1,99 @@
-from flask import Flask, abort, request, jsonify, url_for
+import os
 
+from flask import Flask, abort, request, jsonify, url_for
+from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
+
+
+basedir = os.path.abspath(os.path.dirname(__file__))
+db_file = os.path.join(basedir, "goal_tracker.db")
 
 app = Flask(__name__)
 app.config["DEBUG"] = True
+app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{db_file}"
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
+db = SQLAlchemy(app)
+
+migrate = Migrate(app, db)
 
 
-users = [
-    {"id": 1, "name": "John Doe", "email_address": "john.doe@gmail.com"},
-    {"id": 2, "name": "Mary Smith", "email_address": "mary.smith@yahoo.com"},
-]
+class User(db.Model):
+    __tablename__ = "users"
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(128), index=True, unique=True)
 
 
 @app.route("/api/v1.0/users", methods=["GET"])
 def get_users():
-    return {"users": users}
+    users = User.query.all()
+    return {"users": [{"id": u.id, "email": u.email} for u in users]}
 
 
 @app.route("/api/v1.0/users/<int:user_id>", methods=["GET"])
 def get_user(user_id):
-    idx = None
-    for i, u_i in enumerate(users):
-        if u_i["id"] == user_id:
-            idx = i
-            break
-    if idx is None:
+    user = User.query.get(user_id)
+    if user is None:
         abort(404)  # Content-Type: text/html; charset=utf-8
-    return users[idx]
+    return {"id": user.id, "email": user.email}
 
 
 @app.route("/api/v1.0/users", methods=["POST"])
 def create_user():
-    if (
-        not request.json
-        or not "name" in request.json
-        or not "email_address" in request.json
-    ):
+    # Check whether the client supplied all required arguments.
+    if not request.json:
         abort(400)  # Content-Type: text/html; charset=utf-8
-    user = {
-        "id": len(users) + 1,
-        "name": request.json["name"],
-        "email_address": request.json["email_address"],
-    }
-    users.append(user)
 
-    r = jsonify(user)
+    email = request.json.get("email")
+    if email is None:
+        abort(400)
+
+    # Prevent the to-be-created user from using the email of any existing user.
+    if User.query.filter_by(email=email).first() is not None:
+        abort(400)
+
+    # Create a new user.
+    user = User(email=request.json["email"])
+    db.session.add(user)
+    db.session.commit()
+
+    r = jsonify({"id": user.id, "email": user.email})
     r.status_code = 201
-    r.headers["Location"] = url_for("get_user", user_id=user["id"])
+    r.headers["Location"] = url_for("get_user", user_id=user.id)
     return r
 
 
 @app.route("/api/v1.0/users/<int:user_id>", methods=["PUT"])
 def update_user(user_id):
-    idx = None
-    for i, u_i in enumerate(users):
-        if u_i["id"] == user_id:
-            idx = i
-            break
-    if idx is None:
-        abort(404)  # Content-Type: text/html; charset=utf-8
+    user = User.query.get(user_id)
+    if user is None:
+        abort(404)
 
+    # Check whether the client supplied admissible arguments.
     if not request.json:
+        abort(400)  # Content-Type: text/html; charset=utf-8
+
+    email = request.json.get("email")
+    if email and type(email) is not str:
         abort(400)
-    if "name" in request.json and type(request.json["name"]) is not str:
-        abort(400)
-    if (
-        "email_address" in request.json
-        and type(request.json["email_address"]) is not str
-    ):
+    if User.query.filter_by(email=email).first() is not None:
         abort(400)
 
-    users[idx]["name"] = request.json.get("name", users[idx]["name"])
-    users[idx]["email_address"] = request.json.get(
-        "email_address", users[idx]["email_address"]
-    )
-    return users[idx]
+    # Update the user.
+    user.email = email or user.email
+    db.session.commit()
+
+    return {"id": user.id, "email": user.email}
 
 
 @app.route("/api/v1.0/users/<int:user_id>", methods=["DELETE"])
 def delete_user(user_id):
-    idx = None
-    for i, u_i in enumerate(users):
-        if u_i["id"] == user_id:
-            idx = i
-            break
-    if idx is None:
+    user = User.query.get(user_id)
+    if user is None:
         abort(404)  # Content-Type: text/html; charset=utf-8
 
-    users.remove(users[idx])
-
+    db.session.delete(user)
+    db.session.commit()
     return "", 204
 
 
