@@ -128,3 +128,135 @@ $ coverage run -m unittest tests.py
 $ coverage html --omit="venv/*",tests.py,"__pycache__/*"
 ```
 and then go on to open `htmlcov/goal_tracker.py.html`.
+
+# `07/backend/goals-resources`
+
+[Nothing to record.]
+
+# `2020/11/06/07-53/08/backend/intervals`
+
+```
+$ rm goal_tracker.db
+
+$ export FLASK_APP=goal_tracker.py
+$ flask db history
+$ flask db current
+$ flask db upgrade
+$ flask db current
+```
+
+```
+$ curl -v -X POST -H "Content-Type: application/json" -d '{"email": "john.doe@gmail.com", "password": "123456"}' http://localhost:5000/api/v1.0/users
+$ curl -v -X POST -H "Content-Type: application/json" -d '{"email": "mary.smith@yahoo.com", "password": "789"}' http://localhost:5000/api/v1.0/users
+
+$ curl -v -X POST -H "Content-Type: application/json" --user "john.doe@gmail.com:123456" http://localhost:5000/api/v1.0/tokens
+$ export T1=<the_returned_JWS_token>
+$ curl -v -X POST -H "Content-Type: application/json" --user "mary.smith@yahoo.com:789" http://localhost:5000/api/v1.0/tokens
+$ export T2=<the_returned_JWS_token>
+
+$ curl -v -X POST -H "Content-Type: application/json" -H "Authorization: Bearer $T1" -d '{"description": "Read a book about blockchain technology"}' http://localhost:5000/api/v1.0/goals
+$ curl -v -X POST -H "Content-Type: application/json" -H "Authorization: Bearer $T1" -d '{"description": "Take a course in self-defense"}' http://localhost:5000/api/v1.0/goals
+
+$ curl -v -X POST -H "Content-Type: application/json" -H "Authorization: Bearer $T2" -d '{"description": "Take a course in self-defense"}' http://localhost:5000/api/v1.0/goals
+```
+
+```
+$ flask db migrate -m 'intervals table (related to the goals table in many-to-1 manner)'
+
+$ flask db history
+$ flask db current
+
+$ flask db upgade
+$ flask db history
+$ flask db current
+```
+
+Each of the following POST requests to `http://localhost:5000/api/v1.0/intervals` fails:
+```
+$ curl -v -X POST -d '{"goal_id": 1}' http://localhost:5000/api/v1.0/intervals
+
+$ curl -v -X POST -H "Authorization: Bearer $T2" -d '{"goal_id": 1}' http://localhost:5000/api/v1.0/intervals
+
+$ curl -v -X POST -H "Authorization: Bearer $T2" -H "Content-Type: application/json" -d '{"goal_id": 1}' http://localhost:5000/api/v1.0/intervals
+
+$ curl -v -X POST -H "Authorization: Bearer $T1" -H "Content-Type: application/json" -d '{"goal_id": 1}' http://localhost:5000/api/v1.0/intervals
+$ curl -v -X POST -H "Authorization: Bearer $T1" -H "Content-Type: application/json" -d '{"goal_id": 1, "start": "2020-11-05 08:45"}' http://localhost:5000/api/v1.0/intervals
+$ curl -v -X POST -H "Authorization: Bearer $T1" -H "Content-Type: application/json" -d '{"goal_id": 1, "final": "2020-11-05 08:45"}' http://localhost:5000/api/v1.0/intervals
+
+$ curl -v -X POST -H "Authorization: Bearer $T1" -H "Content-Type: application/json" -d '{"goal_id": 1, "start": "-11-05 08:45", "final": "2020-11-05 09:16"}' http://localhost:5000/api/v1.0/intervals
+```
+whereas each of the following ones works:
+```
+$ curl -v -X POST -H "Authorization: Bearer $T1" -H "Content-Type: application/json" -d '{"goal_id": 1, "start": "2020-11-05 08:45", "final": "2020-11-05 09:15"}' http://localhost:5000/api/v1.0/intervals
+
+$ curl -v -X POST -H "Authorization: Bearer $T2" -H "Content-Type: application/json" -d '{"goal_id": 3, "start": "2020-11-06 08:45", "final": "2020-11-06 09:15"}' http://localhost:5000/api/v1.0/intervals
+
+$ curl -v -X POST -H "Authorization: Bearer $T1" -H "Content-Type: application/json" -d '{"goal_id": 2, "start": "2020-11-07 08:45", "final": "2020-11-07 09:15"}' http://localhost:5000/api/v1.0/intervals
+
+$ curl -v -X POST -H "Authorization: Bearer $T1" -H "Content-Type: application/json" -d '{"goal_id": 2, "start": "3333-11-07 08:45", "final": "3333-11-07 09:15"}' http://localhost:5000/api/v1.0/intervals
+```
+
+At this point, it is possible and advisable to issue a `sqlite3 goal_tracker.db` and to
+run the following query:
+```
+SELECT users.email, goals.description, intervals.id, intervals.start, intervals.final
+FROM users
+    JOIN goals ON users.id = goals.user_id
+    JOIN intervals ON goals.id = intervals.goal_id;
+```
+
+Each of the following GET requests to `http://localhost:5000/api/v1.0/intervals` fails:
+```
+$ curl -v -X GET http://localhost:5000/api/v1.0/intervals
+```
+whereas each of the following ones works:
+```
+$ curl -v -X GET -H "Authorization: Bearer $T1" http://localhost:5000/api/v1.0/intervals
+$ curl -v -X GET -H "Authorization: Bearer $T2" http://localhost:5000/api/v1.0/intervals
+```
+
+Each of the following GET requests to
+`http://localhost:5000/api/v1.0/intervals/<int:interval_id>` fails:
+```
+$ curl -v -X GET http://localhost:5000/api/v1.0/intervals/1
+
+$ curl -v -X GET -H "Authorization: Bearer $T2" GET http://localhost:5000/api/v1.0/intervals/1
+```
+whereas each of the following ones works:
+```
+$ curl -v -X GET -H "Authorization: Bearer $T1" GET http://localhost:5000/api/v1.0/intervals/1
+$ curl -v -X GET -H "Authorization: Bearer $T2" GET http://localhost:5000/api/v1.0/intervals/2
+```
+
+Each of the following PUT requests to
+`http://localhost:5000/api/v1.0/intervals/<int:inteval_id>` fails:
+```
+$ curl -v -X PUT -d '{"final": "2020-11-05 09:15"}' http://localhost:5000/api/v1.0/intervals/1
+
+$ curl -v -X PUT -H "Authorization: Bearer $T2" -d '{"final": "2020-11-05 09:15"}' http://localhost:5000/api/v1.0/intervals/1
+
+$ curl -v -X PUT -H "Authorization: Bearer $T2" -H "Content-Type: application/json" -d '{"final": "2020-11-05 09:15"}' http://localhost:5000/api/v1.0/intervals/1
+
+$ curl -v -X PUT -H "Authorization: Bearer $T1" -H "Content-Type: application/json" -d '{"start": "2020-11-04 18:00", "final": "2020-11-04 19:00"}' http://localhost:5000/api/v1.0/intervals/2
+
+$ curl -v -X PUT -H "Authorization: Bearer $T1" -H "Content-Type: application/json" -d '{"goal_id": "1", "start": "1111-11-04 18:00"}' http://localhost:5000/api/v1.0/intervals/4
+```
+whereas each of the following ones works:
+```
+$ curl -v -X PUT -H "Authorization: Bearer $T1" -H "Content-Type: application/json" -d '{"final": "2020-11-05 09:00"}' http://localhost:5000/api/v1.0/intervals/1
+$ curl -v -X PUT -H "Authorization: Bearer $T2" -H "Content-Type: application/json" -d '{"start": "2020-11-04 18:00", "final": "2020-11-04 19:00"}' http://localhost:5000/api/v1.0/intervals/2
+$ curl -v -X PUT -H "Authorization: Bearer $T1" -H "Content-Type: application/json" -d '{"start": "2020-11-04 18:00", "final": "2020-11-04 19:00"}' http://localhost:5000/api/v1.0/intervals/3
+
+$ curl -v -X PUT -H "Authorization: Bearer $T1" -H "Content-Type: application/json" -d '{"goal_id": 1, "start": "1111-11-04 18:00"}' http://localhost:5000/api/v1.0/intervals/4
+```
+
+Each of the following DELETE requests to
+`http://localhost:5000/api/v1.0/intervals/<int:interval_id>` fails:
+```
+$ curl -v -X DELETE http://localhost:5000/api/v1.0/intervals/4
+$ curl -v -X DELETE -H "Authorization: Bearer $T2" http://localhost:5000/api/v1.0/intervals/4
+```
+but the following one works:
+```
+$ curl -v -X DELETE -H "Authorization: Bearer $T1" http://localhost:5000/api/v1.0/intervals/4
+```
