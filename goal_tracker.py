@@ -100,6 +100,16 @@ def parse_time(dt_str):
     return dt
 
 
+def error_response(status_code, message):
+    payload = {
+        "error": HTTP_STATUS_CODES.get(status_code),
+        "message": message,
+    }
+    r = jsonify(payload)
+    r.status_code = status_code
+    return r
+
+
 basic_auth = HTTPBasicAuth()
 
 
@@ -160,13 +170,9 @@ def get_users():
 def get_user(user_id):
     user = User.query.get(user_id)
     if user is None:
-        payload = {
-            "error": HTTP_STATUS_CODES.get(404),
-            "message": "There does not exist a user with the provided user ID.",
-        }
-        r = jsonify(payload)
-        r.status_code = 404
-        return r
+        return error_response(
+            404, "There does not exist a user with the provided user ID."
+        )
     return {"id": user.id, "email": user.email}
 
 
@@ -174,37 +180,23 @@ def get_user(user_id):
 def create_user():
     # Check whether the client supplied all required arguments.
     if not request.json:
-        payload = {
-            "error": HTTP_STATUS_CODES.get(400),
-            "message": (
-                'Your request did not include a "Content-Type: application/json"'
-                " header."
-            ),
-        }
-        r = jsonify(payload)
-        r.status_code = 400
-        return r
+        return error_response(
+            400,
+            'Your request did not include a "Content-Type: application/json" header.',
+        )
 
     email = request.json.get("email")
     password = request.json.get("password")
     if email is None or password is None:
-        payload = {
-            "error": HTTP_STATUS_CODES.get(400),
-            "message": "The request body must include both an email and a password.",
-        }
-        r = jsonify(payload)
-        r.status_code = 400
-        return r
+        return error_response(
+            400, "The request body must include both an email and a password."
+        )
 
     # Prevent the to-be-created user from using the email of any existing user.
     if User.query.filter_by(email=email).first() is not None:
-        payload = {
-            "error": HTTP_STATUS_CODES.get(400),
-            "message": "There already exists a user with the provided email.",
-        }
-        r = jsonify(payload)
-        r.status_code = 400
-        return r
+        return error_response(
+            400, "There already exists a user with the provided email."
+        )
 
     # Create a new user.
     user = User(email=email)
@@ -223,44 +215,26 @@ def create_user():
 def edit_user(user_id):
     user = User.query.get_or_404(user_id)  # NB! Content-Type: text/html; charset=utf-8
     if user != basic_auth.current_user():
-        payload = {
-            "error": HTTP_STATUS_CODES.get(403),
-            "message": "You may not edit any user's account other than your own.",
-        }
-        r = jsonify(payload)
-        r.status_code = 403
-        return r
+        return error_response(
+            403, "You may not edit any user's account other than your own."
+        )
 
     # Check whether the client supplied admissible arguments.
     if not request.json:
-        payload = {
-            "error": HTTP_STATUS_CODES.get(400),
-            "message": (
-                'Your request did not include a "Content-Type: application/json"'
-                " header."
-            ),
-        }
-        r = jsonify(payload)
-        r.status_code = 400
-        return r
+        return error_response(
+            400,
+            'Your request did not include a "Content-Type: application/json" header.',
+        )
 
     email = request.json.get("email")
     if email and type(email) is not str:
-        payload = {
-            "error": HTTP_STATUS_CODES.get(400),
-            "message": "If an email is provided in the request body, it must be a string.",
-        }
-        r = jsonify(payload)
-        r.status_code = 400
-        return r
+        return error_response(
+            400, "If an email is provided in the request body, it must be a string."
+        )
     if User.query.filter_by(email=email).first() is not None:
-        payload = {
-            "error": HTTP_STATUS_CODES.get(400),
-            "message": "There already exists a user with the provided email.",
-        }
-        r = jsonify(payload)
-        r.status_code = 400
-        return r
+        return error_response(
+            400, "There already exists a user with the provided email."
+        )
 
     # Update the user.
     user.email = email or user.email
@@ -274,13 +248,9 @@ def edit_user(user_id):
 def delete_user(user_id):
     user = User.query.get_or_404(user_id)  # NB! Content-Type: text/html; charset=utf-8
     if user != basic_auth.current_user():
-        payload = {
-            "error": HTTP_STATUS_CODES.get(403),
-            "message": "You may not delete any user's account other than your own.",
-        }
-        r = jsonify(payload)
-        r.status_code = 403
-        return r
+        return error_response(
+            403, "You may not delete any user's account other than your own."
+        )
 
     db.session.delete(user)
     db.session.commit()
@@ -310,13 +280,9 @@ def get_goal(goal_id):
     goal = Goal.query.get_or_404(goal_id)  # NB! Content-Type: text/html; charset=utf-8
 
     if token_auth.current_user() != goal.user:
-        payload = {
-            "error": HTTP_STATUS_CODES.get(403),
-            "message": "You may not access goals, which do not belong to you.",
-        }
-        r = jsonify(payload)
-        r.status_code = 403
-        return r
+        return error_response(
+            403, "You may not access goals, which do not belong to you."
+        )
 
     return {"id": goal.id, "description": goal.description}
 
@@ -326,40 +292,22 @@ def get_goal(goal_id):
 def create_goal():
     # Check whether the client supplied all required arguments.
     if not request.json:
-        payload = {
-            "error": HTTP_STATUS_CODES.get(400),
-            "message": (
-                'Your request did not include a "Content-Type: application/json"'
-                " header."
-            ),
-        }
-        r = jsonify(payload)
-        r.status_code = 400
-        return r
+        return error_response(
+            400,
+            'Your request did not include a "Content-Type: application/json header.',
+        )
 
     description = request.json.get("description")
     if description is None or type(description) is not str:
-        payload = {
-            "error": HTTP_STATUS_CODES.get(400),
-            "message": (
-                "The request body must include a description, which must be a string."
-            ),
-        }
-        r = jsonify(payload)
-        r.status_code = 400
-        return r
+        return error_response(
+            400, "The request body must include a description, which must be a string."
+        )
 
     if (
         token_auth.current_user().goals.filter_by(description=description).first()
         is not None
     ):
-        payload = {
-            "error": HTTP_STATUS_CODES.get(400),
-            "message": "You already have a goal with the same description.",
-        }
-        r = jsonify(payload)
-        r.status_code = 403
-        return r
+        return error_response(403, "You already have a goal with the same description.")
 
     # Create a new goal for the logged-in user.
     goal = Goal(description=description)
@@ -377,53 +325,36 @@ def create_goal():
 def edit_goal(goal_id):
     goal = token_auth.current_user().goals.filter_by(id=goal_id).first()
     if goal is None:
-        payload = {
-            "error": HTTP_STATUS_CODES.get(400),  # TODO: find out if this is suitable
-            "message": "You may only edit goals that both exist and belong to you.",
-        }
-        r = jsonify(payload)
-        r.status_code = 400
-        return r
+        # TODO: find out if the following status code is suitable
+        return error_response(
+            400, "You may only edit goals that both exist and belong to you."
+        )
 
     # Check whether the client supplied admissible arguments.
     if not request.json:
-        payload = {
-            "error": HTTP_STATUS_CODES.get(400),
-            "message": (
-                'Your request did not include a "Content-Type: application/json"'
-                " header."
-            ),
-        }
-        r = jsonify(payload)
-        r.status_code = 400
-        return r
+        return error_response(
+            400,
+            'Your request did not include a "Content-Type: application/json" header.',
+        )
 
     description = request.json.get("description")
     if description is not None:
         if type(description) is not str:
-            payload = {
-                "error": HTTP_STATUS_CODES.get(400),
-                "message": (
-                    "If a description is provided in the request body, it must be a string."
-                ),
-            }
-            r = jsonify(payload)
-            r.status_code = 400
-            return r
+            return error_response(
+                400,
+                "If a description is provided in the request body, it must be a string.",
+            )
         elif (
             token_auth.current_user().goals.filter_by(description=description).first()
             is not None
         ):
-            payload = {
-                "error": HTTP_STATUS_CODES.get(403),
-                "message": (
+            return error_response(
+                403,
+                (
                     "You already have a goal, whose description coincides with what you"
                     " provided in the request payload."
                 ),
-            }
-            r = jsonify(payload)
-            r.status_code = 403
-            return r
+            )
 
     # Update the goal.
     goal.description = description or goal.description
@@ -437,13 +368,10 @@ def edit_goal(goal_id):
 def delete_goal(goal_id):
     goal = token_auth.current_user().goals.filter_by(id=goal_id).first()
     if goal is None:
-        payload = {
-            "error": HTTP_STATUS_CODES.get(400),  # TODO: find out if this is suitable
-            "message": "You may only delete goals that both exist and belong to you.",
-        }
-        r = jsonify(payload)
-        r.status_code = 400
-        return r
+        # TODO: find out if the following status code is suitable
+        return error_response(
+            400, "You may only delete goals that both exist and belong to you."
+        )
 
     db.session.delete(goal)
     db.session.commit()
@@ -485,13 +413,7 @@ def get_interval(interval_id):
             ' that is associated with the provided "interval_id".'
         )
     if message is not None:
-        payload = {
-            "error": HTTP_STATUS_CODES.get(400),
-            "message": message,
-        }
-        r = jsonify(payload)
-        r.status_code = 400
-        return r
+        return error_response(400, message)
 
     return {
         "id": interval.id,
@@ -506,104 +428,49 @@ def get_interval(interval_id):
 def create_interval():
     # Check whether the client supplied all required arguments.
     if not request.json:
-        payload = {
-            "error": HTTP_STATUS_CODES.get(400),
-            "message": (
+        return error_response(
+            400,
+            (
                 'Your request did not include a "Content-Type: application/json"'
                 " header."
             ),
-        }
-        r = jsonify(payload)
-        r.status_code = 400
-        return r
+        )
 
     goal_id = request.json.get("goal_id")
     if goal_id is None or not isinstance(goal_id, int):
-        payload = {
-            "error": HTTP_STATUS_CODES.get(400),
-            "message": "The request body must include a goal_id, which must be an int.",
-        }
-        r = jsonify(payload)
-        r.status_code = 400
-        return r
+        return error_response(
+            400, "The request body must include a goal_id, which must be an int."
+        )
     if token_auth.current_user().goals.filter_by(id=goal_id).first() is None:
-        payload = {
-            "error": HTTP_STATUS_CODES.get(400),
-            "message": (
-                'Your user does not have a Goal resource with the provided "goal_id".'
-            ),
-        }
-        r = jsonify(payload)
-        r.status_code = 400
-        return r
+        return error_response(
+            400, 'Your user does not have a Goal resource with the provided "goal_id".'
+        )
 
     start_str = request.json.get("start")
     if start_str is None:
-        payload = {
-            "error": HTTP_STATUS_CODES.get(400),
-            "message": 'The request body must include both a "start" timestamp.',
-        }
-        r = jsonify(payload)
-        r.status_code = 400
-        return r
+        return error_response(
+            400, 'The request body must include both a "start" timestamp.'
+        )
     else:
         try:
             start = parse_time(start_str)
         except ValueError:
-            payload = {
-                "error": HTTP_STATUS_CODES.get(400),
-                "message": '"start" must match the format "YYYY-MM-DD HH:MM".',
-            }
-            r = jsonify(payload)
-            r.status_code = 400
-            return r
+            return error_response(
+                400, '"start" must match the format "YYYY-MM-DD HH:MM".'
+            )
 
     final_str = request.json.get("final")
     if final_str is None:
-        payload = {
-            "error": HTTP_STATUS_CODES.get(400),
-            "message": 'The request body must include both a "final" timestamp.',
-        }
-        r = jsonify(payload)
-        r.status_code = 400
-        return r
+        return error_response(
+            400, 'The request body must include both a "final" timestamp.'
+        )
     else:
         try:
             final = parse_time(final_str)
         except ValueError:
-            payload = {
-                "error": HTTP_STATUS_CODES.get(400),
-                "message": '"final" must match the format "YYYY-MM-DD HH:MM".',
-            }
-            r = jsonify(payload)
-            r.status_code = 400
-            return r
-
-    # fmt: off
-    '''
-    final_str = request.json.get("final")
-    try:
-        message = None
-        start = datetime.datetime.strptime(start_str, "%Y-%m-%d %H:%M")
-        final = datetime.datetime.strptime(final_str, "%Y-%m-%d %H:%M")
-    except TypeError:
-        message = (
-            'The request body must include both a "start" and a "final" timestamp.'
-        )
-    except ValueError:
-        message = (
-            'Each of "start" and "final" must match the format "YYYY-MM-DD HH:MM".'
-        )
-    if message is not None:
-        payload = {
-            "error": HTTP_STATUS_CODES.get(400),
-            "message": message,
-        }
-        r = jsonify(payload)
-        r.status_code = 400
-        return r
-    '''
-    # fmt: on
+            return error_response(
+                400, '"final" must match the format "YYYY-MM-DD HH:MM".'
+            )
 
     interval = Interval(start=start, final=final, goal_id=goal_id)
     db.session.add(interval)
@@ -624,16 +491,10 @@ def create_interval():
 @token_auth.login_required
 def edit_interval(interval_id):
     if not request.json:
-        payload = {
-            "error": HTTP_STATUS_CODES.get(400),
-            "message": (
-                'Your request did not include a "Content-Type: application/json"'
-                " header."
-            ),
-        }
-        r = jsonify(payload)
-        r.status_code = 400
-        return r
+        return error_response(
+            400,
+            'Your request did not include a "Content-Type: application/json header.',
+        )
 
     # Check whether the client supplied a valid interval_id (as part of the URL).
     interval = Interval.query.get(interval_id)
@@ -650,37 +511,19 @@ def edit_interval(interval_id):
             ' that is associated with the provided "interval_id".'
         )
     if message is not None:
-        payload = {
-            "error": HTTP_STATUS_CODES.get(400),
-            "message": message,
-        }
-        r = jsonify(payload)
-        r.status_code = 400
-        return r
+        return error_response(400, message)
 
     # Check whether the client supplied all required arguments in the request body.
     goal_id = request.json.get("goal_id") or interval.goal_id
     if not isinstance(goal_id, int):
-        payload = {
-            "error": HTTP_STATUS_CODES.get(400),
-            "message": 'If the request body includes "goal_id", it must be an integer.',
-        }
-        r = jsonify(payload)
-        r.status_code = 400
-        return r
+        return error_response(
+            400, 'If the request body includes "goal_id", it must be an integer.'
+        )
     if token_auth.current_user().goals.filter_by(id=goal_id).first() is None:
-        payload = {
-            "error": HTTP_STATUS_CODES.get(400),
-            "message": (
-                'Your user does not have a Goal resource with the provided "goal_id".'
-            ),
-        }
-        r = jsonify(payload)
-        r.status_code = 400
-        return r
+        return error_response(
+            400, 'Your user does not have a Goal resource with the provided "goal_id".'
+        )
 
-    # TODO: extract an `error_response` function, and utilize it in the next block
-    #       as well as throughout the codebase
     start_str = request.json.get("start")
     if start_str is None:
         start = None
@@ -688,15 +531,9 @@ def edit_interval(interval_id):
         try:
             start = parse_time(start_str)
         except ValueError:
-            payload = {
-                "error": HTTP_STATUS_CODES.get(400),
-                "message": (
-                    'If provided, "start" must match the format "YYYY-MM-DD HH:MM".'
-                ),
-            }
-            r = jsonify(payload)
-            r.status_code = 400
-            return r
+            return error_response(
+                400, 'If provided, "start" must match the format "YYYY-MM-DD HH:MM".'
+            )
 
     final_str = request.json.get("final")
     if final_str is None:
@@ -705,15 +542,9 @@ def edit_interval(interval_id):
         try:
             final = parse_time(final_str)
         except ValueError:
-            payload = {
-                "error": HTTP_STATUS_CODES.get(400),
-                "message": (
-                    'If provided, "final" must match the format "YYYY-MM-DD HH:MM".'
-                ),
-            }
-            r = jsonify(payload)
-            r.status_code = 400
-            return r
+            return error_response(
+                400, 'If provided, "final" must match the format "YYYY-MM-DD HH:MM".'
+            )
 
     # Update the interval.
     interval.start = start or interval.start
@@ -746,13 +577,7 @@ def delete_interval(interval_id):
             ' that is associated with the provided "interval_id".'
         )
     if message is not None:
-        payload = {
-            "error": HTTP_STATUS_CODES.get(400),
-            "message": message,
-        }
-        r = jsonify(payload)
-        r.status_code = 400
-        return r
+        return error_response(400, message)
 
     db.session.delete(interval)
     db.session.commit()

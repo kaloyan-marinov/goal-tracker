@@ -18,7 +18,7 @@ from goal_tracker import app, db, User
 app.config["TESTING"] = True
 
 
-class GoalTrackerTests(unittest.TestCase):
+class TestBase(unittest.TestCase):
     def setUp(self):
         db.drop_all()  # just in case
         db.create_all()
@@ -121,6 +121,10 @@ class GoalTrackerTests(unittest.TestCase):
         #       other helper methods in this class
 
         return body, rv.status_code, rv.headers
+
+
+class TestUsersAndGoals(TestBase):
+    """Test User and Goal resources."""
 
     def test_content_type(self):
         # Attempt to create a user by providing the wrong Content-Type.
@@ -479,13 +483,11 @@ class GoalTrackerTests(unittest.TestCase):
         self.assertEqual(s, 400)
 
 
-class TestIntervals(unittest.TestCase):
+class TestIntervals(TestBase):
     """Test Interval resources."""
 
     def setUp(self):
-        db.drop_all()  # just in case
-        db.create_all()
-        self.client = app.test_client()
+        super().setUp()
 
         self.token_4_john_doe, self.token_4_mary_smith = self.create_users_and_tokens()
 
@@ -504,79 +506,29 @@ class TestIntervals(unittest.TestCase):
             {"email": "john.doe@gmail.com", "password": "123456"},
             {"email": "mary.smith@yahoo.com", "password": "789"},
         ]:
-            data_str = json.dumps(data)
-            res = self.client.post(
-                "/api/v1.0/users",
-                data=data_str,
-                headers={
-                    "Accept": "application/json",
-                    "Content-Type": "application/json",
-                },
-            )
+            r, s, h = self.post("/api/v1.0/users", data=data)
 
-        res = self.client.post(
-            "/api/v1.0/tokens",
-            headers={
-                "Accept": "application/json",
-                "Content-Type": "application/json",
-                "Authorization": (
-                    "Basic "
-                    + base64.b64encode(
-                        "john.doe@gmail.com:123456".encode("utf-8")
-                    ).decode("utf-8")
-                ),
-            },
-        )
-        payload = json.loads(res.get_data(as_text=True))
-        token_4_john_doe = payload["token"]
+        r, s, h = self.post("/api/v1.0/tokens", basic_auth="john.doe@gmail.com:123456",)
+        token_4_john_doe = r["token"]
 
-        res = self.client.post(
-            "/api/v1.0/tokens",
-            headers={
-                "Accept": "application/json",
-                "Content-Type": "application/json",
-                "Authorization": (
-                    "Basic "
-                    + base64.b64encode(
-                        "mary.smith@yahoo.com:789".encode("utf-8")
-                    ).decode("utf-8")
-                ),
-            },
-        )
-        payload = json.loads(res.get_data(as_text=True))
-        token_4_mary_smith = payload["token"]
+        r, s, h = self.post("/api/v1.0/tokens", basic_auth="mary.smith@yahoo.com:789",)
+        token_4_mary_smith = r["token"]
 
         return token_4_john_doe, token_4_mary_smith
 
     def create_goal(self, token, description):
-        data_str = json.dumps({"description": description})
-        res = self.client.post(
-            "/api/v1.0/goals",
-            data=data_str,
-            headers={
-                "Accept": "application/json",
-                "Content-Type": "application/json",
-                "Authorization": f"Bearer {token}",
-            },
+        r, s, h = self.post(
+            "/api/v1.0/goals", data={"description": description}, token_auth=token,
         )
-        payload = json.loads(res.get_data(as_text=True))
-        return res.status_code, payload
+        return s, r
 
     def tearDown(self):
         db.drop_all()
 
     def test_with_one_user(self):
         # Get all intervals.
-        res = self.client.get(
-            "/api/v1.0/intervals",
-            headers={
-                "Accept": "application/json",
-                "Content-Type": "application/json",
-                "Authorization": f"Bearer {self.token_4_john_doe}",
-            },
-        )
-        payload = json.loads(res.get_data(as_text=True))
-        self.assertEqual(res.status_code, 200)
+        r, s, h = self.get("/api/v1.0/intervals", token_auth=self.token_4_john_doe)
+        self.assertEqual(s, 200)
 
         # Create an Interval resource.
         req_payload = {
@@ -584,33 +536,17 @@ class TestIntervals(unittest.TestCase):
             "start": "2020-11-05 08:45",
             "final": "2020-11-05 09:15",
         }
-        data_str = json.dumps(req_payload)
-        res = self.client.post(
-            "/api/v1.0/intervals",
-            data=data_str,
-            headers={
-                "Accept": "application/json",
-                "Content-Type": "application/json",
-                "Authorization": f"Bearer {self.token_4_john_doe}",
-            },
+        r, s, h = self.post(
+            "/api/v1.0/intervals", data=req_payload, token_auth=self.token_4_john_doe
         )
-        payload = json.loads(res.get_data(as_text=True))
-        self.assertEqual(res.status_code, 201)
-        url_4_interval_1 = res.headers["Location"]
+        self.assertEqual(s, 201)
+        url_4_interval_1 = h["Location"]
 
         # (Now that the `intervals` table is not empty...) Get all intervals.
-        res = self.client.get(
-            "/api/v1.0/intervals",
-            headers={
-                "Accept": "application/json",
-                "Content-Type": "application/json",
-                "Authorization": f"Bearer {self.token_4_john_doe}",
-            },
-        )
-        payload = json.loads(res.get_data(as_text=True))
-        self.assertEqual(res.status_code, 200)
+        r, s, h = self.get("/api/v1.0/intervals", token_auth=self.token_4_john_doe)
+        self.assertEqual(s, 200)
         self.assertEqual(
-            payload,
+            r,
             {
                 "intervals": [
                     {
@@ -635,56 +571,30 @@ class TestIntervals(unittest.TestCase):
             {"goal_id": 1, "start": "2020-11-05 08:45", "final": "-11-05 09:15"},
             {"goal_id": 1, "start": "-11-05 08:45"},
         ]:
-            data_str = json.dumps(req_payload)
-            res = self.client.post(
+            r, s, h = self.post(
                 "/api/v1.0/intervals",
-                data=data_str,
-                headers={
-                    "Accept": "application/json",
-                    "Content-Type": "application/json",
-                    "Authorization": f"Bearer {self.token_4_john_doe}",
-                },
+                data=req_payload,
+                token_auth=self.token_4_john_doe,
             )
-            payload = json.loads(res.get_data(as_text=True))
-            self.assertEqual(res.status_code, 400)
+            self.assertEqual(s, 400)
 
         # Access an Interval resource.
-        res = self.client.get(
-            url_4_interval_1,
-            headers={
-                "Accept": "application/json",
-                "Content-Type": "application/json",
-                "Authorization": f"Bearer {self.token_4_john_doe}",
-            },
-        )
-        payload = json.loads(res.get_data(as_text=True))
-        self.assertEqual(res.status_code, 200)
+        r, s, h = self.get(url_4_interval_1, token_auth=self.token_4_john_doe)
+        self.assertEqual(s, 200)
 
         # Attempt to access an Interval resource that doesn't exist.
-        res = self.client.get(
-            url_4_interval_1.replace("/1", "/17"),
-            headers={
-                "Accept": "application/json",
-                "Content-Type": "application/json",
-                "Authorization": f"Bearer {self.token_4_john_doe}",
-            },
+        r, s, h = self.get(
+            url_4_interval_1.replace("/1", "/17"), token_auth=self.token_4_john_doe
         )
-        payload = json.loads(res.get_data(as_text=True))
-        self.assertEqual(res.status_code, 400)
+        self.assertEqual(s, 400)
 
         # Attempt to edit an Interval resource that doesn't exist.
-        data_str = json.dumps(req_payload)
-        res = self.client.put(
+        r, s, h = self.put(
             url_4_interval_1.replace("/1", "/17"),
-            data=data_str,
-            headers={
-                "Accept": "application/json",
-                "Content-Type": "application/json",
-                "Authorization": f"Bearer {self.token_4_john_doe}",
-            },
+            data=req_payload,
+            token_auth=self.token_4_john_doe,
         )
-        payload = json.loads(res.get_data(as_text=True))
-        self.assertEqual(res.status_code, 400)
+        self.assertEqual(s, 400)
 
         # Edit an Interval resource.
         for req_payload in [
@@ -692,18 +602,10 @@ class TestIntervals(unittest.TestCase):
             {"start": "2020-11-05 08:45", "goal_id": 1},
             {"final": "2020-11-05 09:15", "goal_id": 1},
         ]:
-            data_str = json.dumps(req_payload)
-            res = self.client.put(
-                url_4_interval_1,
-                data=data_str,
-                headers={
-                    "Accept": "application/json",
-                    "Content-Type": "application/json",
-                    "Authorization": f"Bearer {self.token_4_john_doe}",
-                },
+            r, s, h = self.put(
+                url_4_interval_1, data=req_payload, token_auth=self.token_4_john_doe
             )
-            payload = json.loads(res.get_data(as_text=True))
-            self.assertEqual(res.status_code, 200)
+            self.assertEqual(s, 200)
 
         # Attempt to edit an Interval resource in an invalid way.
         for req_payload in [
@@ -712,41 +614,20 @@ class TestIntervals(unittest.TestCase):
             {"goal_id": 1, "start": "-11-05 08:46"},
             {"goal_id": 1, "final": "-11-05 09:16"},
         ]:
-            data_str = json.dumps(req_payload)
-            res = self.client.put(
-                url_4_interval_1,
-                data=data_str,
-                headers={
-                    "Accept": "application/json",
-                    "Content-Type": "application/json",
-                    "Authorization": f"Bearer {self.token_4_john_doe}",
-                },
+            r, s, h = self.put(
+                url_4_interval_1, data=req_payload, token_auth=self.token_4_john_doe
             )
-            payload = json.loads(res.get_data(as_text=True))
-            self.assertEqual(res.status_code, 400)
+            self.assertEqual(s, 400)
 
         # Attempt to delete an Interval resource that doesn't exist.
-        res = self.client.delete(
-            url_4_interval_1.replace("/1", "/17"),
-            headers={
-                "Accept": "application/json",
-                "Content-Type": "application/json",
-                "Authorization": f"Bearer {self.token_4_john_doe}",
-            },
+        r, s, h = self.delete(
+            url_4_interval_1.replace("/1", "/17"), token_auth=self.token_4_john_doe
         )
-        self.assertEqual(res.status_code, 400)
+        self.assertEqual(s, 400)
 
         # Delete an Interval resource.
-        res = self.client.delete(
-            url_4_interval_1,
-            headers={
-                "Accept": "application/json",
-                "Content-Type": "application/json",
-                "Authorization": f"Bearer {self.token_4_john_doe}",
-            },
-        )
-        self.assertEqual(res.get_data(as_text=True), "")
-        self.assertEqual(res.status_code, 204)
+        r, s, h = self.delete(url_4_interval_1, token_auth=self.token_4_john_doe)
+        self.assertEqual(s, 204)
 
     def test_with_two_users(self):
         # Create an Interval resource for a goal of the first user's.
@@ -755,58 +636,30 @@ class TestIntervals(unittest.TestCase):
             "start": "2020-11-05 08:45",
             "final": "2020-11-05 09:15",
         }
-        data_str = json.dumps(req_payload)
-        res = self.client.post(
-            "/api/v1.0/intervals",
-            data=data_str,
-            headers={
-                "Accept": "application/json",
-                "Content-Type": "application/json",
-                "Authorization": f"Bearer {self.token_4_john_doe}",
-            },
+        r, s, h = self.post(
+            "/api/v1.0/intervals", data=req_payload, token_auth=self.token_4_john_doe
         )
-        payload = json.loads(res.get_data(as_text=True))
-        self.assertEqual(res.status_code, 201)
-        url_4_interval_1 = res.headers["Location"]
+        self.assertEqual(s, 201)
+        url_4_interval_1 = h["Location"]
 
         # Attempt to access an Interval resource by means of the wrong token.
-        res = self.client.get(
-            url_4_interval_1,
-            headers={
-                "Accept": "application/json",
-                "Content-Type": "application/json",
-                "Authorization": f"Bearer {self.token_4_mary_smith}",
-            },
-        )
-        payload = json.loads(res.get_data(as_text=True))
-        self.assertEqual(res.status_code, 400)
+        r, s, h = self.get(url_4_interval_1, token_auth=self.token_4_mary_smith)
+        self.assertEqual(s, 400)
 
         # Attempt to edit an Interval resource by means of the wrong token.
-        data_str = json.dumps(
-            {"start": "2020-11-05 08:46", "final": "2020-11-05 09:16", "goal_id": 2}
+        req_payload = {
+            "start": "2020-11-05 08:46",
+            "final": "2020-11-05 09:16",
+            "goal_id": 2,
+        }
+        r, s, h = self.put(
+            url_4_interval_1, data=req_payload, token_auth=self.token_4_mary_smith
         )
-        res = self.client.put(
-            url_4_interval_1,
-            data=data_str,
-            headers={
-                "Accept": "application/json",
-                "Content-Type": "application/json",
-                "Authorization": f"Bearer {self.token_4_mary_smith}",
-            },
-        )
-        payload = json.loads(res.get_data(as_text=True))
-        self.assertEqual(res.status_code, 400)
+        self.assertEqual(s, 400)
 
         # Attempt to delete an Interval resource by means of the wrong token.
-        res = self.client.delete(
-            url_4_interval_1,
-            headers={
-                "Accept": "application/json",
-                "Content-Type": "application/json",
-                "Authorization": f"Bearer {self.token_4_mary_smith}",
-            },
-        )
-        self.assertEqual(res.status_code, 400)
+        r, s, h = self.delete(url_4_interval_1, token_auth=self.token_4_mary_smith)
+        self.assertEqual(s, 400)
 
 
 if __name__ == "__main__":
