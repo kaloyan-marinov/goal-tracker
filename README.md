@@ -129,11 +129,12 @@ $    `(venv) $ flask db downgrade` which provides a very flexible framework,
 ```
 
 There are a few more useful commands that work with the migration history:
+
 ```
 # 6. get the list of migrations
 (venv) $ flask db history
 
-# 7. 
+# 7.
 (venv) $ flask db current
 ```
 
@@ -254,19 +255,24 @@ $ curl \
 # `06/backend/unit-tests`
 
 Executing the following command creates an `htmlcov` directory:
+
 ```
 (venv) $ python tests.py
 ```
+
 but neither does executing the tests through VS Code, nor does executing
+
 ```
 (venv) $ python -m unittest discover -v .
 ```
 
 To get a report of unittest coverage, first issue
+
 ```
 $ coverage run -m unittest tests.py
 $ coverage html --omit="venv/*",tests.py,"__pycache__/*"
 ```
+
 and then go on to open `htmlcov/goal_tracker.py.html`.
 
 # `07/backend/goals-resources`
@@ -350,6 +356,7 @@ $ flask db current
 ```
 
 Each of the following POST requests to `http://localhost:5000/api/v1.0/intervals` fails:
+
 ```
 $ curl \
     -v \
@@ -402,7 +409,9 @@ $ curl \
     -d '{"goal_id": 1, "start": "-11-05 08:45", "final": "2020-11-05 09:16"}' \
     http://localhost:5000/api/v1.0/intervals
 ```
+
 whereas each of the following ones works:
+
 ```
 $ curl \
     -v \
@@ -439,6 +448,7 @@ $ curl \
 
 At this point, it is possible and advisable to issue a `sqlite3 goal_tracker.db` and to
 run the following query:
+
 ```
 SELECT users.email, goals.description, intervals.id, intervals.start, intervals.final
 FROM users
@@ -447,13 +457,16 @@ FROM users
 ```
 
 Each of the following GET requests to `http://localhost:5000/api/v1.0/intervals` fails:
+
 ```
 $ curl \
     -v \
     -X GET \
     http://localhost:5000/api/v1.0/intervals
 ```
+
 whereas each of the following ones works:
+
 ```
 $ curl \
     -v \
@@ -469,6 +482,7 @@ $ curl \
 
 Each of the following GET requests to
 `http://localhost:5000/api/v1.0/intervals/<int:interval_id>` fails:
+
 ```
 $ curl \
     -v \
@@ -481,7 +495,9 @@ $ curl \
     -H "Authorization: Bearer $T2" \
     http://localhost:5000/api/v1.0/intervals/1
 ```
+
 whereas each of the following ones works:
+
 ```
 $ curl \
     -v \
@@ -497,6 +513,7 @@ $ curl \
 
 Each of the following PUT requests to
 `http://localhost:5000/api/v1.0/intervals/<int:inteval_id>` fails:
+
 ```
 $ curl \
     -v \
@@ -535,7 +552,9 @@ $ curl \
     -d '{"goal_id": "1", "start": "1111-11-04 18:00"}' \
     http://localhost:5000/api/v1.0/intervals/4
 ```
+
 whereas each of the following ones works:
+
 ```
 $ curl \
     -v \
@@ -570,6 +589,7 @@ $ curl \
 
 Each of the following DELETE requests to
 `http://localhost:5000/api/v1.0/intervals/<int:interval_id>` fails:
+
 ```
 $ curl \
     -v \
@@ -581,7 +601,9 @@ $ curl \
     -H "Authorization: Bearer $T2" \
     http://localhost:5000/api/v1.0/intervals/4
 ```
+
 but the following one works:
+
 ```
 $ curl \
     -v \
@@ -589,3 +611,7 @@ $ curl \
     -H "Authorization: Bearer $T1" \
     http://localhost:5000/api/v1.0/intervals/4
 ```
+
+# `2020/11/14/15-57/10/frontend/NavigationBar-Landing-and-static-Register-components`
+
+- https://codewithstupid.com/react-router-with-switch-and-link/
