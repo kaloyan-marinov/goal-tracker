@@ -1,7 +1,11 @@
 // import React from "react";
 import { useState, Fragment } from 'react'
+import { useDispatch } from 'react-redux'
+import { displayAlertTemporarily } from '../alerts/alertsSlice'
 
 const Register = () => {
+  const dispatch = useDispatch()
+
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -21,8 +25,7 @@ const Register = () => {
     e.preventDefault()
 
     if (password !== confirmPassword) {
-      // TODO: Display a notification in the frontend that the passwords do not match.
-      console.log(`${Date().toString()} - Passwords do not match.`)
+      dispatch(displayAlertTemporarily('PASSWORDS DO NOT MATCH'))
     } else {
       // TODO: Make a request for creating a new user to the backend.
       console.log(`${Date().toString()}`)
