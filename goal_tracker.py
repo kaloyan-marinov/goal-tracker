@@ -160,10 +160,19 @@ def token_auth_error():
     return r
 
 
+@app.route("/api/v1.0/user", methods=["GET"])
+@token_auth.login_required
+def get_user_details():
+    return {
+        "id": token_auth.current_user().id,
+        "email": token_auth.current_user().email,
+    }
+
+
 @app.route("/api/v1.0/users", methods=["GET"])
 def get_users():
     users = User.query.all()
-    return {"users": [{"id": u.id, "email": u.email} for u in users]}
+    return {"users": [{"id": u.id} for u in users]}
 
 
 @app.route("/api/v1.0/users/<int:user_id>", methods=["GET"])
@@ -173,7 +182,7 @@ def get_user(user_id):
         return error_response(
             404, "There does not exist a user with the provided user ID."
         )
-    return {"id": user.id, "email": user.email}
+    return {"id": user.id}
 
 
 @app.route("/api/v1.0/users", methods=["POST"])

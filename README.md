@@ -615,3 +615,63 @@ $ curl \
 # `2020/11/14/15-57/10/frontend/NavigationBar-Landing-and-static-Register-components`
 
 - https://codewithstupid.com/react-router-with-switch-and-link/
+
+# `2020/12/10/17_04/12/backend/improve-privacy-protection-when-accessing-user-resources`
+
+Temporarily, create a new user:
+
+```
+$ curl \
+    -v \
+    -X POST \
+    -H "Content-Type: application/json" \
+    -d '{"email": "name@domain.ext", "password": "temporary-user"}' \
+    http://localhost:5000/api/v1.0/users
+$ export ID=<the-id-of-the-user>
+```
+
+and issue a token for that user:
+
+```
+$ curl \
+    -v \
+    -X POST \
+    -H "Content-Type: application/json" \
+    -u name@domain.ext:temporary-user \
+    http://localhost:5000/api/v1.0/tokens
+$ export T1=<the-returned-JWS-token>
+```
+
+Whereas `curl` makes this request to a publicly available endpoint and, correspondingly,
+the response contains only public information (about the user, who is identified as
+part of the URL):
+
+```
+$ curl \
+    -v \
+    -X GET \
+    http://localhost:5000/api/v1.0/users/$ID
+```
+
+`curl` makes the following request to a **protected** endpoint and, correspondingly, the
+response contains private information (about the user, who is authenticated and
+authorized via the **required** JSON web token):
+
+```
+$ curl \
+    -v \
+    -X GET \
+    -H "Authorization: Bearer $T1" \
+    http://localhost:5000/api/v1.0/user
+```
+
+Finally, since we said the created user was going to be created only for temporary use,
+let us now go ahead and delete the user:
+
+```
+$ curl \
+    -v \
+    -X DELETE \
+    --user name@domain.ext:temporary-user \
+    http://localhost:5000/api/v1.0/users/$ID
+```

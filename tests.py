@@ -180,6 +180,7 @@ class TestUsersAndGoals(TestBase):
         # Get all users.
         r, s, h = self.get("/api/v1.0/users")
         self.assertEqual(s, 200)
+        self.assertEqual(r, {"users": []})
 
         # Get a user that doesn't exist.
         r, s, h = self.get("/api/v1.0/users/1")
@@ -193,22 +194,30 @@ class TestUsersAndGoals(TestBase):
         self.assertEqual(s, 201)
         url_4_created_user = h["Location"]
 
-        # Create a duplicate user.
+        # Attempt to create a duplicate user.
         r, s, h = self.post(
             "/api/v1.0/users", data={"email": "john.doe@yahoo.com", "password": "789"}
         )
         self.assertEqual(s, 400)
+        self.assertEqual(
+            r,
+            {
+                "error": "Bad Request",
+                "message": "There already exists a user with the provided email.",
+            },
+        )
 
         # Create an incomplete user.
-        r, s, h = self.post("/api/v1.0/users", data={"email": "mary.smith@yahoo.com"},)
+        r, s, h = self.post("/api/v1.0/users", data={"email": "mary.smith@yahoo.com"})
         self.assertEqual(s, 400)
 
-        r, s, h = self.post("/api/v1.0/users", data={"password": "123456"},)
+        r, s, h = self.post("/api/v1.0/users", data={"password": "123456"})
         self.assertEqual(s, 400)
 
         # Get an existing user.
         r, s, h = self.get(url_4_created_user)
         self.assertEqual(s, 200)
+        self.assertEqual(r, {"id": 1})
 
         # Modify an existing user.
         r, s, h = self.put(
@@ -227,7 +236,7 @@ class TestUsersAndGoals(TestBase):
         self.assertEqual(s, 400)
 
         # Modify an existing user in an invalid way, by providing an email that is
-        # currently associate with some user (who MAY be the one making the HTTP
+        # currently associated with some user (who MAY be the one making the HTTP
         # request).
         r, s, h = self.put(
             url_4_created_user,
@@ -261,6 +270,11 @@ class TestUsersAndGoals(TestBase):
         )
         self.assertEqual(s, 201)
         url_4_mary_smith = h["Location"]
+
+        # Get both users.
+        r, s, h = self.get("/api/v1.0/users")
+        self.assertEqual(s, 200)
+        self.assertEqual(r, {"users": [{"id": 1}, {"id": 2}]})
 
         # Have one user attempt to modify another user.
         r, s, h = self.put(
@@ -298,6 +312,12 @@ class TestUsersAndGoals(TestBase):
             token_auth=token,  # TODO: consider renaming this kwarg to `bearer_token`
         )
         self.assertEqual(s, 200)
+        self.assertEqual(r, {"goals": []})
+
+        # Access another token-restricted resource.
+        r, s, h = self.get("/api/v1.0/user", token_auth=token)
+        self.assertEqual(s, 200)
+        self.assertEqual(r, {"id": 1, "email": "john.doe@gmail.com"})
 
         # Verify that a JWS token, which contains a non-existent user ID, is invalid.
         with patch("flask_sqlalchemy.BaseQuery.get_or_404", return_value=None) as m:
