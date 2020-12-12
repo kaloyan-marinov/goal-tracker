@@ -3,6 +3,10 @@ import { useSelector } from 'react-redux'
 
 const Alert = () => {
   const alerts = useSelector((state) => state.alerts.entities)
+  /*
+  TODO: find the commit that added the previous instruction,
+        and figure out why it didn't define a selector function in authSlice.js
+  */
 
   return (
     alerts !== null &&

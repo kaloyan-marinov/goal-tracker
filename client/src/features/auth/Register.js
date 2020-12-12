@@ -2,9 +2,15 @@
 import { useState, Fragment } from 'react'
 import { useDispatch } from 'react-redux'
 import { displayAlertTemporarily } from '../alerts/alertsSlice'
+import { register, issueJWSToken } from './authSlice'
+import { useSelector } from 'react-redux'
+import { selectIsAuthenticated } from './authSlice'
+import { Redirect } from 'react-router-dom'
+import { loadUser } from './authSlice'
 
 const Register = () => {
   const dispatch = useDispatch()
+  const isAuthenticated = useSelector(selectIsAuthenticated)
 
   const [formData, setFormData] = useState({
     email: '',
@@ -21,16 +27,22 @@ const Register = () => {
     })
   }
 
-  const onSubmit = (e) => {
+  const onSubmit = async (e) => {
+    // TODO: identify the commit where the `async` should have _first_ been added to the previous line, and add it there
     e.preventDefault()
 
     if (password !== confirmPassword) {
       dispatch(displayAlertTemporarily('PASSWORDS DO NOT MATCH'))
     } else {
-      // TODO: Make a request for creating a new user to the backend.
-      console.log(`${Date().toString()}`)
-      console.log(formData)
+      dispatch(register(email, password))
+        .then(() => dispatch(issueJWSToken(email, password)))
+        .then(() => dispatch(loadUser()))
+        .catch(() => {})
     }
+  }
+
+  if (isAuthenticated) {
+    return <Redirect to="/dashboard" />
   }
 
   return (
@@ -44,7 +56,7 @@ const Register = () => {
             name="email"
             value={email}
             onChange={(e) => onChange(e)}
-            required
+            // required // disabled temporarily, to test the server side
           />
         </div>
         <div>

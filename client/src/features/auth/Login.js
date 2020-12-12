@@ -1,7 +1,17 @@
 // import React from "react";
 import { useState, Fragment } from 'react'
+import { useDispatch } from 'react-redux'
+import { issueJWSToken } from './authSlice'
+import { useSelector } from 'react-redux'
+import { selectIsAuthenticated } from './authSlice'
+import { Redirect } from 'react-router-dom'
+import { loadUser } from './authSlice'
+import { displayAlertTemporarily } from '../alerts/alertsSlice'
 
 const Login = () => {
+  const dispatch = useDispatch()
+  const isAuthenticated = useSelector(selectIsAuthenticated)
+
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -16,11 +26,17 @@ const Login = () => {
     })
   }
 
-  const onSubmit = (e) => {
+  const onSubmit = async (e) => {
+    // TODO: identify the commit where the `async` should have _first_ been added to the previous line, and add it there
     e.preventDefault()
 
-    console.log(`${Date().toString()} - form submitted`)
-    console.log(formData)
+    dispatch(issueJWSToken(email, password))
+      .then(() => dispatch(loadUser()))
+      .catch(() => dispatch(displayAlertTemporarily('AUTHENTICATION FAILED')))
+  }
+
+  if (isAuthenticated) {
+    return <Redirect to="/dashboard" />
   }
 
   return (
@@ -34,7 +50,7 @@ const Login = () => {
             name="email"
             value={email}
             onChange={(e) => onChange(e)}
-            required
+            // required // disabled temporarily, to test the server side
           />
         </div>
         <div>
