@@ -303,7 +303,7 @@ def create_goal():
     if not request.json:
         return error_response(
             400,
-            'Your request did not include a "Content-Type: application/json header.',
+            'Your request did not include a "Content-Type: application/json" header.',
         )
 
     description = request.json.get("description")
@@ -311,6 +311,8 @@ def create_goal():
         return error_response(
             400, "The request body must include a description, which must be a string."
         )
+    elif description == "":
+        return error_response(400, "The description must be a non-empty string.")
 
     if (
         token_auth.current_user().goals.filter_by(description=description).first()
@@ -352,6 +354,12 @@ def edit_goal(goal_id):
             return error_response(
                 400,
                 "If a description is provided in the request body, it must be a string.",
+            )
+        elif description == "":
+            return error_response(
+                400,
+                "If a description is provided in the request body, it must be a"
+                " non-empty string.",
             )
         elif (
             token_auth.current_user().goals.filter_by(description=description).first()
@@ -502,7 +510,7 @@ def edit_interval(interval_id):
     if not request.json:
         return error_response(
             400,
-            'Your request did not include a "Content-Type: application/json header.',
+            'Your request did not include a "Content-Type: application/json" header.',
         )
 
     # Check whether the client supplied a valid interval_id (as part of the URL).

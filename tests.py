@@ -386,6 +386,18 @@ class TestUsersAndGoals(TestBase):
         )
         self.assertEqual(s, 400)
 
+        r, s, h = self.post(
+            "/api/v1.0/goals", data={"description": ""}, token_auth=token_4_john_doe
+        )
+        self.assertEqual(s, 400)
+        self.assertEqual(
+            r,
+            {
+                "error": "Bad Request",
+                "message": "The description must be a non-empty string.",
+            },
+        )
+
         # Retrieve a single one of the user's goals.
         r, s, h = self.get(url_4_john_doe_goal_1, token_auth=token_4_john_doe)
         self.assertEqual(s, 200)
@@ -411,6 +423,21 @@ class TestUsersAndGoals(TestBase):
             token_auth=token_4_john_doe,
         )
         self.assertEqual(s, 400)
+
+        r, s, h = self.put(
+            url_4_john_doe_goal_1, data={"description": ""}, token_auth=token_4_john_doe
+        )
+        self.assertEqual(s, 400)
+        self.assertEqual(
+            r,
+            {
+                "error": "Bad Request",
+                "message": (
+                    "If a description is provided in the request body, it must be a"
+                    " non-empty string."
+                ),
+            },
+        )
 
         # Edit a goal in an invalid way, by providing a duplicate description.
         r, s, h = self.put(
