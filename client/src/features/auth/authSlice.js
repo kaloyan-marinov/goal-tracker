@@ -97,7 +97,7 @@ export default function authReducer(state = initialState, action) {
         isAuthenticated: false,
         currentUser: null,
       }
-    }
+    } /* end: auth/logout */
 
     default:
       return state
@@ -165,7 +165,7 @@ export const register = (email, password) => async (dispatch) => {
     const response = await axios.post('/api/v1.0/users', body, config)
     dispatch(registerFulfilled())
 
-    dispatch(displayAlertTemporarily('[YOU HAVE SUCCESSFULLY REGISTERED]'))
+    dispatch(displayAlertTemporarily('YOU HAVE SUCCESSFULLY REGISTERED'))
 
     return Promise.resolve()
   } catch (error) {

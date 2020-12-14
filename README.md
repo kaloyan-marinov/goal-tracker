@@ -675,3 +675,14 @@ $ curl \
     --user name@domain.ext:temporary-user \
     http://localhost:5000/api/v1.0/users/$ID
 ```
+
+# `2020/12/14/07_30/15/frontend/fix-an-erroneous-usage-of-a-Link-component`
+
+According to https://stackoverflow.com/questions/4855168/what-is-href-and-why-is-it-used :
+
+- The main use of anchor tags - `<a></a>` - is as hyperlinks.
+- The href property is required only for an anchor to actually be a hyperlink!
+- `href="#some-id"` would scroll to an element on the current page such as `<div id="some-id">`.
+- `href="//site.com/#some-id"` would go to `site.com` and scroll to the id on that page.
+- `href="#"` doesn't specify an id name, but does have a corresponding location - the top of the page. Clicking an anchor with `href="#"` will move the scroll position to the top.
+- An example where a hyperlink placeholder makes sense is within template previews... the best solution for hyperlink placeholders is actually `href="#!"`. The idea here is that there hopefully isn't an element on the page with `id="!"` ... and the hyperlink therefore refers to nothing - so nothing happens.

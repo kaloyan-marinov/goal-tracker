@@ -19,7 +19,9 @@ const NavigationBar = () => {
         <Link to="/dashboard">Dashboard</Link>
       </li>
       <li>
-        <Link onClick={() => dispatch(logout())}>Logout</Link>
+        <a href="#!" onClick={() => dispatch(logout())}>
+          Logout
+        </a>
       </li>
     </ul>
   ) : (
