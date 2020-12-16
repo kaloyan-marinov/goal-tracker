@@ -9,12 +9,12 @@ import './App.css'
 import Alert from './features/alerts/Alert'
 import { useDispatch } from 'react-redux'
 import { useEffect } from 'react'
-import { loadUser } from './features/auth/authSlice'
+import { fetchUser } from './features/auth/authSlice'
 
 const App = () => {
   const dispatch = useDispatch()
 
-  useEffect(() => dispatch(loadUser()), [])
+  useEffect(() => dispatch(fetchUser()), [])
 
   return (
     <BrowserRouter>

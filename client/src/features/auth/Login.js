@@ -5,7 +5,7 @@ import { issueJWSToken } from './authSlice'
 import { useSelector } from 'react-redux'
 import { selectIsAuthenticated } from './authSlice'
 import { Redirect } from 'react-router-dom'
-import { loadUser } from './authSlice'
+import { fetchUser } from './authSlice'
 import { displayAlertTemporarily } from '../alerts/alertsSlice'
 
 const Login = () => {
@@ -31,7 +31,7 @@ const Login = () => {
     e.preventDefault()
 
     dispatch(issueJWSToken(email, password))
-      .then(() => dispatch(loadUser()))
+      .then(() => dispatch(fetchUser()))
       .catch(() => dispatch(displayAlertTemporarily('AUTHENTICATION FAILED')))
   }
 

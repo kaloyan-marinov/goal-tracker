@@ -2,11 +2,11 @@
 import { useState, Fragment } from 'react'
 import { useDispatch } from 'react-redux'
 import { displayAlertTemporarily } from '../alerts/alertsSlice'
-import { register, issueJWSToken } from './authSlice'
+import { createUser, issueJWSToken } from './authSlice'
 import { useSelector } from 'react-redux'
 import { selectIsAuthenticated } from './authSlice'
 import { Redirect } from 'react-router-dom'
-import { loadUser } from './authSlice'
+import { fetchUser } from './authSlice'
 
 const Register = () => {
   const dispatch = useDispatch()
@@ -34,9 +34,9 @@ const Register = () => {
     if (password !== confirmPassword) {
       dispatch(displayAlertTemporarily('PASSWORDS DO NOT MATCH'))
     } else {
-      dispatch(register(email, password))
+      dispatch(createUser(email, password))
         .then(() => dispatch(issueJWSToken(email, password)))
-        .then(() => dispatch(loadUser()))
+        .then(() => dispatch(fetchUser()))
         .catch(() => {})
     }
   }

@@ -10,36 +10,36 @@ const initialState = {
 
 export default function authReducer(state = initialState, action) {
   switch (action.type) {
-    case 'auth/registerPending': {
+    case 'auth/createUser/pending': {
       return {
         ...state,
         requestStatus: 'loading',
       }
-    } /* end: auth/registerPending */
+    } /* end: auth/createUser/pending */
 
-    case 'auth/registerFulfilled': {
+    case 'auth/createUser/fulfilled': {
       return {
         ...state,
         requestStatus: 'succeeded', // TODO: find the commit where this was added and replace the "fulfilled" in that commit with "succeeded"
       }
-    } /* end: auth/registerFulfilled */
+    } /* end: auth/createUser/fulfilled */
 
-    case 'auth/registerRejected': {
+    case 'auth/createUser/rejected': {
       return {
         ...state,
         requestStatus: 'failed',
         // error: action.error, // TODO: find out if this should be added (or should have first been added) to the "implement an authSlice, and within that a register() "thunk action" + dispatch register() from <Register>" commit
       }
-    } /* end: auth/registerRejected */
+    } /* end: auth/createUser/rejected */
 
-    case 'auth/issueJWSTokenPending': {
+    case 'auth/issueJWSToken/pending': {
       return {
         ...state,
         requestStatus: 'loading',
       }
-    } /* end: auth/issueJWSTokenPending */
+    } /* end: auth/issueJWSToken/pending */
 
-    case 'auth/issueJWSTokenFulfilled': {
+    case 'auth/issueJWSToken/fulfilled': {
       const token = action.payload
 
       localStorage.setItem('goal-tracker-token', token)
@@ -50,24 +50,24 @@ export default function authReducer(state = initialState, action) {
         token,
         isAuthenticated: true,
       }
-    } /* end: auth/issueJWSTokenFulfilled */
+    } /* end: auth/issueJWSToken/fulfilled */
 
-    case 'auth/issueJWSTokenRejected': {
+    case 'auth/issueJWSToken/rejected': {
       return {
         ...state,
         requestStatus: 'failed',
         // error: action.error, // find out if this should be added (or should have first been added) to the commit that adds this case
       }
-    } /* end: auth/issueJWSTokenRejected */
+    } /* end: auth/issueJWSToken/rejected */
 
-    case 'auth/loadUserPending': {
+    case 'auth/fetchUser/pending': {
       return {
         ...state,
         requestStatus: 'loading',
       }
-    } /* end: auth/loadUserPending */
+    } /* end: auth/fetchUser/pending */
 
-    case 'auth/loadUserFulfilled': {
+    case 'auth/fetchUser/fulfilled': {
       const user = action.payload
 
       return {
@@ -76,14 +76,14 @@ export default function authReducer(state = initialState, action) {
         isAuthenticated: true,
         currentUser: user,
       }
-    } /* end: auth/loadUserFulfilled */
+    } /* end: auth/fetchUser/fulfilled */
 
-    case 'auth/loadUserRejected': {
+    case 'auth/fetchUser/rejected': {
       return {
         ...state,
         requestStatus: 'failed',
       }
-    } /* end: auth/loadUserRejected */
+    } /* end: auth/fetchUser/rejected */
 
     case 'auth/logout': {
       localStorage.removeItem('goal-tracker-token')
@@ -105,44 +105,44 @@ export default function authReducer(state = initialState, action) {
 }
 
 /* Action creator functions */
-const registerPending = () => ({
-  type: 'auth/registerPending',
+const createUserPending = () => ({
+  type: 'auth/createUser/pending',
 })
 
-const registerFulfilled = () => ({
-  type: 'auth/registerFulfilled',
+const createUserFulfilled = () => ({
+  type: 'auth/createUser/fulfilled',
 })
 
-const registerRejected = (error) => ({
-  type: 'auth/registerRejected',
+const createUserRejected = (error) => ({
+  type: 'auth/createUser/rejected',
   error,
 })
 
 const issueJWSTokenPending = () => ({
-  type: 'auth/issueJWSTokenPending',
+  type: 'auth/issueJWSToken/pending',
 })
 
 const issueJWSTokenFulfilled = (token) => ({
-  type: 'auth/issueJWSTokenFulfilled',
+  type: 'auth/issueJWSToken/fulfilled',
   payload: token,
 })
 
 const issueJWSTokenRejected = (error) => ({
-  type: 'auth/issueJWSTokenRejected',
+  type: 'auth/issueJWSToken/rejected',
   error,
 })
 
-const loadUserPending = () => ({
-  type: 'auth/loadUserPending',
+const fetchUserPending = () => ({
+  type: 'auth/fetchUser/pending',
 })
 
-const loadUserFulfilled = (user) => ({
-  type: 'auth/loadUserFulfilled',
+const fetchUserFulfilled = (user) => ({
+  type: 'auth/fetchUser/fulfilled',
   payload: user,
 })
 
-const loadUserRejected = (error) => ({
-  type: 'auth/loadUserRejected',
+const fetchUserRejected = (error) => ({
+  type: 'auth/fetchUser/rejected',
   error,
 })
 
@@ -151,7 +151,7 @@ export const logout = () => ({
 })
 
 /* "Thunk action creator" functions */
-export const register = (email, password) => async (dispatch) => {
+export const createUser = (email, password) => async (dispatch) => {
   const config = {
     headers: {
       'Content-Type': 'application/json',
@@ -160,16 +160,16 @@ export const register = (email, password) => async (dispatch) => {
 
   const body = JSON.stringify({ email, password })
 
-  dispatch(registerPending())
+  dispatch(createUserPending())
   try {
     const response = await axios.post('/api/v1.0/users', body, config)
-    dispatch(registerFulfilled())
+    dispatch(createUserFulfilled())
 
     dispatch(displayAlertTemporarily('YOU HAVE SUCCESSFULLY REGISTERED'))
 
     return Promise.resolve()
   } catch (error) {
-    dispatch(registerRejected(error.toString()))
+    dispatch(createUserRejected(error.toString()))
 
     const payload = error.response.data
     dispatch(displayAlertTemporarily(`[${payload.message}]`))
@@ -202,7 +202,7 @@ export const issueJWSToken = (email, password) => async (dispatch) => {
   }
 }
 
-export const loadUser = () => async (dispatch) => {
+export const fetchUser = () => async (dispatch) => {
   const body = {}
   /* TODO: remove the previous instruction altogether,
            because no body is to be sent when making an axios.get() request
@@ -217,12 +217,12 @@ export const loadUser = () => async (dispatch) => {
     },
   }
 
-  dispatch(loadUserPending())
+  dispatch(fetchUserPending())
   try {
     const response = await axios.get('/api/v1.0/user', config)
-    dispatch(loadUserFulfilled(response.data))
+    dispatch(fetchUserFulfilled(response.data))
   } catch (error) {
-    dispatch(loadUserRejected(error.toString()))
+    dispatch(fetchUserRejected(error.toString()))
   }
 }
 
