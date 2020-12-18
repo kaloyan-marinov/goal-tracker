@@ -3,6 +3,7 @@ import { displayAlertTemporarily } from '../alerts/alertsSlice'
 
 const initialState = {
   requestStatus: 'idle', // or: 'loading', 'succeeded', 'failed',
+  requestError: null, // or: string
   token: localStorage.getItem('goal-tracker-token'),
   isAuthenticated: null,
   currentUser: null,
@@ -21,6 +22,7 @@ export default function authReducer(state = initialState, action) {
       return {
         ...state,
         requestStatus: 'succeeded', // TODO: find the commit where this was added and replace the "fulfilled" in that commit with "succeeded"
+        requestError: null,
       }
     } /* end: auth/createUser/fulfilled */
 
@@ -28,7 +30,7 @@ export default function authReducer(state = initialState, action) {
       return {
         ...state,
         requestStatus: 'failed',
-        // error: action.error, // TODO: find out if this should be added (or should have first been added) to the "implement an authSlice, and within that a register() "thunk action" + dispatch register() from <Register>" commit
+        requestError: action.error,
       }
     } /* end: auth/createUser/rejected */
 
@@ -47,6 +49,7 @@ export default function authReducer(state = initialState, action) {
       return {
         ...state,
         requestStatus: 'succeeded',
+        requestError: null,
         token,
         isAuthenticated: true,
       }
@@ -56,7 +59,7 @@ export default function authReducer(state = initialState, action) {
       return {
         ...state,
         requestStatus: 'failed',
-        // error: action.error, // find out if this should be added (or should have first been added) to the commit that adds this case
+        requestError: action.error,
       }
     } /* end: auth/issueJWSToken/rejected */
 
@@ -73,6 +76,7 @@ export default function authReducer(state = initialState, action) {
       return {
         ...state,
         requestStatus: 'succeeded',
+        requestError: null,
         isAuthenticated: true,
         currentUser: user,
       }
@@ -82,6 +86,7 @@ export default function authReducer(state = initialState, action) {
       return {
         ...state,
         requestStatus: 'failed',
+        requestError: action.error,
       }
     } /* end: auth/fetchUser/rejected */
 
@@ -164,17 +169,12 @@ export const createUser = (email, password) => async (dispatch) => {
   try {
     const response = await axios.post('/api/v1.0/users', body, config)
     dispatch(createUserFulfilled())
-
-    dispatch(displayAlertTemporarily('YOU HAVE SUCCESSFULLY REGISTERED'))
-
     return Promise.resolve()
-  } catch (error) {
-    dispatch(createUserRejected(error.toString()))
-
-    const payload = error.response.data
-    dispatch(displayAlertTemporarily(`[${payload.message}]`))
-
-    return Promise.reject()
+  } catch (err) {
+    const errorPayload = err.response.data
+    const actionError = errorPayload.message || 'ERROR NOT FROM BACKEND'
+    dispatch(createUserRejected(actionError))
+    return Promise.reject(actionError)
   }
 }
 
@@ -196,9 +196,11 @@ export const issueJWSToken = (email, password) => async (dispatch) => {
     const response = await axios.post('/api/v1.0/tokens', body, config)
     dispatch(issueJWSTokenFulfilled(response.data.token))
     return Promise.resolve()
-  } catch (error) {
-    dispatch(issueJWSTokenRejected(error.toString()))
-    return Promise.reject()
+  } catch (err) {
+    const errorPayload = err.response.data
+    const actionError = errorPayload.error || 'ERROR NOT FROM BACKEND'
+    dispatch(issueJWSTokenRejected(actionError))
+    return Promise.reject(actionError)
   }
 }
 
@@ -221,8 +223,12 @@ export const fetchUser = () => async (dispatch) => {
   try {
     const response = await axios.get('/api/v1.0/user', config)
     dispatch(fetchUserFulfilled(response.data))
-  } catch (error) {
-    dispatch(fetchUserRejected(error.toString()))
+    return Promise.resolve()
+  } catch (err) {
+    const errorPayload = err.response.data
+    const actionError = errorPayload.error || 'ERROR NOT FROM BACKEND'
+    dispatch(fetchUserRejected(actionError))
+    return Promise.reject(actionError)
   }
 }
 

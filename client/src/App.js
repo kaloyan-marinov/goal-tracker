@@ -14,7 +14,14 @@ import { fetchUser } from './features/auth/authSlice'
 const App = () => {
   const dispatch = useDispatch()
 
-  useEffect(() => dispatch(fetchUser()), [])
+  useEffect(() => {
+    const promise = dispatch(fetchUser())
+    /* TODO: find out if the next instruction is an acceptable way of dealing with the
+             fetchUser() "thunk" action, whose latest version is introduced in the same
+             commit as this comment.
+    */
+    return promise.then(() => {}).catch(() => {})
+  }, [])
 
   return (
     <BrowserRouter>
