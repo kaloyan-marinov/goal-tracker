@@ -494,6 +494,7 @@ def create_interval():
     db.session.commit()
 
     payload = {
+        "id": interval.id,
         "start": format_time(interval.start),
         "final": format_time(interval.final),
         "goal_id": interval.goal_id,

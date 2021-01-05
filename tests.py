@@ -587,6 +587,15 @@ class TestIntervals(TestBase):
             "/api/v1.0/intervals", data=req_payload, token_auth=self.token_4_john_doe
         )
         self.assertEqual(s, 201)
+        self.assertEqual(
+            r,
+            {
+                "id": 1,
+                "goal_id": 1,
+                "start": "2020-11-05 08:45",
+                "final": "2020-11-05 09:15",
+            },
+        )
         url_4_interval_1 = h["Location"]
 
         # (Now that the `intervals` table is not empty...) Get all intervals.
