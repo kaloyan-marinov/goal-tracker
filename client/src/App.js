@@ -10,6 +10,12 @@ import Alert from './features/alerts/Alert'
 import { useDispatch } from 'react-redux'
 import { useEffect } from 'react'
 import { fetchUser } from './features/auth/authSlice'
+import Dashboard from './features/dashboard/Dashboard'
+import PrivateRoute from './features/auth/PrivateRoute'
+import GoalsOverview from './features/goals/GoalsOverview'
+import AddNewGoal from './features/goals/AddNewGoal'
+import EditGoal from './features/goals/EditGoal'
+import DeleteGoal from './features/goals/DeleteGoal'
 
 const App = () => {
   const dispatch = useDispatch()
@@ -33,6 +39,19 @@ const App = () => {
           <Switch>
             <Route exact path="/register" component={Register} />
             <Route exact path="/login" component={Login} />
+            <PrivateRoute exact path="/dashboard" component={Dashboard} />
+            <PrivateRoute
+              exact
+              path="/goals-overview"
+              component={GoalsOverview}
+            />
+            <PrivateRoute exact path="/add-new-goal" component={AddNewGoal} />
+            <PrivateRoute exact path="/edit-goal/:id" component={EditGoal} />
+            <PrivateRoute
+              exact
+              path="/delete-goal/:id"
+              component={DeleteGoal}
+            />
           </Switch>
         </section>
       </Fragment>

@@ -1,6 +1,15 @@
 // import React from "react";
+import { useSelector } from 'react-redux'
+import { selectIsAuthenticated } from '../auth/authSlice'
+import { Redirect } from 'react-router-dom'
 
 const Landing = () => {
+  const isAuthenticated = useSelector(selectIsAuthenticated)
+
+  if (isAuthenticated) {
+    return <Redirect to="/dashboard" />
+  }
+
   return (
     <div className="container">
       <h1>WELCOME TO GoalTracker</h1>

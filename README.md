@@ -686,3 +686,15 @@ According to https://stackoverflow.com/questions/4855168/what-is-href-and-why-is
 - `href="//site.com/#some-id"` would go to `site.com` and scroll to the id on that page.
 - `href="#"` doesn't specify an id name, but does have a corresponding location - the top of the page. Clicking an anchor with `href="#"` will move the scroll position to the top.
 - An example where a hyperlink placeholder makes sense is within template previews... the best solution for hyperlink placeholders is actually `href="#!"`. The idea here is that there hopefully isn't an element on the page with `id="!"` ... and the hyperlink therefore refers to nothing - so nothing happens.
+
+# `2020/12/11/14_37/16/frontend/dashboard-and-profile-management`
+
+```
+SELECT
+	users.id AS users_id,
+	users.email AS users_email,
+	goals.id AS goals_id,
+	goals.description AS goals_description
+FROM users
+JOIN goals ON users.id = goals.user_id;
+```

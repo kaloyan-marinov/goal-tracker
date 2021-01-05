@@ -7,11 +7,17 @@ import {
   logout,
 } from '../auth/authSlice'
 import { Fragment } from 'react'
+import { reinitializeGoalsSlice } from '../goals/goalsSlice'
 
 const NavigationBar = () => {
   const dispatch = useDispatch()
   const requestStatus = useSelector(selectRequestStatus)
   const isAuthenticated = useSelector(selectIsAuthenticated)
+
+  const onClick = () => {
+    dispatch(logout())
+    dispatch(reinitializeGoalsSlice())
+  }
 
   const links = isAuthenticated ? (
     <ul>
@@ -19,7 +25,7 @@ const NavigationBar = () => {
         <Link to="/dashboard">Dashboard</Link>
       </li>
       <li>
-        <a href="#!" onClick={() => dispatch(logout())}>
+        <a href="#!" onClick={onClick}>
           Logout
         </a>
       </li>

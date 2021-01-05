@@ -245,3 +245,5 @@ export const selectIsAuthenticated = (state) => {
 }
 
 export const selectRequestStatus = (state) => state.auth.requestStatus
+
+export const selectCurrentUser = (state) => state.auth.currentUser
