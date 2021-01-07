@@ -698,3 +698,19 @@ SELECT
 FROM users
 JOIN goals ON users.id = goals.user_id;
 ```
+
+# `2021/01/05/12_46/20/frontend/working-with-intervals`
+
+```
+SELECT
+	users.id AS users_id,
+	users.email AS users_email,
+	goals.id AS goals_id,
+	goals.description AS goals_description,
+    intervals.id AS intervals_id,
+    intervals.start AS intervals_start,
+    intervals.final AS intervals_final
+FROM users
+JOIN goals ON users.id = goals.user_id
+JOIN intervals ON goals.id = intervals.goal_id;
+```

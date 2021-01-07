@@ -16,6 +16,10 @@ import GoalsOverview from './features/goals/GoalsOverview'
 import AddNewGoal from './features/goals/AddNewGoal'
 import EditGoal from './features/goals/EditGoal'
 import DeleteGoal from './features/goals/DeleteGoal'
+import IntervalsOverview from './features/intervals/IntervalsOverview'
+import AddNewInterval from './features/intervals/AddNewInterval'
+import EditInterval from './features/intervals/EditInterval'
+import DeleteInterval from './features/intervals/DeleteInterval'
 
 const App = () => {
   const dispatch = useDispatch()
@@ -51,6 +55,26 @@ const App = () => {
               exact
               path="/delete-goal/:id"
               component={DeleteGoal}
+            />
+            <PrivateRoute
+              exact
+              path="/intervals-overview"
+              component={IntervalsOverview}
+            />
+            <PrivateRoute
+              exact
+              path="/add-new-interval"
+              component={AddNewInterval}
+            />
+            <PrivateRoute
+              exact
+              path="/edit-interval/:id"
+              component={EditInterval}
+            />
+            <PrivateRoute
+              exact
+              path="/delete-interval/:id"
+              component={DeleteInterval}
             />
           </Switch>
         </section>

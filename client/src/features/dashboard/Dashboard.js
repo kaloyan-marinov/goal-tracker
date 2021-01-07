@@ -17,6 +17,9 @@ const Dashboard = () => {
           <li>
             <Link to="/goals-overview">Goals Overview</Link>
           </li>
+          <li>
+            <Link to="/intervals-overview">Intervals Overview</Link>
+          </li>
         </ul>
       </div>
     </Fragment>
