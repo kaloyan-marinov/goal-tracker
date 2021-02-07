@@ -11,8 +11,8 @@ from itsdangerous import (
     BadSignature,
     SignatureExpired,
 )
-import datetime
 
+from utils import format_time, parse_time
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 db_file = os.path.join(basedir, "goal_tracker.db")
@@ -75,29 +75,6 @@ class Interval(db.Model):
 
     def __repr__(self):
         return f"<Interval {self.id} (goal={self.goal})>"
-
-
-def format_time(dt):
-    """
-    Args:
-        dt (datetime.datetime): a timestamp
-
-    Returns:
-        (str): a string representation of the timestamp
-    """
-    return dt.strftime("%Y-%m-%d %H:%M")
-
-
-def parse_time(dt_str):
-    """
-    Args:
-        dt_str (str): a string representation of a timestamp
-
-    Returns:
-        (datetime.datetime): the timestamp
-    """
-    dt = datetime.datetime.strptime(dt_str, "%Y-%m-%d %H:%M")
-    return dt
 
 
 def error_response(status_code, message):
