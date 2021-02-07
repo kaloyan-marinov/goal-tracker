@@ -4,7 +4,6 @@ from flask import Flask, request, jsonify, url_for
 from werkzeug.http import HTTP_STATUS_CODES
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
-from werkzeug.security import generate_password_hash, check_password_hash
 from flask_httpauth import HTTPBasicAuth, HTTPTokenAuth
 from itsdangerous import (
     TimedJSONWebSignatureSerializer as Serializer,
@@ -13,6 +12,7 @@ from itsdangerous import (
 )
 
 from utils import format_time, parse_time
+
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 db_file = os.path.join(basedir, "goal_tracker.db")
@@ -29,52 +29,10 @@ db = SQLAlchemy(app)
 
 migrate = Migrate(app, db)
 
-
-class User(db.Model):
-    __tablename__ = "users"
-    id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(128), index=True, unique=True)
-    password_hash = db.Column(db.String(128))
-
-    goals = db.relationship("Goal", lazy="dynamic", backref="user")
-
-    def set_password_hash(self, password):
-        self.password_hash = generate_password_hash(password)
-
-    def check_password(self, password):
-        return check_password_hash(self.password_hash, password)
-
-    def __repr__(self):
-        return f"<User {self.email}>"
-
-    def generate_token(self):
-        token = token_serializer.dumps({"user_id": self.id}).decode("utf-8")
-        return token
+token_serializer = Serializer(app.config["SECRET_KEY"], expires_in=3600)
 
 
-class Goal(db.Model):
-    __tablename__ = "goals"
-    id = db.Column(db.Integer, primary_key=True)
-    description = db.Column(db.String(256))
-
-    user_id = db.Column(db.Integer, db.ForeignKey("users.id"))
-
-    intervals = db.relationship("Interval", lazy="dynamic", backref="goal")
-
-    def __repr__(self):
-        return f"<Goal '{self.description}'>"
-
-
-class Interval(db.Model):
-    __tablename__ = "intervals"
-    id = db.Column(db.Integer, primary_key=True)
-    start = db.Column(db.DateTime)  # TODO: consider adding `nullable=False`
-    final = db.Column(db.DateTime)
-
-    goal_id = db.Column(db.Integer, db.ForeignKey("goals.id"))
-
-    def __repr__(self):
-        return f"<Interval {self.id} (goal={self.goal})>"
+from models import User, Goal, Interval
 
 
 def error_response(status_code, message):
@@ -107,8 +65,6 @@ def basic_auth_error():
     r.headers["WWW-Authenticate"] = 'Bearer realm="Authentication Required"'
     return r
 
-
-token_serializer = Serializer(app.config["SECRET_KEY"], expires_in=3600)
 
 token_auth = HTTPTokenAuth(scheme="Bearer")
 

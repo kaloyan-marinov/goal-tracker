@@ -4,8 +4,28 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
+        // Does not properly tell an external debugger that there's been an error.
         {
-            "name": "Python: Flask",
+            "name": "[new way] Python: Flask",
+            "type": "python",
+            "request": "launch",
+            "module": "flask",
+            "env": {
+                "FLASK_APP": "goal_tracker.py",
+                "FLASK_ENV": "development",
+                "FLASK_DEBUG": "0"
+            },
+            "args": [
+                "run",
+                "--no-debugger",
+                "--no-reload"
+            ],
+            "jinja": true
+        },
+        // Uses the app.run() function.
+        // The environment variables are not used, but they don't hurt anything, so it's OK to leave them here.
+        {
+            "name": "[old way] Python: Flask",
             "type": "python",
             "request": "launch",
             "module": "goal_tracker",
