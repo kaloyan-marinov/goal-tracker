@@ -774,3 +774,21 @@ What is common among those different ways of running the tests is that, in each 
 In summary, this sub-section demonstrates that:
 - if one uses (a) to run the repository's tests, the Python interpreter first parses `tests.py`, and then it parses `goal_tracker/goal_tracker.py`
 - if one uses (b) or (c) to run the repository's tests, the files are parsed in the opposite order
+
+# `2021/01/28/06_53/25/backend/move-the-tests-to-a-package`
+
+The previous section discussed subtle differences between different ways of running the repository's tests.
+
+The branch corresponding to the current section introduces such changes that necessitate the following modifications to the ways of running the tests:
+
+  (a) the removal of the `if __name__ == "__main__"` block from `tests/tests.py` means that it is no longer possible to run the tests by issuing `(venv) $ PYTHONPATH=. python tests/tests.py` on the command line
+
+  (b) on the command line, issue `(venv) $ python -m unittest discover -v tests/`
+
+  (c) in VS Code (Version: 1.53.0), use the IDE's UI by clicking on "Run All Tests"
+
+  (d) on the command line, issue `(venv) $ FLASK_APP=goal_tracker_dev_server.py flask test`
+
+As of the first commit in this branch, it no longer makes any difference which way one runs the tests, i.e. in each case:
+  - the test suite passes
+  - the run uses an in-memory SQLite database (and/because the Python interpreter first parses `tests.py`, and then it parses `goal_tracker/goal_tracker.py`)

@@ -1,4 +1,6 @@
 import os
+import subprocess
+import sys
 
 from flask import Flask, request, jsonify, url_for
 from werkzeug.http import HTTP_STATUS_CODES
@@ -20,6 +22,14 @@ app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get(
 )
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY") or "my-secret"
+
+
+@app.cli.command()
+def test():
+    """Run unit tests."""
+    tests = subprocess.call(["python", "-c", "import tests; tests.run()"])
+    sys.exit(tests)
+
 
 db = SQLAlchemy(app)
 
