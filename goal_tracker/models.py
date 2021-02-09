@@ -1,9 +1,6 @@
 from werkzeug.security import generate_password_hash, check_password_hash
 
-try:
-    from __main__ import db, token_serializer
-except ImportError:
-    from goal_tracker import db, token_serializer
+from .goal_tracker import db, token_serializer
 
 
 class User(db.Model):

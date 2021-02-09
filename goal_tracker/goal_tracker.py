@@ -11,14 +11,15 @@ from itsdangerous import (
     SignatureExpired,
 )
 
-from utils import format_time, parse_time
+from .utils import format_time, parse_time
 
 
-basedir = os.path.abspath(os.path.dirname(__file__))
+basedir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 db_file = os.path.join(basedir, "goal_tracker.db")
 
 app = Flask(__name__)
 app.config["DEBUG"] = True
+print(f"goal_tracker/goal_tracker.py - DATABASE_URL={os.environ.get('DATABASE_URL')}")
 app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get(
     "DATABASE_URL", f"sqlite:///{db_file}"
 )
@@ -32,7 +33,7 @@ migrate = Migrate(app, db)
 token_serializer = Serializer(app.config["SECRET_KEY"], expires_in=3600)
 
 
-from models import User, Goal, Interval
+from .models import User, Goal, Interval
 
 
 def error_response(status_code, message):
@@ -533,7 +534,3 @@ def delete_interval(interval_id):
     db.session.delete(interval)
     db.session.commit()
     return "", 204
-
-
-if __name__ == "__main__":
-    app.run(use_debugger=False, use_reloader=False, passthrough_errors=True)

@@ -12,8 +12,35 @@ from itsdangerous import SignatureExpired, BadSignature
 # cov = coverage.Coverage(branch=True)
 # cov.start()
 
+# fmt: off
+'''
+If you comment out this block and uncomment the next block,
+the differences between different ways of running the tests
+(which differences are described in the
+`2021/01/27/06_37/23/backend/move-the-application-to-a-package` section of README.md)
+will no longer exist.
+'''
 os.environ["DATABASE_URL"] = "sqlite://"
-from goal_tracker import app, db, User
+print(f"tests.py - DATABASE_URL={os.environ.get('DATABASE_URL')}")
+from goal_tracker.goal_tracker import app, db, User
+
+print(
+    f"tests.py - app.config['SQLALCHEMY_DATABASE_URI]={app.config['SQLALCHEMY_DATABASE_URI']}"
+)
+# fmt: on
+
+# fmt: off
+'''
+# os.environ["DATABASE_URL"] = "sqlite://"
+print(f"tests.py - DATABASE_URL={os.environ.get('DATABASE_URL')}")
+from goal_tracker.goal_tracker import app, db, User
+
+print(
+    f"tests.py - app.config['SQLALCHEMY_DATABASE_URI]={app.config['SQLALCHEMY_DATABASE_URI']}"
+)
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite://"
+'''
+# fmt: on
 
 app.config["TESTING"] = True
 
@@ -326,7 +353,7 @@ class TestUsersAndGoals(TestBase):
 
         # Verify that a JWS token, which has expired, is invalid.
         with patch(
-            "goal_tracker.Serializer.loads",
+            "goal_tracker.goal_tracker.Serializer.loads",
             side_effect=SignatureExpired("forced via mocking/patching"),
         ):
             r, s, h = self.get("/api/v1.0/goals", token_auth=token)
@@ -334,7 +361,7 @@ class TestUsersAndGoals(TestBase):
 
         # Verify that a JWS token, whose signature has been tampered with, is invalid.
         with patch(
-            "goal_tracker.Serializer.loads",
+            "goal_tracker.goal_tracker.Serializer.loads",
             side_effect=BadSignature("forced via mocking/patching"),
         ):
             r, s, h = self.get("/api/v1.0/goals", token_auth=token)

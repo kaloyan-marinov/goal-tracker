@@ -714,3 +714,63 @@ FROM users
 JOIN goals ON users.id = goals.user_id
 JOIN intervals ON goals.id = intervals.goal_id;
 ```
+
+# `2021/01/27/06_37/23/backend/move-the-application-to-a-package`
+
+Logically, the only way to avoid the issues with `__main__` is to ensure that the application [instance] is not [created in] the `__main__` module. (So we need to move it somewhere else so that, when we run the application, we don't run the application directly but we run it through something else.)
+
+---
+
+After making the first commit in this branch, I noticed that there were subtle differences between the following different ways of running the repository's tests:
+
+  (a) on the command line, issue `(venv) $ python tests.py`
+
+  (b) on the command line, issue `(venv) $ python -m unittest discover -v .`
+
+  (c) in VS Code (Version: 1.53.0), use the IDE's UI by clicking on "Run All Tests"
+
+(It was those differences that motivated the second commit in the branch.)
+
+What is common among those different ways of running the tests is that, in each case, the test suite passes. What is different among the those different ways of running the tests is that:
+
+  1. doing (a) uses an in-memory SQLite database, which is what one would expect from the implementations of `tests.py` and `goal_tracker/goal_tracker.py` - to wit:
+     ```
+     $ python tests.py
+     tests.py - DATABASE_URL=sqlite://
+     goal_tracker/goal_tracker.py - DATABASE_URL=sqlite://
+     tests.py - app.config['SQLALCHEMY_DATABASE_URI]=sqlite://
+     ...
+     Ran 8 tests in 4.314s
+     
+     OK
+     ```
+
+  2. in discord with that expectation however, doing (b)
+     - uses the on-disk database `goal_tracker.db`, and (in view of the `TestBase.setUp` and `TestBase.tearDown` methods)
+     - drops all tables in that database
+     
+     to wit:
+     ```
+     $ python -m unittest discover -v .
+     goal_tracker/goal_tracker.py - DATABASE_URL=None
+     tests.py - DATABASE_URL=sqlite://
+     tests.py - app.config['SQLALCHEMY_DATABASE_URI]=sqlite:////<absolute-path-to->goal-tracker/goal_tracker.db
+     ...
+     Ran 8 tests in 4.314s
+     
+     OK
+     ```
+  3. doing (c) has the same consequences as doing (b) - to wit:
+     ```
+     goal_tracker/goal_tracker.py - DATABASE_URL=None
+     tests.py - DATABASE_URL=sqlite://
+     tests.py - app.config['SQLALCHEMY_DATABASE_URI]=sqlite:////<absolute-path-to->goal-tracker/goal_tracker.db
+     ...
+     Ran 8 tests in 4.673s
+
+     OK
+     ```
+
+In summary, this sub-section demonstrates that:
+- if one uses (a) to run the repository's tests, the Python interpreter first parses `tests.py`, and then it parses `goal_tracker/goal_tracker.py`
+- if one uses (b) or (c) to run the repository's tests, the files are parsed in the opposite order
