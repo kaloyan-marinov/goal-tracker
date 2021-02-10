@@ -7,16 +7,13 @@ import sys
 from unittest.mock import patch
 from itsdangerous import SignatureExpired, BadSignature
 
-
-os.environ["DATABASE_URL"] = "sqlite://"
-print(f"tests.py - DATABASE_URL={os.environ.get('DATABASE_URL')}")
 from goal_tracker.goal_tracker import app, db, User
 
-print(
-    f"tests.py - app.config['SQLALCHEMY_DATABASE_URI]={app.config['SQLALCHEMY_DATABASE_URI']}"
-)
 
-app.config["TESTING"] = True
+print(
+    f"tests.py - app.config['SQLALCHEMY_DATABASE_URI']={app.config['SQLALCHEMY_DATABASE_URI']}"
+)
+print(f"tests.py - app.config['TESTING']={app.config['TESTING']}")
 
 
 class TestBase(unittest.TestCase):

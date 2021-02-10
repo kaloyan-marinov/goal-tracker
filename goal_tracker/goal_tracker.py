@@ -8,20 +8,17 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 
+from config import config
 from .utils import format_time, parse_time
 
 
-basedir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-db_file = os.path.join(basedir, "goal_tracker.db")
-
 app = Flask(__name__)
-app.config["DEBUG"] = True
-print(f"goal_tracker/goal_tracker.py - DATABASE_URL={os.environ.get('DATABASE_URL')}")
-app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get(
-    "DATABASE_URL", f"sqlite:///{db_file}"
+config_name = os.environ.get("GOAL_TRACKER_CONFIG", "development")
+print(f"goal_tracker/goal_tracker.py - config_name={config_name}")
+app.config.from_object(config[config_name])
+print(
+    f"goal_tracker/goal_tracker.py - app.config['SQLALCHEMY_DATABASE_URI']={app.config['SQLALCHEMY_DATABASE_URI']}"
 )
-app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY") or "my-secret"
 
 
 @app.cli.command()

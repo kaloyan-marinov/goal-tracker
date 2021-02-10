@@ -747,14 +747,14 @@ What is common among those different ways of running the tests is that, in each 
 
   2. in discord with that expectation however, doing (b)
      - uses the on-disk database `goal_tracker.db`, and (in view of the `TestBase.setUp` and `TestBase.tearDown` methods)
-     - drops all tables in that database
+     - _drops all tables in that database_
      
      to wit:
      ```
      $ python -m unittest discover -v .
      goal_tracker/goal_tracker.py - DATABASE_URL=None
      tests.py - DATABASE_URL=sqlite://
-     tests.py - app.config['SQLALCHEMY_DATABASE_URI]=sqlite:////<absolute-path-to->goal-tracker/goal_tracker.db
+     tests.py - app.config['SQLALCHEMY_DATABASE_URI]=sqlite:////<absolute-path-to->/goal-tracker/goal_tracker.db
      ...
      Ran 8 tests in 4.314s
      
@@ -764,7 +764,7 @@ What is common among those different ways of running the tests is that, in each 
      ```
      goal_tracker/goal_tracker.py - DATABASE_URL=None
      tests.py - DATABASE_URL=sqlite://
-     tests.py - app.config['SQLALCHEMY_DATABASE_URI]=sqlite:////<absolute-path-to->goal-tracker/goal_tracker.db
+     tests.py - app.config['SQLALCHEMY_DATABASE_URI]=sqlite:////<absolute-path-to->/goal-tracker/goal_tracker.db
      ...
      Ran 8 tests in 4.673s
 
@@ -792,3 +792,37 @@ The branch corresponding to the current section introduces such changes that nec
 As of the first commit in this branch, it no longer makes any difference which way one runs the tests, i.e. in each case:
   - the test suite passes
   - the run uses an in-memory SQLite database (and/because the Python interpreter first parses `tests.py`, and then it parses `goal_tracker/goal_tracker.py`)
+
+# `2021/02/03/06_47/26/backend/move-the-configuration-to-a-separate-module`
+
+This branch has, somewhat frustratingly, re-introduced subtle differences between the different ways of running the tests:
+
+1. the statement under (a) in the previous section applies also to this branch
+
+2. doing (b) from the previous section uses the on-disk database `goal_tracker.db`, and as a consequence _drops all tables in that database_ - to wit:
+
+    ```
+    goal_tracker/goal_tracker.py - config_name=development
+    goal_tracker/goal_tracker.py - app.config['SQLALCHEMY_DATABASE_URI']=sqlite:////<absolute-path-to->/goal-tracker/goal_tracker.db
+    tests.py - app.config['SQLALCHEMY_DATABASE_URI']=sqlite:////<absolute-path-to->/goal-tracker/goal_tracker.db
+    tests.py - app.config['TESTING']=False
+    ```
+3. doing (c) from the previous section has the same consequences as doing (b) [from the previous section] - to wit:
+
+    ```
+    goal_tracker/goal_tracker.py - config_name=development
+    goal_tracker/goal_tracker.py - app.config['SQLALCHEMY_DATABASE_URI']=sqlite:////<absolute-path-to->/goal-tracker/goal_tracker.db
+    tests.py - app.config['SQLALCHEMY_DATABASE_URI']=sqlite:////<absolute-path-to->/goal-tracker/goal_tracker.db
+    tests.py - app.config['TESTING']=False
+    ```
+
+4. doing (d) from the previous section uses an in-memory SQLite database (and, as a consequence, running the tests doesn't make any changes to the on-disk database `goal_tracker.db`, which is the appropriate behavior) - to wit:
+
+    ```
+    goal_tracker/goal_tracker.py - config_name=development
+    goal_tracker/goal_tracker.py - app.config['SQLALCHEMY_DATABASE_URI']=sqlite:////<absolute-path-to->/goal-tracker/goal_tracker.db
+    goal_tracker/goal_tracker.py - config_name=testing
+    goal_tracker/goal_tracker.py - app.config['SQLALCHEMY_DATABASE_URI']=sqlite://
+    tests.py - app.config['SQLALCHEMY_DATABASE_URI']=sqlite://
+    tests.py - app.config['TESTING']=True
+    ```
