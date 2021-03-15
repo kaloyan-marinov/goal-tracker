@@ -1,6 +1,7 @@
+from flask import current_app
 from werkzeug.security import generate_password_hash, check_password_hash
 
-from .goal_tracker import db, token_serializer
+from . import db
 
 
 class User(db.Model):
@@ -21,7 +22,7 @@ class User(db.Model):
         return f"<User {self.email}>"
 
     def generate_token(self):
-        token = token_serializer.dumps({"user_id": self.id}).decode("utf-8")
+        token = current_app.token_serializer.dumps({"user_id": self.id}).decode("utf-8")
         return token
 
 

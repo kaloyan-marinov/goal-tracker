@@ -7,23 +7,29 @@ import sys
 from unittest.mock import patch
 from itsdangerous import SignatureExpired, BadSignature
 
-from goal_tracker.goal_tracker import app, db, User
-
-
-print(
-    f"tests.py - app.config['SQLALCHEMY_DATABASE_URI']={app.config['SQLALCHEMY_DATABASE_URI']}"
-)
-print(f"tests.py - app.config['TESTING']={app.config['TESTING']}")
+from goal_tracker import create_app, db
 
 
 class TestBase(unittest.TestCase):
     def setUp(self):
+        self.app = create_app(config_name="testing")
+        print(
+            f"tests/tests.py - self.app.config['SQLALCHEMY_DATABASE_URI']={self.app.config['SQLALCHEMY_DATABASE_URI']}"
+        )
+        print(f"tests/tests.py - self.app.config['TESTING']={self.app.config['TESTING']}")
+
+        self.ctx = self.app.app_context()
+        self.ctx.push()
+
         db.drop_all()  # just in case
         db.create_all()
-        self.client = app.test_client()
+
+        self.client = self.app.test_client()
 
     def tearDown(self):
         db.drop_all()
+
+        self.ctx.pop()
 
     def get_headers(self, basic_auth=None, token_auth=None):
         headers = {
@@ -324,7 +330,7 @@ class TestUsersAndGoals(TestBase):
 
         # Verify that a JWS token, which has expired, is invalid.
         with patch(
-            "goal_tracker.goal_tracker.Serializer.loads",
+            "goal_tracker.Serializer.loads",
             side_effect=SignatureExpired("forced via mocking/patching"),
         ):
             r, s, h = self.get("/api/v1.0/goals", token_auth=token)
@@ -332,7 +338,7 @@ class TestUsersAndGoals(TestBase):
 
         # Verify that a JWS token, whose signature has been tampered with, is invalid.
         with patch(
-            "goal_tracker.goal_tracker.Serializer.loads",
+            "goal_tracker.Serializer.loads",
             side_effect=BadSignature("forced via mocking/patching"),
         ):
             r, s, h = self.get("/api/v1.0/goals", token_auth=token)

@@ -1,8 +1,7 @@
-from flask import jsonify
+from flask import jsonify, current_app
 from flask_httpauth import HTTPBasicAuth, HTTPTokenAuth
 from itsdangerous import BadSignature, SignatureExpired
 
-from .goal_tracker import token_serializer
 from .models import User
 
 
@@ -33,7 +32,7 @@ token_auth = HTTPTokenAuth(scheme="Bearer")
 @token_auth.verify_token
 def verify_token(token):
     try:
-        token_payload = token_serializer.loads(token)
+        token_payload = current_app.token_serializer.loads(token)
     except SignatureExpired:
         return None  # valid token, but expired
     except BadSignature:

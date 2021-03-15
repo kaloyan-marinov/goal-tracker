@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, request, url_for
 from werkzeug.http import HTTP_STATUS_CODES
 
-from .goal_tracker import db
+from . import db
 from .auth import basic_auth, token_auth
 from .models import User, Goal, Interval
 from .utils import format_time, parse_time

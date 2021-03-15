@@ -721,13 +721,13 @@ Logically, the only way to avoid the issues with `__main__` is to ensure that th
 
 ---
 
-After making the first commit in this branch, I noticed that there were subtle differences between the following different ways of running the repository's tests:
+After making the first commit in this branch, I noticed that there were moderately-significant differences between the following different ways of running the repository's tests:
 
   (a) on the command line, issue `(venv) $ python tests.py`
 
   (b) on the command line, issue `(venv) $ python -m unittest discover -v .`
 
-  (c) in VS Code (Version: 1.53.0), use the IDE's UI by clicking on "Run All Tests"
+  (c) in VS Code (Version: 1.53.0), use the IDE's GUI by clicking on "Run All Tests"
 
 (It was those differences that motivated the second commit in the branch.)
 
@@ -777,7 +777,7 @@ In summary, this sub-section demonstrates that:
 
 # `2021/01/28/06_53/25/backend/move-the-tests-to-a-package`
 
-The previous section discussed subtle differences between different ways of running the repository's tests.
+The previous section discussed moderately-significant differences between different ways of running the repository's tests.
 
 The branch corresponding to the current section introduces such changes that necessitate the following modifications to the ways of running the tests:
 
@@ -785,7 +785,7 @@ The branch corresponding to the current section introduces such changes that nec
 
   (b) on the command line, issue `(venv) $ python -m unittest discover -v tests/`
 
-  (c) in VS Code (Version: 1.53.0), use the IDE's UI by clicking on "Run All Tests"
+  (c) in VS Code (Version: 1.53.0), use the IDE's GUI by clicking on "Run All Tests"
 
   (d) on the command line, issue `(venv) $ FLASK_APP=goal_tracker_dev_server.py flask test`
 
@@ -795,7 +795,7 @@ As of the first commit in this branch, it no longer makes any difference which w
 
 # `2021/02/03/06_47/26/backend/move-the-configuration-to-a-separate-module`
 
-This branch has, somewhat frustratingly, re-introduced subtle differences between the different ways of running the tests:
+This branch has, somewhat frustratingly, re-introduced moderately-significant differences between the different ways of running the tests:
 
 1. the statement under (a) in the previous section applies also to this branch
 
@@ -825,4 +825,164 @@ This branch has, somewhat frustratingly, re-introduced subtle differences betwee
     goal_tracker/goal_tracker.py - app.config['SQLALCHEMY_DATABASE_URI']=sqlite://
     tests.py - app.config['SQLALCHEMY_DATABASE_URI']=sqlite://
     tests.py - app.config['TESTING']=True
+    ```
+
+# `2021/02/04/06_53/28/backend/use-an-application-factory-function`
+
+1. You can run the tests in several (at-least-at-this-stage-insignificantly-different) ways:
+  
+    (a) _with coverage and produce an HTML report_ (which requires you to execute both of the commands that follow)
+
+    ```
+    (venv) goal-tracker $ coverage run -m unittest discover -v tests/
+
+
+
+    test_with_one_user (tests.TestIntervals) ... goal_tracker/__init__.py - config_name=testing
+    tests/tests.py - self.app.config['SQLALCHEMY_DATABASE_URI']=sqlite://
+    tests/tests.py - self.app.config['TESTING']=True
+    ok
+    ...
+    ----------------------------------------------------------------------
+    Ran 8 tests in 4.252s
+
+    OK
+    ```
+
+    ```
+    (venv) goal-tracker $ coverage html --omit="venv/*","tests/*","__pycache__/*"
+
+
+
+    [the last command doesn't output anything in the terminal]
+    ```
+
+    (b) _with coverage but without producing an HTML report_
+    ```
+    (venv) goal-tracker $ FLASK_APP=goal_tracker_dev_server.py flask test
+
+
+
+    goal_tracker/__init__.py - config_name=development
+    goal_tracker_dev_server.py - app.config['SQLALCHEMY_DATABASE_URI']=sqlite:////<absolute-path-to->/goal-tracker/goal_tracker.db
+    test_with_one_user (tests.tests.TestIntervals) ... goal_tracker/__init__.py - config_name=testing
+    tests/tests.py - self.app.config['SQLALCHEMY_DATABASE_URI']=sqlite://
+    tests/tests.py - self.app.config['TESTING']=True
+    ok
+    ...
+    ----------------------------------------------------------------------
+    Ran 8 tests in 5.004s
+
+    OK
+
+    Name                       Stmts   Miss Branch BrPart  Cover
+    ------------------------------------------------------------
+    config.py                     16      0      0      0   100%
+    goal_tracker/__init__.py      21      1      2      1    91%
+    goal_tracker/api.py          234      4     88      5    97%
+    goal_tracker/auth.py          36      0      6      0   100%
+    goal_tracker/models.py        34      3      0      0    91%
+    goal_tracker/utils.py          6      0      0      0   100%
+    ------------------------------------------------------------
+    TOTAL                        347      8     96      6    97%
+    ```
+
+    (c) _without coverage and without producing an HTML report_
+
+    To achieve that, you can either use the command line:
+    ```
+    (venv) goal-tracker $ python -m unittest discover -v tests/
+
+
+
+    test_with_one_user (tests.TestIntervals) ... goal_tracker/__init__.py - config_name=testing
+    tests/tests.py - self.app.config['SQLALCHEMY_DATABASE_URI']=sqlite://
+    tests/tests.py - self.app.config['TESTING']=True
+    ok
+    ...
+    ----------------------------------------------------------------------
+    Ran 8 tests in 3.883s
+
+    OK
+    ```
+    or VS Code:
+    ```
+    [in VS Code (Version: 1.53.0), use the IDE's GUI by clicking on "Run All Tests"]
+
+
+
+    [still in IDE's GUI, click on "Show Test Output"]
+    test_with_one_user (tests.TestIntervals) ... goal_tracker/__init__.py - config_name=testing
+    tests/tests.py - self.app.config['SQLALCHEMY_DATABASE_URI']=sqlite://
+    tests/tests.py - self.app.config['TESTING']=True
+    ok
+    ...
+    ----------------------------------------------------------------------
+    Ran 8 tests in 5.096s
+
+    OK
+    ```
+
+2. You can use the Flask development server to run/start//serve the application. That can be achieved in several (at-least-at-this-stage-insignificantly-different) ways:
+
+    (a) the "new way" of running/starting//serving a Flask application (i.e. invoking `flask run`) on the command line:
+    ```
+    (venv) goal-tracker $ FLASK_APP=goal_tracker_dev_server.py flask run
+
+
+
+    * Serving Flask app "goal_tracker_dev_server.py"
+    * Environment: production
+    WARNING: This is a development server. Do not use it in a production deployment.
+    Use a production WSGI server instead.
+    * Debug mode: off
+    goal_tracker/__init__.py - config_name=development
+    goal_tracker_dev_server.py - app.config['SQLALCHEMY_DATABASE_URI']=sqlite:////<absolute-path-to->/goal-tracker/goal_tracker.db
+    * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
+    ```
+
+    (b) the "old way" of running/starting//serving a Flask application (i.e. using `if __name__ == "__main__": app.run()` in a module where a `Flask` (application) object is created, and invoking `python`) on the command line:
+    ```
+    (venv) goal-tracker $ python goal_tracker_dev_server.py 
+
+
+
+    goal_tracker/__init__.py - config_name=development
+    goal_tracker_dev_server.py - app.config['SQLALCHEMY_DATABASE_URI']=sqlite:////<absolute-path-to->/goal-tracker/goal_tracker.db
+    * Serving Flask app "goal_tracker" (lazy loading)
+    * Environment: production
+    WARNING: This is a development server. Do not use it in a production deployment.
+    Use a production WSGI server instead.
+    * Debug mode: on
+    * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
+    ```
+
+    (c) the "new way" of running/starting//serving a Flask application from VS Code:
+    ```
+    [use VS Code to launch "[new way] Python Flask"]
+
+
+
+    (venv) goal-tracker $  cd /<absolute-path-to->/goal-tracker ; /usr/bin/env /<absolute-path-to->/goal-tracker/venv/bin/python3 ~/.vscode/extensions/ms-python.python-2021.1.502429796/pythonFiles/lib/python/debugpy/launcher 49168 -- -m flask run --no-debugger --no-reload 
+    * Serving Flask app "goal_tracker_dev_server.py"
+    * Environment: development
+    * Debug mode: off
+    goal_tracker/__init__.py - config_name=development
+    goal_tracker_dev_server.py - app.config['SQLALCHEMY_DATABASE_URI']=sqlite:////<absolute-path-to->/goal-tracker/goal_tracker.db
+    * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
+    ```
+
+    (d) the "old way" of running/starting//serving a Flask application from VS Code:
+    ```
+    [use VS Code to launch "[old way] Python Flask"]
+
+
+
+    (venv) goal-tracker $  cd /<absolute-path-to->/goal-tracker ; /usr/bin/env /<absolute-path-to->/goal-tracker/venv/bin/python3 ~/.vscode/extensions/ms-python.python-20.1.502429796/pythonFiles/lib/python/debugpy/launcher 49196 -- -m goal_tracker_dev_server 
+    goal_tracker/__init__.py - config_name=development
+    goal_tracker_dev_server.py - app.config['SQLALCHEMY_DATABASE_URI']=sqlite:////<absolute-path-to->/goal-tracker/goal_tracker.db
+    * Serving Flask app "goal_tracker" (lazy loading)
+    * Environment: development
+    * Debug mode: on
+    * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
     ```

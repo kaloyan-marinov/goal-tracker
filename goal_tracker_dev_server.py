@@ -1,4 +1,22 @@
-from goal_tracker import app
+import subprocess
+import sys
+
+from goal_tracker import create_app
+
+
+app = create_app()
+
+
+print(
+    f"goal_tracker_dev_server.py - app.config['SQLALCHEMY_DATABASE_URI']={app.config['SQLALCHEMY_DATABASE_URI']}"
+)
+
+
+@app.cli.command()
+def test():
+    """Run unit tests."""
+    tests = subprocess.call(["python", "-c", "import tests; tests.run()"])
+    sys.exit(tests)
 
 
 if __name__ == "__main__":
