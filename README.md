@@ -1,256 +1,154 @@
-# `01/set-up-the-flask-app-in-vs-code`
+# Table of Contents
 
+This repository's documentation is organized as follows.
+
+1. [Introduction](#introduction)
+
+2. [How to set up the project for local development](#how-to-set-up-the-project-for-local-development)
+
+3. [Future plans](#future-plans)
+
+# Introduction
+
+`GoalTracker` is a web application that ... [TBD]
+
+# How to set up the project for local development
+
+1. clone this repository, and navigate into your local repository
+
+2. at the the root of your local repository, create a `.env` file with the following structure:
 ```
-$ python3 --version
-Python 3.8.3
-$ python 3 -m venv venv
-$ source venv/bin/activate
-(venv) $ pip install --upgrade pip
-(venv) $ pip install -r requirements.txt
-```
+GOAL_TRACKER_CONFIG=development
 
-# `02/backend/users-resource`
-
-```
-$ curl \
-    --verbose \
-    --header "Content-Type: application/json" \
-    http://localhost:5000/api/v1.0/users
-$ curl \
-    --verbose \
-    --header "Content-Type: application/json" \
-    http://localhost:5000/api/v1.0/users/1
-
-$ curl \
-    --request POST \
-    --verbose \
-    --header "Content-Type: application/json" \
-    --data '{"email": "john.doe@gmail.com"}' \
-    http://localhost:5000/api/v1.0/users
-$ curl \
-    -v \
-    -H "Content-Type: application/json" \
-    http://localhost:5000/api/v1.0/users/1
-
-$ curl \
-    -X POST \
-    -v \
-    -H "Content-Type: application/json" \
-    -d '{"email": "john.doe@gmail.com"}' \
-    http://localhost:5000/api/v1.0/users
-$ curl \
-    -X POST \
-    -v \
-    -H "Content-Type: application/json" \
-    -d '{"email": "mary.smith@yahoo.com"}' \
-    http://localhost:5000/api/v1.0/users
-$ curl \
-    -v \
-    -H "Content-Type: application/json" \
-    http://localhost:5000/api/v1.0/users
-
-$ curl \
-    -X PUT \
-    -v \
-    -H "Content-Type: application/json" \
-    -d '{"email": "b.b@yahoo.com"}' \
-    http://localhost:5000/api/v1.0/users/2
-$ curl \
-    -v \
-    -H "Content-Type: application/json" \
-    http://localhost:5000/api/v1.0/users
-$ curl \
-    -X PUT \
-    -v \
-    -H "Content-Type: application/json" \
-    -d '{"email": "john.doe@gmail.com"}' \
-    http://localhost:5000/api/v1.0/users/2
-$ curl \
-    -v \
-    -H "Content-Type: application/json" \
-    http://localhost:5000/api/v1.0/users
-$ curl \
-    -X PUT \
-    -v \
-    -H "Content-Type: application/json" \
-    -d '{"email": "mary.smith@yahoo.com"}' \
-    http://localhost:5000/api/v1.0/users/2
-$ curl \
-    -v \
-    -H "Content-Type: application/json" \
-    http://localhost:5000/api/v1.0/users
-
-$ curl \
-    --request DELETE \
-    --verbose \
-    --header "Content-Type: application/json" \
-    http://localhost:5000/api/v1.0/users/1
-$ curl \
-    -v \
-    -H "Content-Type: application/json" \
-    http://localhost:5000/api/v1.0/users
-$ curl \
-    --request DELETE \
-    --verbose \
-    --header "Content-Type: application/json" \
-    http://localhost:5000/api/v1.0/users/2
-$ curl \
-    -v \
-    -H "Content-Type: application/json" \
-    http://localhost:5000/api/v1.0/users
+SECRET_KEY=<specify-a-good-secret-key-here>
+DATABASE_URL=sqlite:///<absolute-path-starting-with-a-leading-slash-and-pointing-to-an-SQLite-file>
 ```
 
-# `03/backend/database`
+(For deployment, you should generate a "good secret key" and store that value in `SECRET_KEY` within the `.env` file; to achieve that, take a look at the "How to generate good secret keys" section on https://flask.palletsprojects.com/en/1.1.x/quickstart/ . For local development, something like `keep-this-value-known-only-to-the-deployment-machine` should suffice.)
 
-Flask-Migrate provides all the migration-related commands as extensions to the `flask`
-command. All the commands that are related to database migrations start with `flask db`.
+3. set up the backend
 
-```
-# 1. initialize a migration repository
-(venv) $ export FLASK_APP=goal_tracker.py
-(venv) $ flask db init
+    - create a Python virtual environment, activate it, and install all dependencies:
+        ```
+        $ python3 --version
+        Python 3.8.3
 
-# 2. treat the contents of the created `migrations` directory (= the scripts describing
-#    changes to the database schema) as part of the application
-(venv) $ git add migrations
-(venv) $ git commit -m 'create the migrations resository'
+        $ python3 -m venv venv
 
-# 3. create the first migration
-(venv) $ flask db migrate -m 'users table'
+        $ source venv/bin/activate
+        (venv) $ pip install --upgrade pip
+        (venv) $ pip install -r requirements.txt
+        ```
 
-# 4. apply the migration to the database
-(venv) $ flask db upgrade
+    - run the tests:
 
-# 5. in the same way, the last migration can be undone by issuing
-$    `(venv) $ flask db downgrade` which provides a very flexible framework,
-#    in which you can work with changes to your database,
-#    and the important aspect is that all these migrations preserve the data that you
-#    have in your database
-```
+        ```
+        (venv) $ FLASK_APP=goal_tracker:dev_server flask test
+        ```
+    
+    - create an empty SQLite database and apply all database migrations:
+        ```
+        (venv) $ FLASK_APP=goal_tracker:create_app flask db upgrade
+        ```
 
-There are a few more useful commands that work with the migration history:
+    - verify that the previous step was successful by issuing `$ sqlite3 <the-value-of-GOAL_TRACKER_CONFIG-in-your-.env-file>` and then issuing:
+        ```
+        SQLite version 3.32.3 2020-06-18 14:16:19
+        Enter ".help" for usage hints.
+        sqlite> .tables
+        alembic_version  goals            intervals        users          
+        sqlite> .schema users
+        CREATE TABLE users (
+                id INTEGER NOT NULL, 
+                email VARCHAR(128), password_hash VARCHAR(128), 
+                PRIMARY KEY (id)
+        );
+        CREATE UNIQUE INDEX ix_users_email ON users (email);
+        sqlite> .schema goals
+        CREATE TABLE goals (
+                id INTEGER NOT NULL, 
+                description VARCHAR(256), 
+                user_id INTEGER, 
+                PRIMARY KEY (id), 
+                FOREIGN KEY(user_id) REFERENCES users (id)
+        );
+        sqlite> .schema intervals
+        CREATE TABLE intervals (
+                id INTEGER NOT NULL, 
+                start DATETIME, 
+                final DATETIME, 
+                goal_id INTEGER, 
+                PRIMARY KEY (id), 
+                FOREIGN KEY(goal_id) REFERENCES goals (id)
+        );
+        sqlite> .quit
+        ```
 
-```
-# 6. get the list of migrations
-(venv) $ flask db history
+    - deactivate the Python virtual environment
+        ```
+        (venv) $ deactivate
+        $ 
+        ```
 
-# 7.
-(venv) $ flask db current
-```
+4. set up the frontend
 
-All commands from the previous section continue to work (without modification). The only
-difference is that executing those commands is, of course, going to modify the database
-(instead of an in-memory structure).
+    - install the Node.js dependenies:
 
-# `04/backend/securing-the-RESTful-web-service`
+        ```
+        $ cd client
+        client $ npm install
+        ```
 
-```
-$ curl \
-    -v \
-    -H "Content-Type: application/json" \
-    http://localhost:5000/api/v1.0/users
-$ curl \
-    -X POST \
-    -v \
-    -H "Content-Type: application/json" \
-    -d '{"email": "john.doe@gmail.com", "password": "123456"}' \
-    http://localhost:5000/api/v1.0/users
-$ curl \
-    -X POST \
-    -v \
-    -H "Content-Type: application/json" \
-    -d '{"email": "mary.smith@yahoo.com", "password": "123456"}' \
-    http://localhost:5000/api/v1.0/users
-$ curl \
-    -v \
-    -H "Content-Type: application/json" \
-    http://localhost:5000/api/v1.0/users
+5. start serving the backend application and the frontend application
 
-$ curl \
-    -v \
-    -X POST \
-    -H "Content-Type: application/json" \
-    -d '{"email": "testing@example.com", "password": "testing"}' \
-    http://localhost:5000/api/v1.0/users
+    - launch a terminal instance and, in it, issue:
 
-$ curl \
-    --verbose \
-    --request PUT \
-    --header "Content-Type: application/json" \
-    --data '{"email": "testing@testing.com"}' \
-    http://localhost:5000/api/v1.0/users/3
-$ curl \
-    --verbose \
-    --request PUT \
-    --header "Content-Type: application/json" \
-    --data '{"email": "testing@testing.com"}' \
-    --user testing@example.com:testing \
-    http://localhost:5000/api/v1.0/users/2
-$ curl \
-    --verbose \
-    --request PUT \
-    --header "Content-Type: application/json" \
-    --data '{"email": "testing@testing.com"}' \
-    --user testing@example.com:testing \
-    http://localhost:5000/api/v1.0/users/3
+        ```
+        $ source venv/bin/activate
+        (venv) $ FLASK_APP=dev_server flask run
+         * Serving Flask app "dev_server"
+         * Environment: production
+         WARNING: This is a development server. Do not use it in a production deployment.
+         Use a production WSGI server instead.
+         * Debug mode: off
+        goal_tracker/__init__.py - config_name=development
+        dev_server.py - app.config['SQLALCHEMY_DATABASE_URI']=<the-value-of-DATABASE_URL-in-your-.env-file>
+         * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
+        ```
 
-$ curl \
-    --verbose \
-    --request DELETE \
-    --header "Content-Type: application/json" \
-    http://localhost:5000/api/v1.0/users/2
-$ curl \
-    --verbose \
-    --request DELETE \
-    --header "Content-Type: application/json" \
-    --user testing@testing.com:testing \
-    http://localhost:5000/api/v1.0/users/2
-$ curl \
-    --verbose \
-    --request DELETE \
-    --header "Content-Type: application/json" \
-    --user testing@testing.com:testing \
-    http://localhost:5000/api/v1.0/users/3
-```
+    - verify that the backend is up and running by issuing:
+        ```
+        $ curl -v localhost:5000/api/v1.0/users
+        *   Trying 127.0.0.1...
+        * TCP_NODELAY set
+        * Connected to localhost (127.0.0.1) port 5000 (#0)
+        > GET /api/v1.0/users HTTP/1.1
+        > Host: localhost:5000
+        > User-Agent: curl/7.64.1
+        > Accept: */*
+        > 
+        * HTTP 1.0, assume close after body
+        < HTTP/1.0 200 OK
+        < Content-Type: application/json
+        < Content-Length: 13
+        < Server: Werkzeug/1.0.1 Python/3.8.3
+        < Date: Mon, 15 Mar 2021 15:54:51 GMT
+        < 
+        {"users":[]}
+        * Closing connection 0
+        ```
 
-# `05/backend/securing-with-jws-tokens`
+    - launch a second terminal instance and, in it, issue:
 
-```
-$ curl \
-    -v \
-    -X POST \
-    http://localhost:5000/api/v1.0/tokens
+        ```
+        $ cd client
+        client $ npm start
 
-$ curl \
-    -v \
-    -X POST \
-    --user john.doe@gmail.com:123456 \
-    http://localhost:5000/api/v1.0/tokens
-$ export T1=<the_returned_JWS_token>
-$ curl \
-    -v \
-    -H "Authorization: Bearer $T1" \
-    http://localhost:5000/welcome
-$ curl \
-    -v \
-    -H "Authorization: Bearer <any_tampering_of_T1_no_matter_how_small> \
-    http://localhost:5000/welcome
+        > client@0.1.0 start <absolute-path-to-your-local-clone-of-this-repo>/client
+        > react-scripts start
 
-$ curl \
-    -v \
-    -X POST \
-    --user mary.smith@yahoo.com:123456 \
-    http://localhost:5000/api/v1.0/tokens
-$ export T2=<the_returned_JWS_token>
-$ curl \
-    -v \
-    -H "Authorization: Bearer $T2" \
-    http://localhost:5000/welcome
-$ curl \
-    -v \
-    -H "Authorization: Bearer <any_tampering_of_T2_no_matter_how_small> \
-    http://localhost:5000/welcome
-```
+        ```
+        and a tab in your operating system's default web browser should open up and load the address localhost:3000/
 
 # `06/backend/unit-tests`
 
@@ -274,408 +172,6 @@ $ coverage html --omit="venv/*",tests.py,"__pycache__/*"
 ```
 
 and then go on to open `htmlcov/goal_tracker.py.html`.
-
-# `07/backend/goals-resources`
-
-[Nothing to record.]
-
-# `2020/11/06/07-53/08/backend/intervals`
-
-```
-$ rm goal_tracker.db
-
-$ export FLASK_APP=goal_tracker.py
-$ flask db history
-$ flask db current
-$ flask db upgrade
-$ flask db current
-```
-
-```
-$ curl \
-    -v \
-    -X POST \
-    -H "Content-Type: application/json" \
-    -d '{"email": "john.doe@gmail.com", "password": "123456"}' \
-    http://localhost:5000/api/v1.0/users
-$ curl \
-    -v \
-    -X POST \
-    -H "Content-Type: application/json" \
-    -d '{"email": "mary.smith@yahoo.com", "password": "789"}' \
-    http://localhost:5000/api/v1.0/users
-
-$ curl \
-    -v \
-    -X POST \
-    -H "Content-Type: application/json" \
-    --user "john.doe@gmail.com:123456" \
-    http://localhost:5000/api/v1.0/tokens
-$ export T1=<the_returned_JWS_token>
-$ curl \
-    -v \
-    -X POST \
-    -H "Content-Type: application/json" \
-    --user "mary.smith@yahoo.com:789" \
-    http://localhost:5000/api/v1.0/tokens
-$ export T2=<the_returned_JWS_token>
-
-$ curl \
-    -v \
-    -X POST \
-    -H "Content-Type: application/json" \
-    -H "Authorization: Bearer $T1" \
-    -d '{"description": "Read a book about blockchain technology"}' \
-    http://localhost:5000/api/v1.0/goals
-$ curl \
-    -v \
-    -X POST \
-    -H "Content-Type: application/json" \
-    -H "Authorization: Bearer $T1" \
-    -d '{"description": "Take a course in self-defense"}' \
-    http://localhost:5000/api/v1.0/goals
-
-$ curl \
-    -v \
-    -X POST \
-    -H "Content-Type: application/json" \
-    -H "Authorization: Bearer $T2" \
-    -d '{"description": "Take a course in self-defense"}' \
-    http://localhost:5000/api/v1.0/goals
-```
-
-```
-$ flask db migrate -m 'intervals table (related to the goals table in many-to-1 manner)'
-
-$ flask db history
-$ flask db current
-
-$ flask db upgade
-$ flask db history
-$ flask db current
-```
-
-Each of the following POST requests to `http://localhost:5000/api/v1.0/intervals` fails:
-
-```
-$ curl \
-    -v \
-    -X POST \
-    -d '{"goal_id": 1}' \
-    http://localhost:5000/api/v1.0/intervals
-
-$ curl \
-    -v \
-    -X POST \
-    -H "Authorization: Bearer $T2" \
-    -d '{"goal_id": 1}' \
-    http://localhost:5000/api/v1.0/intervals
-
-$ curl \
-    -v \
-    -X POST \
-    -H "Authorization: Bearer $T2" \
-    -H "Content-Type: application/json" \
-    -d '{"goal_id": 1}' \
-    http://localhost:5000/api/v1.0/intervals
-
-$ curl \
-    -v \
-    -X POST \
-    -H "Authorization: Bearer $T1" \
-    -H "Content-Type: application/json" \
-    -d '{"goal_id": 1}' \
-    http://localhost:5000/api/v1.0/intervals
-$ curl \
-    -v \
-    -X POST \
-    -H "Authorization: Bearer $T1" \
-    -H "Content-Type: application/json" \
-    -d '{"goal_id": 1, "start": "2020-11-05 08:45"}' \
-    http://localhost:5000/api/v1.0/intervals
-$ curl \
-    -v \
-    -X POST \
-    -H "Authorization: Bearer $T1" \
-    -H "Content-Type: application/json" \
-    -d '{"goal_id": 1, "final": "2020-11-05 08:45"}' \
-    http://localhost:5000/api/v1.0/intervals
-
-$ curl \
-    -v \
-    -X POST \
-    -H "Authorization: Bearer $T1" \
-    -H "Content-Type: application/json" \
-    -d '{"goal_id": 1, "start": "-11-05 08:45", "final": "2020-11-05 09:16"}' \
-    http://localhost:5000/api/v1.0/intervals
-```
-
-whereas each of the following ones works:
-
-```
-$ curl \
-    -v \
-    -X POST \
-    -H "Authorization: Bearer $T1" \
-    -H "Content-Type: application/json" \
-    -d '{"goal_id": 1, "start": "2020-11-05 08:45", "final": "2020-11-05 09:15"}' \
-    http://localhost:5000/api/v1.0/intervals
-
-$ curl \
-    -v \
-    -X POST \
-    -H "Authorization: Bearer $T2" \
-    -H "Content-Type: application/json" \
-    -d '{"goal_id": 3, "start": "2020-11-06 08:45", "final": "2020-11-06 09:15"}' \
-    http://localhost:5000/api/v1.0/intervals
-
-$ curl \
-    -v \
-    -X POST \
-    -H "Authorization: Bearer $T1" \
-    -H "Content-Type: application/json" \
-    -d '{"goal_id": 2, "start": "2020-11-07 08:45", "final": "2020-11-07 09:15"}' \
-    http://localhost:5000/api/v1.0/intervals
-
-$ curl \
-    -v \
-    -X POST \
-    -H "Authorization: Bearer $T1" \
-    -H "Content-Type: application/json" \
-    -d '{"goal_id": 2, "start": "3333-11-07 08:45", "final": "3333-11-07 09:15"}' \
-    http://localhost:5000/api/v1.0/intervals
-```
-
-At this point, it is possible and advisable to issue a `sqlite3 goal_tracker.db` and to
-run the following query:
-
-```
-SELECT users.email, goals.description, intervals.id, intervals.start, intervals.final
-FROM users
-    JOIN goals ON users.id = goals.user_id
-    JOIN intervals ON goals.id = intervals.goal_id;
-```
-
-Each of the following GET requests to `http://localhost:5000/api/v1.0/intervals` fails:
-
-```
-$ curl \
-    -v \
-    -X GET \
-    http://localhost:5000/api/v1.0/intervals
-```
-
-whereas each of the following ones works:
-
-```
-$ curl \
-    -v \
-    -X GET \
-    -H "Authorization: Bearer $T1" \
-    http://localhost:5000/api/v1.0/intervals
-$ curl \
-    -v \
-    -X GET \
-    -H "Authorization: Bearer $T2" \
-    http://localhost:5000/api/v1.0/intervals
-```
-
-Each of the following GET requests to
-`http://localhost:5000/api/v1.0/intervals/<int:interval_id>` fails:
-
-```
-$ curl \
-    -v \
-    -X GET \
-    http://localhost:5000/api/v1.0/intervals/1
-
-$ curl \
-    -v \
-    -X GET \
-    -H "Authorization: Bearer $T2" \
-    http://localhost:5000/api/v1.0/intervals/1
-```
-
-whereas each of the following ones works:
-
-```
-$ curl \
-    -v \
-    -X GET \
-    -H "Authorization: Bearer $T1" \
-    http://localhost:5000/api/v1.0/intervals/1
-$ curl \
-    -v \
-    -X GET \
-    -H "Authorization: Bearer $T2" \
-    http://localhost:5000/api/v1.0/intervals/2
-```
-
-Each of the following PUT requests to
-`http://localhost:5000/api/v1.0/intervals/<int:inteval_id>` fails:
-
-```
-$ curl \
-    -v \
-    -X PUT \
-    -d '{"final": "2020-11-05 09:15"}' \
-    http://localhost:5000/api/v1.0/intervals/1
-
-$ curl \
-    -v \
-    -X PUT \
-    -H "Authorization: Bearer $T2" \
-    -d '{"final": "2020-11-05 09:15"}' \
-    http://localhost:5000/api/v1.0/intervals/1
-
-$ curl \
-    -v \
-    -X PUT \
-    -H "Authorization: Bearer $T2" \
-    -H "Content-Type: application/json" \
-    -d '{"final": "2020-11-05 09:15"}' \
-    http://localhost:5000/api/v1.0/intervals/1
-
-$ curl \
-    -v \
-    -X PUT \
-    -H "Authorization: Bearer $T1" \
-    -H "Content-Type: application/json" \
-    -d '{"start": "2020-11-04 18:00", "final": "2020-11-04 19:00"}' \
-    http://localhost:5000/api/v1.0/intervals/2
-
-$ curl \
-    -v \
-    -X PUT \
-    -H "Authorization: Bearer $T1" \
-    -H "Content-Type: application/json" \
-    -d '{"goal_id": "1", "start": "1111-11-04 18:00"}' \
-    http://localhost:5000/api/v1.0/intervals/4
-```
-
-whereas each of the following ones works:
-
-```
-$ curl \
-    -v \
-    -X PUT \
-    -H "Authorization: Bearer $T1" \
-    -H "Content-Type: application/json" \
-    -d '{"final": "2020-11-05 09:00"}' \
-    http://localhost:5000/api/v1.0/intervals/1
-$ curl \
-    -v \
-    -X PUT \
-    -H "Authorization: Bearer $T2" \
-    -H "Content-Type: application/json" \
-    -d '{"start": "2020-11-04 18:00", "final": "2020-11-04 19:00"}' \
-    http://localhost:5000/api/v1.0/intervals/2
-$ curl \
-    -v \
-    -X PUT \
-    -H "Authorization: Bearer $T1" \
-    -H "Content-Type: application/json" \
-    -d '{"start": "2020-11-04 18:00", "final": "2020-11-04 19:00"}' \
-    http://localhost:5000/api/v1.0/intervals/3
-
-$ curl \
-    -v \
-    -X PUT \
-    -H "Authorization: Bearer $T1" \
-    -H "Content-Type: application/json" \
-    -d '{"goal_id": 1, "start": "1111-11-04 18:00"}' \
-    http://localhost:5000/api/v1.0/intervals/4
-```
-
-Each of the following DELETE requests to
-`http://localhost:5000/api/v1.0/intervals/<int:interval_id>` fails:
-
-```
-$ curl \
-    -v \
-    -X DELETE \
-    http://localhost:5000/api/v1.0/intervals/4
-$ curl \
-    -v \
-    -X DELETE \
-    -H "Authorization: Bearer $T2" \
-    http://localhost:5000/api/v1.0/intervals/4
-```
-
-but the following one works:
-
-```
-$ curl \
-    -v \
-    -X DELETE \
-    -H "Authorization: Bearer $T1" \
-    http://localhost:5000/api/v1.0/intervals/4
-```
-
-# `2020/11/14/15-57/10/frontend/NavigationBar-Landing-and-static-Register-components`
-
-- https://codewithstupid.com/react-router-with-switch-and-link/
-
-# `2020/12/10/17_04/12/backend/improve-privacy-protection-when-accessing-user-resources`
-
-Temporarily, create a new user:
-
-```
-$ curl \
-    -v \
-    -X POST \
-    -H "Content-Type: application/json" \
-    -d '{"email": "name@domain.ext", "password": "temporary-user"}' \
-    http://localhost:5000/api/v1.0/users
-$ export ID=<the-id-of-the-user>
-```
-
-and issue a token for that user:
-
-```
-$ curl \
-    -v \
-    -X POST \
-    -H "Content-Type: application/json" \
-    -u name@domain.ext:temporary-user \
-    http://localhost:5000/api/v1.0/tokens
-$ export T1=<the-returned-JWS-token>
-```
-
-Whereas `curl` makes this request to a publicly available endpoint and, correspondingly,
-the response contains only public information (about the user, who is identified as
-part of the URL):
-
-```
-$ curl \
-    -v \
-    -X GET \
-    http://localhost:5000/api/v1.0/users/$ID
-```
-
-`curl` makes the following request to a **protected** endpoint and, correspondingly, the
-response contains private information (about the user, who is authenticated and
-authorized via the **required** JSON web token):
-
-```
-$ curl \
-    -v \
-    -X GET \
-    -H "Authorization: Bearer $T1" \
-    http://localhost:5000/api/v1.0/user
-```
-
-Finally, since we said the created user was going to be created only for temporary use,
-let us now go ahead and delete the user:
-
-```
-$ curl \
-    -v \
-    -X DELETE \
-    --user name@domain.ext:temporary-user \
-    http://localhost:5000/api/v1.0/users/$ID
-```
-
 # `2020/12/14/07_30/15/frontend/fix-an-erroneous-usage-of-a-Link-component`
 
 According to https://stackoverflow.com/questions/4855168/what-is-href-and-why-is-it-used :
@@ -686,146 +182,6 @@ According to https://stackoverflow.com/questions/4855168/what-is-href-and-why-is
 - `href="//site.com/#some-id"` would go to `site.com` and scroll to the id on that page.
 - `href="#"` doesn't specify an id name, but does have a corresponding location - the top of the page. Clicking an anchor with `href="#"` will move the scroll position to the top.
 - An example where a hyperlink placeholder makes sense is within template previews... the best solution for hyperlink placeholders is actually `href="#!"`. The idea here is that there hopefully isn't an element on the page with `id="!"` ... and the hyperlink therefore refers to nothing - so nothing happens.
-
-# `2020/12/11/14_37/16/frontend/dashboard-and-profile-management`
-
-```
-SELECT
-	users.id AS users_id,
-	users.email AS users_email,
-	goals.id AS goals_id,
-	goals.description AS goals_description
-FROM users
-JOIN goals ON users.id = goals.user_id;
-```
-
-# `2021/01/05/12_46/20/frontend/working-with-intervals`
-
-```
-SELECT
-	users.id AS users_id,
-	users.email AS users_email,
-	goals.id AS goals_id,
-	goals.description AS goals_description,
-    intervals.id AS intervals_id,
-    intervals.start AS intervals_start,
-    intervals.final AS intervals_final
-FROM users
-JOIN goals ON users.id = goals.user_id
-JOIN intervals ON goals.id = intervals.goal_id;
-```
-
-# `2021/01/27/06_37/23/backend/move-the-application-to-a-package`
-
-Logically, the only way to avoid the issues with `__main__` is to ensure that the application [instance] is not [created in] the `__main__` module. (So we need to move it somewhere else so that, when we run the application, we don't run the application directly but we run it through something else.)
-
----
-
-After making the first commit in this branch, I noticed that there were moderately-significant differences between the following different ways of running the repository's tests:
-
-  (a) on the command line, issue `(venv) $ python tests.py`
-
-  (b) on the command line, issue `(venv) $ python -m unittest discover -v .`
-
-  (c) in VS Code (Version: 1.53.0), use the IDE's GUI by clicking on "Run All Tests"
-
-(It was those differences that motivated the second commit in the branch.)
-
-What is common among those different ways of running the tests is that, in each case, the test suite passes. What is different among the those different ways of running the tests is that:
-
-  1. doing (a) uses an in-memory SQLite database, which is what one would expect from the implementations of `tests.py` and `goal_tracker/goal_tracker.py` - to wit:
-     ```
-     $ python tests.py
-     tests.py - DATABASE_URL=sqlite://
-     goal_tracker/goal_tracker.py - DATABASE_URL=sqlite://
-     tests.py - app.config['SQLALCHEMY_DATABASE_URI]=sqlite://
-     ...
-     Ran 8 tests in 4.314s
-     
-     OK
-     ```
-
-  2. in discord with that expectation however, doing (b)
-     - uses the on-disk database `goal_tracker.db`, and (in view of the `TestBase.setUp` and `TestBase.tearDown` methods)
-     - _drops all tables in that database_
-     
-     to wit:
-     ```
-     $ python -m unittest discover -v .
-     goal_tracker/goal_tracker.py - DATABASE_URL=None
-     tests.py - DATABASE_URL=sqlite://
-     tests.py - app.config['SQLALCHEMY_DATABASE_URI]=sqlite:////<absolute-path-to->/goal-tracker/goal_tracker.db
-     ...
-     Ran 8 tests in 4.314s
-     
-     OK
-     ```
-  3. doing (c) has the same consequences as doing (b) - to wit:
-     ```
-     goal_tracker/goal_tracker.py - DATABASE_URL=None
-     tests.py - DATABASE_URL=sqlite://
-     tests.py - app.config['SQLALCHEMY_DATABASE_URI]=sqlite:////<absolute-path-to->/goal-tracker/goal_tracker.db
-     ...
-     Ran 8 tests in 4.673s
-
-     OK
-     ```
-
-In summary, this sub-section demonstrates that:
-- if one uses (a) to run the repository's tests, the Python interpreter first parses `tests.py`, and then it parses `goal_tracker/goal_tracker.py`
-- if one uses (b) or (c) to run the repository's tests, the files are parsed in the opposite order
-
-# `2021/01/28/06_53/25/backend/move-the-tests-to-a-package`
-
-The previous section discussed moderately-significant differences between different ways of running the repository's tests.
-
-The branch corresponding to the current section introduces such changes that necessitate the following modifications to the ways of running the tests:
-
-  (a) the removal of the `if __name__ == "__main__"` block from `tests/tests.py` means that it is no longer possible to run the tests by issuing `(venv) $ PYTHONPATH=. python tests/tests.py` on the command line
-
-  (b) on the command line, issue `(venv) $ python -m unittest discover -v tests/`
-
-  (c) in VS Code (Version: 1.53.0), use the IDE's GUI by clicking on "Run All Tests"
-
-  (d) on the command line, issue `(venv) $ FLASK_APP=goal_tracker_dev_server.py flask test`
-
-As of the first commit in this branch, it no longer makes any difference which way one runs the tests, i.e. in each case:
-  - the test suite passes
-  - the run uses an in-memory SQLite database (and/because the Python interpreter first parses `tests.py`, and then it parses `goal_tracker/goal_tracker.py`)
-
-# `2021/02/03/06_47/26/backend/move-the-configuration-to-a-separate-module`
-
-This branch has, somewhat frustratingly, re-introduced moderately-significant differences between the different ways of running the tests:
-
-1. the statement under (a) in the previous section applies also to this branch
-
-2. doing (b) from the previous section uses the on-disk database `goal_tracker.db`, and as a consequence _drops all tables in that database_ - to wit:
-
-    ```
-    goal_tracker/goal_tracker.py - config_name=development
-    goal_tracker/goal_tracker.py - app.config['SQLALCHEMY_DATABASE_URI']=sqlite:////<absolute-path-to->/goal-tracker/goal_tracker.db
-    tests.py - app.config['SQLALCHEMY_DATABASE_URI']=sqlite:////<absolute-path-to->/goal-tracker/goal_tracker.db
-    tests.py - app.config['TESTING']=False
-    ```
-3. doing (c) from the previous section has the same consequences as doing (b) [from the previous section] - to wit:
-
-    ```
-    goal_tracker/goal_tracker.py - config_name=development
-    goal_tracker/goal_tracker.py - app.config['SQLALCHEMY_DATABASE_URI']=sqlite:////<absolute-path-to->/goal-tracker/goal_tracker.db
-    tests.py - app.config['SQLALCHEMY_DATABASE_URI']=sqlite:////<absolute-path-to->/goal-tracker/goal_tracker.db
-    tests.py - app.config['TESTING']=False
-    ```
-
-4. doing (d) from the previous section uses an in-memory SQLite database (and, as a consequence, running the tests doesn't make any changes to the on-disk database `goal_tracker.db`, which is the appropriate behavior) - to wit:
-
-    ```
-    goal_tracker/goal_tracker.py - config_name=development
-    goal_tracker/goal_tracker.py - app.config['SQLALCHEMY_DATABASE_URI']=sqlite:////<absolute-path-to->/goal-tracker/goal_tracker.db
-    goal_tracker/goal_tracker.py - config_name=testing
-    goal_tracker/goal_tracker.py - app.config['SQLALCHEMY_DATABASE_URI']=sqlite://
-    tests.py - app.config['SQLALCHEMY_DATABASE_URI']=sqlite://
-    tests.py - app.config['TESTING']=True
-    ```
 
 # `2021/02/04/06_53/28/backend/use-an-application-factory-function`
 
@@ -987,14 +343,6 @@ This branch has, somewhat frustratingly, re-introduced moderately-significant di
     * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
     ```
 
-# `2021/03/15/15_27/31/backend/begin-requiring-a-.env-file`
+# Future plans
 
-at the the root of your local repository, create a `.env` file with the following structure:
-```
-GOAL_TRACKER_CONFIG=<one-of-the-keys-of-the-config.config-dictionary>
-
-SECRET_KEY=<specify-a-good-secret-key-here>
-DATABASE_URL=sqlite:///<absolute-path-starting-with-a-leading-slash-and-pointing-to-an-SQLite-file>
-```
-
-(For deployment, you should generate a "good secret key" and store that value in `SECRET_KEY` within the `.env` file; to achieve that, take a look at the "How to generate good secret keys" section on https://flask.palletsprojects.com/en/1.1.x/quickstart/ . For local development, something like `keep-this-value-known-only-to-the-deployment-machine` should suffice.)
+... [TBD]
