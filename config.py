@@ -1,15 +1,21 @@
 import os
 
+from dotenv import find_dotenv, load_dotenv
 
-basedir = os.path.abspath(os.path.dirname(__file__))
+
+# Search for a .env file by walking up directories until it's found.
+dotenv_path = find_dotenv()
+
+# Load up the entries as environment variables.
+load_dotenv(dotenv_path=dotenv_path)
 
 
 class Config(object):
     DEBUG = False
     TESTING = False
-    SECRET_KEY = os.environ.get("SECRET_KEY", "my-secret")
+    SECRET_KEY = os.environ.get("SECRET_KEY")
     SQLALCHEMY_DATABASE_URI = os.environ.get(
-        "DATABASE_URL", "sqlite:///" + os.path.join(basedir, "goal_tracker.db")
+        "DATABASE_URL"
     )
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
