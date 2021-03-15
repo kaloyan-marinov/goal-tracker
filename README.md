@@ -986,3 +986,15 @@ This branch has, somewhat frustratingly, re-introduced moderately-significant di
     * Debug mode: on
     * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
     ```
+
+# `2021/03/15/15_27/31/backend/begin-requiring-a-.env-file`
+
+at the the root of your local repository, create a `.env` file with the following structure:
+```
+GOAL_TRACKER_CONFIG=<one-of-the-keys-of-the-config.config-dictionary>
+
+SECRET_KEY=<specify-a-good-secret-key-here>
+DATABASE_URL=sqlite:///<absolute-path-starting-with-a-leading-slash-and-pointing-to-an-SQLite-file>
+```
+
+(For deployment, you should generate a "good secret key" and store that value in `SECRET_KEY` within the `.env` file; to achieve that, take a look at the "How to generate good secret keys" section on https://flask.palletsprojects.com/en/1.1.x/quickstart/ . For local development, something like `keep-this-value-known-only-to-the-deployment-machine` should suffice.)
