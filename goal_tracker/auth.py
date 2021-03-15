@@ -2,7 +2,7 @@ from flask import jsonify, current_app
 from flask_httpauth import HTTPBasicAuth, HTTPTokenAuth
 from itsdangerous import BadSignature, SignatureExpired
 
-from .models import User
+from goal_tracker.models import User
 
 
 basic_auth = HTTPBasicAuth()

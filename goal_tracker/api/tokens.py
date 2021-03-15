@@ -1,6 +1,6 @@
-from ..auth import basic_auth
+from goal_tracker.api import api_bp
 
-from . import api_bp
+from goal_tracker.auth import basic_auth
 
 
 @api_bp.route("/tokens", methods=["POST"])

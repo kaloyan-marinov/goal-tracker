@@ -1,7 +1,7 @@
 from flask import current_app
 from werkzeug.security import generate_password_hash, check_password_hash
 
-from . import db
+from goal_tracker import db
 
 
 class User(db.Model):

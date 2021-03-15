@@ -15,4 +15,4 @@ def error_response(status_code, message):
     return r
 
 
-from . import users, tokens, goals, intervals
+from goal_tracker.api import users, tokens, goals, intervals

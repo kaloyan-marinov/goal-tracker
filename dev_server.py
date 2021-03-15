@@ -8,7 +8,7 @@ app = create_app()
 
 
 print(
-    f"goal_tracker_dev_server.py - app.config['SQLALCHEMY_DATABASE_URI']={app.config['SQLALCHEMY_DATABASE_URI']}"
+    f"dev_server.py - app.config['SQLALCHEMY_DATABASE_URI']={app.config['SQLALCHEMY_DATABASE_URI']}"
 )
 
 
