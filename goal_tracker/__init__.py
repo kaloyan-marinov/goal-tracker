@@ -14,7 +14,7 @@ migrate = Migrate()
 
 
 # Import the models so that they are registered with SQLAlchemy.
-from . import models
+from goal_tracker import models
 
 
 def create_app(config_name=None):
@@ -44,7 +44,7 @@ def create_app(config_name=None):
 
     # Register `Blueprint`(s) with the application instance.
     # (By themselves, `Blueprint`s are "inactive".)
-    from .api import api_bp
+    from goal_tracker.api import api_bp
 
     app.register_blueprint(api_bp, url_prefix="/api/v1.0")
 

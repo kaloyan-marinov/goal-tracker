@@ -1,9 +1,10 @@
 from flask import jsonify, request, url_for
 
-from . import api_bp, error_response
-from .. import db
-from ..auth import token_auth
-from ..models import Goal
+from goal_tracker.api import api_bp, error_response
+
+from goal_tracker import db
+from goal_tracker.auth import token_auth
+from goal_tracker.models import Goal
 
 
 @api_bp.route("/goals", methods=["GET"])
