@@ -6,8 +6,6 @@ import coverage
 
 
 def run():
-    os.environ["GOAL_TRACKER_CONFIG"] = "testing"
-
     # start coverage engine
     cov = coverage.Coverage(branch=True)
     cov.start()
