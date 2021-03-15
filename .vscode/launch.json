@@ -11,7 +11,7 @@
             "request": "launch",
             "module": "flask",
             "env": {
-                "FLASK_APP": "goal_tracker_dev_server.py",
+                "FLASK_APP": "dev_server.py",
                 "FLASK_ENV": "development",
                 "FLASK_DEBUG": "0"
             },
@@ -28,7 +28,7 @@
             "name": "[old way] Python: Flask",
             "type": "python",
             "request": "launch",
-            "module": "goal_tracker_dev_server",
+            "module": "dev_server",
             "args": [],
             "jinja": true
         }
