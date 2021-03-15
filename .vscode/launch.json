@@ -29,10 +29,6 @@
             "type": "python",
             "request": "launch",
             "module": "goal_tracker_dev_server",
-            "env": {
-                "FLASK_APP": "goal_tracker.py",
-                "FLASK_ENV": "development"
-            },
             "args": [],
             "jinja": true
         }
