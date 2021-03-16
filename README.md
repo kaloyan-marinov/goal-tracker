@@ -4,15 +4,45 @@ This repository's documentation is organized as follows.
 
 1. [Introduction](#introduction)
 
-2. [How to set up the project for local development](#how-to-set-up-the-project-for-local-development)
+2. [Motivation](#motivation)
 
-3. [Different options for serving our backend application](#different-options-for-serving-our-backend-application)
+3. [The functionality provided by the web application](#the-functionality-provided-by-the-web-application)
 
-4. [Future plans](#future-plans)
+4. [How to set up the project for local development](#how-to-set-up-the-project-for-local-development)
+
+5. [Different options for serving our backend application](#different-options-for-serving-our-backend-application)
+
+6. [Future plans](#future-plans)
 
 # Introduction
 
-`GoalTracker` is a web application that ... [TBD]
+`GoalTracker` is a web application, which aims to help you _form a clear, focused idea of who you are today and who you want to be tomorrow_.
+
+I decided to build such an application after watching a YouTube video titled "Seneca - How To Manage Your Time (Stoicism)". That video was posted on August 26, 2019 in the "Philosophies for Life" channel on YouTube. More specifically, my motivation for building `GoalTracker` came about as a combination of (a) thoughts about work-life balance that are at the forefront of my mind, and (b) ideas that are presented in the video. The next section attempts to convey the mentioned combination in a clear and concise way.
+
+# Motivation
+
+Seneca’s essay “On the shortness of life” offers us an urgent reminder about the non-renewability of our most important resource - our time. Time is our least renewable and therefore most valuable resource. To wit:
+
+- on the one hand, if you have time (such as 20, 30, or 40 years left in your life) but run out of money, _it is possible (albeit not always easy) for you to earn more money_;
+
+- on the other hand, if you have money but your life is approaching its end, _there don't exist any ways for you to earn more time_.
+
+Furthermore, we all work hard to essentially earn two things: money and time that we can spend as we see fit. In view of that as well as of the non-renewability of time, it logically follows that we should not waste the free time we earn. Unfortunately, achieving that in today's world is easier said than done, because:
+
+(a) a prominent part of contemporary life is what can be aptly described as "open-ended forms of entertainment", which are pervasive and omnipresent; while open-ended forms of entertainment (such as TV series, video games, social media, etc.) are not inherently bad, we can easily allow them to consume too much of our waking hours; and
+
+(b) spending our free time "as we see fit" can include things that range from spending quality time with people we love or _exercising_ regularly; to _traveling_; to _developing a useful skill_ or _seeking out new opportunities_.
+
+# The functionality provided by the web application
+
+In a nutshell, `GoalTracker` aims to help you protect your hard-earned free time from leaking out uncontrollably.
+
+For any activity that is meaningful to your vision of life, you can create a corresponding entity called a _Goal_. Whether that activity is continuous in nature (such as spending time with you family) or term-limited (such as attaining a Grade Point Average of at least 3.5 in the next semester) remains entirely within your control.
+
+In addition to that, there is another important feature that `GoalTracker` provides - namely, it allows you to create _Interval_ records, which encapsulate how much time you have spent in pursuit of each of your _Goals_.
+
+In summary, `GoalTracker` enables you to shine a light on the things that make excessive demands on your time so that, if need be, you can re-prioritize your _Goals_ in order to begin investing your hard-earned free time in the _Goals_ that _are truly meaningful to your own vision of life_.
 
 # How to set up the project for local development
 
@@ -265,4 +295,8 @@ Next, we are going to document 4 different options for starting a process that s
 
 # Future plans
 
-... [TBD]
+- Transition from a SQLite database to a MySQL database
+
+- Add styling to the frontend application
+
+- Implement a mobile client
