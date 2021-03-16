@@ -43,7 +43,26 @@ This repository's documentation is organized as follows.
     - run the tests:
 
         ```
+        [option A: without coverage (and, obviously don't produce an HTML report)]
+
+        (venv) $ python -m unittest discover -v tests/
+        [or, in VS Code (Version: 1.53.0),
+        use the IDE's GUI by clicking on "Run All Tests";
+        once the tests have been executed, click on "Show Test Output"]
+
+        [option B: with coverage but don't produce an HTML report]
+
         (venv) $ FLASK_APP=dev_server.py flask test
+
+        [option C: with coverage and produce an HTML report]
+
+        (venv) $ coverage run -m unittest discover -v tests/
+        (venv) $ coverage html --omit="venv/*","tests/*","__pycache__/*"
+        [
+            the last command doesn't output anything in the terminal,
+            but it creates a folder called `htmlcov`
+        ]
+        [open the `htmlcov/index.html` file in your web browser]       
         ```
     
     - create an empty SQLite database and apply all database migrations:
@@ -152,122 +171,7 @@ This repository's documentation is organized as follows.
         ```
         and a tab in your operating system's default web browser should open up and load the address localhost:3000/
 
-# `06/backend/unit-tests`
-
-executing the tests through VS Code
-
-executing
-```
-(venv) $ python -m unittest discover -v .
-```
-
-To get a report of unittest coverage, first issue
-
-```
-$ coverage run -m unittest tests/tests.py
-$ coverage html --omit="venv/*","tests/*","__pycache__/*"
-```
-
-and then go on to open `htmlcov/index.html`.
-
 # `2021/02/04/06_53/28/backend/use-an-application-factory-function`
-
-1. You can run the tests in several (at-least-at-this-stage-insignificantly-different) ways:
-  
-    (a) _with coverage and produce an HTML report_
-
-    ```
-    (venv) goal-tracker $ coverage run -m unittest discover -v tests/
-
-
-
-    test_with_one_user (tests.TestIntervals) ... goal_tracker/__init__.py - config_name=testing
-    tests/tests.py - self.app.config['SQLALCHEMY_DATABASE_URI']=sqlite://
-    tests/tests.py - self.app.config['TESTING']=True
-    ok
-    ...
-    ----------------------------------------------------------------------
-    Ran 8 tests in 4.252s
-
-    OK
-    ```
-
-    ```
-    (venv) goal-tracker $ coverage html --omit="venv/*","tests/*","__pycache__/*"
-
-
-
-    [the last command doesn't output anything in the terminal,
-    but it creates a folder called `htmlcov`]
-    ```
-
-    open the `htmlcov/index.html` file in your web browser
-
-    (b) _with coverage but without producing an HTML report_
-    ```
-    (venv) goal-tracker $ FLASK_APP=dev_server.py flask test
-
-
-
-    goal_tracker/__init__.py - config_name=development
-    dev_server.py - app.config['SQLALCHEMY_DATABASE_URI']=sqlite:///<the-value-of-GOAL_TRACKER_CONFIG-in-your-.env-file>
-    test_with_one_user (tests.tests.TestIntervals) ... goal_tracker/__init__.py - config_name=testing
-    tests/tests.py - self.app.config['SQLALCHEMY_DATABASE_URI']=sqlite://
-    tests/tests.py - self.app.config['TESTING']=True
-    ok
-    ...
-    ----------------------------------------------------------------------
-    Ran 8 tests in 5.004s
-
-    OK
-
-    Name                       Stmts   Miss Branch BrPart  Cover
-    ------------------------------------------------------------
-    config.py                     16      0      0      0   100%
-    goal_tracker/__init__.py      21      1      2      1    91%
-    goal_tracker/api.py          234      4     88      5    97%
-    goal_tracker/auth.py          36      0      6      0   100%
-    goal_tracker/models.py        34      3      0      0    91%
-    goal_tracker/utils.py          6      0      0      0   100%
-    ------------------------------------------------------------
-    TOTAL                        347      8     96      6    97%
-    ```
-
-    (c) _without coverage and without producing an HTML report_
-
-    To achieve that, you can either use the command line:
-    ```
-    (venv) goal-tracker $ python -m unittest discover -v tests/
-
-
-
-    test_with_one_user (tests.TestIntervals) ... goal_tracker/__init__.py - config_name=testing
-    tests/tests.py - self.app.config['SQLALCHEMY_DATABASE_URI']=sqlite://
-    tests/tests.py - self.app.config['TESTING']=True
-    ok
-    ...
-    ----------------------------------------------------------------------
-    Ran 8 tests in 3.883s
-
-    OK
-    ```
-    or VS Code:
-    ```
-    [in VS Code (Version: 1.53.0), use the IDE's GUI by clicking on "Run All Tests"]
-
-
-
-    [still in IDE's GUI, click on "Show Test Output"]
-    test_with_one_user (tests.TestIntervals) ... goal_tracker/__init__.py - config_name=testing
-    tests/tests.py - self.app.config['SQLALCHEMY_DATABASE_URI']=sqlite://
-    tests/tests.py - self.app.config['TESTING']=True
-    ok
-    ...
-    ----------------------------------------------------------------------
-    Ran 8 tests in 5.096s
-
-    OK
-    ```
 
 2. You can use the Flask development server to run/start//serve the application. That can be achieved in several (at-least-at-this-stage-insignificantly-different) ways:
 
