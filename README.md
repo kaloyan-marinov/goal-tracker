@@ -18,7 +18,7 @@ This repository's documentation is organized as follows.
 
 `GoalTracker` is a web application, which aims to help you _form a clear, focused idea of who you are today and who you want to be tomorrow_.
 
-I decided to build such an application after watching a YouTube video titled "Seneca - How To Manage Your Time (Stoicism)". That video was posted on August 26, 2019 in the "Philosophies for Life" channel on YouTube. More specifically, my motivation for building `GoalTracker` came about as a combination of (a) thoughts about work-life balance that are at the forefront of my mind, and (b) ideas that are presented in the video. The next section attempts to convey the mentioned combination in a clear and concise way.
+I decided to build such an application after watching a YouTube video titled "Seneca - How To Manage Your Time (Stoicism)". That video was posted on August 26, 2019 in the "Philosophies for Life" channel on YouTube. More specifically, my motivation for building `GoalTracker` came about as a combination of (a) thoughts about work-life balance that are at the forefront of my mind, and (b) ideas that are presented in the video.
 
 # Motivation
 
@@ -38,11 +38,15 @@ Furthermore, we all work hard to essentially earn two things: money and time tha
 
 In a nutshell, `GoalTracker` aims to help you protect your hard-earned free time from leaking out uncontrollably.
 
-For any activity that is meaningful to your vision of life, you can create a corresponding entity called a _Goal_. Whether that activity is continuous in nature (such as spending time with you family) or term-limited (such as attaining a Grade Point Average of at least 3.5 in the next semester) remains entirely within your control.
+For any activity that is meaningful to your vision of life, you can create a corresponding entity called a _Goal_. Whether the underlying activity is continuous in nature (such as spending time with your family) or term-limited (such as attaining a Grade Point Average of at least 3.5 in the next semester) remains entirely within your control.
 
 In addition to that, there is another important feature that `GoalTracker` provides - namely, it allows you to create _Interval_ records, which encapsulate how much time you have spent in pursuit of each of your _Goals_.
 
-In summary, `GoalTracker` enables you to shine a light on the things that make excessive demands on your time so that, if need be, you can re-prioritize your _Goals_ in order to begin investing your hard-earned free time in the _Goals_ that are truly valuable to your own vision of life.
+In summary, `GoalTracker` enables you to maintain enough self-awareness to remember the lessons of your past, so as to be more effective today.
+
+- Firstly, by making _Goal_ and _Interval_ records within your personal `GoalTracker` account, you shine a light on the things that make excessive demands on your time.
+
+- Secondly and if need be, you can re-prioritize your _Goals_ in order to begin investing more of your hard-earned free time in those _Goals_ that are truly valuable to your own vision of life.
 
 # How to set up the project for local development
 
@@ -156,6 +160,15 @@ In summary, `GoalTracker` enables you to shine a light on the things that make e
         ```
 
 4. set up the frontend
+
+    - download the Node.js runtime and install it on your system:
+
+        ```
+        $ node --version
+        v14.15.0
+        $ npm --version
+        6.14.8
+        ```
 
     - install the Node.js dependenies:
 
