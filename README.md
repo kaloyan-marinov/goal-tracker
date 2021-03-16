@@ -154,14 +154,9 @@ This repository's documentation is organized as follows.
 
 # `06/backend/unit-tests`
 
-Executing the following command creates an `htmlcov` directory:
+executing the tests through VS Code
 
-```
-(venv) $ python tests.py
-```
-
-but neither does executing the tests through VS Code, nor does executing
-
+executing
 ```
 (venv) $ python -m unittest discover -v .
 ```
@@ -169,27 +164,17 @@ but neither does executing the tests through VS Code, nor does executing
 To get a report of unittest coverage, first issue
 
 ```
-$ coverage run -m unittest tests.py
-$ coverage html --omit="venv/*",tests.py,"__pycache__/*"
+$ coverage run -m unittest tests/tests.py
+$ coverage html --omit="venv/*","tests/*","__pycache__/*"
 ```
 
-and then go on to open `htmlcov/goal_tracker.py.html`.
-# `2020/12/14/07_30/15/frontend/fix-an-erroneous-usage-of-a-Link-component`
-
-According to https://stackoverflow.com/questions/4855168/what-is-href-and-why-is-it-used :
-
-- The main use of anchor tags - `<a></a>` - is as hyperlinks.
-- The href property is required only for an anchor to actually be a hyperlink!
-- `href="#some-id"` would scroll to an element on the current page such as `<div id="some-id">`.
-- `href="//site.com/#some-id"` would go to `site.com` and scroll to the id on that page.
-- `href="#"` doesn't specify an id name, but does have a corresponding location - the top of the page. Clicking an anchor with `href="#"` will move the scroll position to the top.
-- An example where a hyperlink placeholder makes sense is within template previews... the best solution for hyperlink placeholders is actually `href="#!"`. The idea here is that there hopefully isn't an element on the page with `id="!"` ... and the hyperlink therefore refers to nothing - so nothing happens.
+and then go on to open `htmlcov/index.html`.
 
 # `2021/02/04/06_53/28/backend/use-an-application-factory-function`
 
 1. You can run the tests in several (at-least-at-this-stage-insignificantly-different) ways:
   
-    (a) _with coverage and produce an HTML report_ (which requires you to execute both of the commands that follow)
+    (a) _with coverage and produce an HTML report_
 
     ```
     (venv) goal-tracker $ coverage run -m unittest discover -v tests/
@@ -212,17 +197,20 @@ According to https://stackoverflow.com/questions/4855168/what-is-href-and-why-is
 
 
 
-    [the last command doesn't output anything in the terminal]
+    [the last command doesn't output anything in the terminal,
+    but it creates a folder called `htmlcov`]
     ```
+
+    open the `htmlcov/index.html` file in your web browser
 
     (b) _with coverage but without producing an HTML report_
     ```
-    (venv) goal-tracker $ FLASK_APP=goal_tracker_dev_server.py flask test
+    (venv) goal-tracker $ FLASK_APP=dev_server.py flask test
 
 
 
     goal_tracker/__init__.py - config_name=development
-    goal_tracker_dev_server.py - app.config['SQLALCHEMY_DATABASE_URI']=sqlite:////<absolute-path-to->/goal-tracker/goal_tracker.db
+    dev_server.py - app.config['SQLALCHEMY_DATABASE_URI']=sqlite:///<the-value-of-GOAL_TRACKER_CONFIG-in-your-.env-file>
     test_with_one_user (tests.tests.TestIntervals) ... goal_tracker/__init__.py - config_name=testing
     tests/tests.py - self.app.config['SQLALCHEMY_DATABASE_URI']=sqlite://
     tests/tests.py - self.app.config['TESTING']=True
