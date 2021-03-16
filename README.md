@@ -190,15 +190,15 @@ As the article explains in its "Better Debug Configuration" section:
     - either show the in-browser debugger when you are in debug mode,
     - or else just show an Internal Server Error page [in your browser] and log the exception to the terminal and/or log file;
     
-- when working with/in VS Code, it would be desirable to have crashes reported in the VS Code debugger; unfortunately, one's first attempt at achieving that in VS Code is obstructed by an old bug in Flask
+- when working in/with VS Code, it would be desirable to have crashes reported in the VS Code debugger; unfortunately, one's first attempt at achieving that in VS Code is obstructed by an old bug in Flask
 
 - the problem is that Flask does not properly configure the bubbling up of errors into an external debugger
 
-Next, we are going to document 4 different options for starting a process that serves our Flask application: the first 2 of those options are done outside VS Code (and, obviously, can't and won't cause crashes to be reported in the VS Code debugger), whereas the last 2 options are done through VS Code but only the very last one causes crashes to be reported in the VS Code debugger. Those options are as follows:
+Next, we are going to document 4 different options for starting a process that serves our backend application: the first 2 of those options are done outside VS Code (and, obviously, can't and won't cause crashes to be reported in the VS Code debugger), whereas the last 2 options are done from within VS Code but only the very last one causes crashes to be reported in the VS Code debugger. Those options are as follows:
 
-- option 1 - the "new way" of serving a Flask application (i.e. invoking `flask run`) on the command line:
+- option 1 - the "new way" of serving our backend application from the command line is to invoke `flask run`:
     ```
-    (venv) goal-tracker $ FLASK_APP=goal_tracker_dev_server.py flask run
+    (venv) $ FLASK_APP=dev_server.py flask run
 
 
 
@@ -212,9 +212,9 @@ Next, we are going to document 4 different options for starting a process that s
     * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
     ```
 
-- option 2 - the "old way" of running/starting//serving a Flask application (i.e. using `if __name__ == "__main__": app.run()` in a module where a `Flask` (application) object is created, and invoking `python`) on the command line:
+- option 2 - the "old way" of serving our backend application from the command line is to start by using a `if __name__ == "__main__": app.run()` codeblock in our module where a `Flask` (application) object is created, and go on to invoke `python <that-module-s-name>`:
     ```
-    (venv) goal-tracker $ python goal_tracker_dev_server.py 
+    (venv) $ python dev_server.py 
 
 
 
@@ -228,13 +228,9 @@ Next, we are going to document 4 different options for starting a process that s
     * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
     ```
 
-- option 3 - the "new way" of running/starting//serving a Flask application from VS Code:
+- option 3 - the "new way" of serving our backend application from VS Code is first to click on "Run and Debug" and then to launch the "[new way] Python Flask" run configuration:
     ```
-    [use VS Code to launch "[new way] Python Flask"]
-
-
-
-    (venv) goal-tracker $  cd /<absolute-path-to->/goal-tracker ; /usr/bin/env /<absolute-path-to->/goal-tracker/venv/bin/python3 ~/.vscode/extensions/ms-python.python-2021.1.502429796/pythonFiles/lib/python/debugpy/launcher 49168 -- -m flask run --no-debugger --no-reload 
+    (venv) $  cd /<absolute-path-to->/goal-tracker ; /usr/bin/env /<absolute-path-to->/goal-tracker/venv/bin/python3 ~/.vscode/extensions/ms-python.python-2021.1.502429796/pythonFiles/lib/python/debugpy/launcher 49168 -- -m flask run --no-debugger --no-reload 
     * Serving Flask app "goal_tracker_dev_server.py"
     * Environment: development
     * Debug mode: off
@@ -243,7 +239,7 @@ Next, we are going to document 4 different options for starting a process that s
     * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
     ```
 
-- option 4 - the "old way" of running/starting//serving a Flask application from VS Code:
+- option 4 - the "old way" of serving our backend application from VS Code is first to click on "Run and Debug" and then to launch the "[old way] Python Flask" run configuration:
     ```
     [use VS Code to launch "[old way] Python Flask"]
 
