@@ -17,14 +17,14 @@ This repository's documentation is organized as follows.
 1. clone this repository, and navigate into your local repository
 
 2. at the the root of your local repository, create a `.env` file with the following structure:
-```
-GOAL_TRACKER_CONFIG=development
+    ```
+    GOAL_TRACKER_CONFIG=development
 
-SECRET_KEY=<specify-a-good-secret-key-here>
-DATABASE_URL=sqlite:///<absolute-path-starting-with-a-leading-slash-and-pointing-to-an-SQLite-file>
-```
+    SECRET_KEY=<specify-a-good-secret-key-here>
+    DATABASE_URL=sqlite:///<absolute-path-starting-with-a-leading-slash-and-pointing-to-an-SQLite-file>
+    ```
 
-(For deployment, you should generate a "good secret key" and store that value in `SECRET_KEY` within the `.env` file; to achieve that, take a look at the "How to generate good secret keys" section on https://flask.palletsprojects.com/en/1.1.x/quickstart/ . For local development, something like `keep-this-value-known-only-to-the-deployment-machine` should suffice.)
+    (For deployment, you should generate a "good secret key" and store that value in `SECRET_KEY` within the `.env` file; to achieve that, take a look at the "How to generate good secret keys" section on https://flask.palletsprojects.com/en/1.1.x/quickstart/ . For local development, something like `keep-this-value-known-only-to-the-deployment-machine` should suffice.)
 
 3. set up the backend
 
@@ -43,7 +43,7 @@ DATABASE_URL=sqlite:///<absolute-path-starting-with-a-leading-slash-and-pointing
     - run the tests:
 
         ```
-        (venv) $ FLASK_APP=goal_tracker:dev_server flask test
+        (venv) $ FLASK_APP=dev_server.py flask test
         ```
     
     - create an empty SQLite database and apply all database migrations:
@@ -101,22 +101,22 @@ DATABASE_URL=sqlite:///<absolute-path-starting-with-a-leading-slash-and-pointing
 
 5. start serving the backend application and the frontend application
 
-    - launch a terminal instance and, in it, issue:
+    - launch a terminal instance and, in it, start a process responsible for serving the backend application:
 
         ```
         $ source venv/bin/activate
-        (venv) $ FLASK_APP=dev_server flask run
-         * Serving Flask app "dev_server"
+        (venv) $ FLASK_APP=dev_server.py flask run
+         * Serving Flask app "dev_server.py"
          * Environment: production
-         WARNING: This is a development server. Do not use it in a production deployment.
-         Use a production WSGI server instead.
+        WARNING: This is a development server. Do not use it in a production deployment.
+        Use a production WSGI server instead.
          * Debug mode: off
         goal_tracker/__init__.py - config_name=development
         dev_server.py - app.config['SQLALCHEMY_DATABASE_URI']=<the-value-of-DATABASE_URL-in-your-.env-file>
          * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
         ```
 
-    - verify that the backend is up and running by issuing:
+        at this point, it is a good idea to verify that the backend is up and running - launch another terminal instance and, in it, issue:
         ```
         $ curl -v localhost:5000/api/v1.0/users
         *   Trying 127.0.0.1...
@@ -136,9 +136,11 @@ DATABASE_URL=sqlite:///<absolute-path-starting-with-a-leading-slash-and-pointing
         < 
         {"users":[]}
         * Closing connection 0
+
+        $ exit
         ```
 
-    - launch a second terminal instance and, in it, issue:
+    - launch a separate terminal instance and, in it, start a process responsible for serving the frontend application:
 
         ```
         $ cd client
