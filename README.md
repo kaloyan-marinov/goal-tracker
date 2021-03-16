@@ -6,7 +6,7 @@ This repository's documentation is organized as follows.
 
 2. [How to set up the project for local development](#how-to-set-up-the-project-for-local-development)
 
-3. [Different options for serving our backend application](#different-options-of-serving-a-flask-application)
+3. [Different options for serving our backend application](#different-options-for-serving-our-backend-application)
 
 4. [Future plans](#future-plans)
 
@@ -58,12 +58,19 @@ This repository's documentation is organized as follows.
 
             ```
             (venv) $ FLASK_APP=dev_server.py flask test
+            [
+                the last command outputs a coverage report in plaintext format
+                within the terminal, and creates a file called `.coverage`
+            ]
             ```
         
         - option C - with coverage and produce an HTML report
 
             ```
             (venv) $ coverage run -m unittest discover -v tests/
+            [
+                the last command creates a file called `.coverage`
+            ]
             
             (venv) $ coverage html --omit="venv/*","tests/*","__pycache__/*"
             [
@@ -202,13 +209,13 @@ Next, we are going to document 4 different options for starting a process that s
 
 
 
-    * Serving Flask app "goal_tracker_dev_server.py"
-    * Environment: production
+     * Serving Flask app "dev_server.py"
+     * Environment: production
     WARNING: This is a development server. Do not use it in a production deployment.
     Use a production WSGI server instead.
-    * Debug mode: off
+     * Debug mode: off
     goal_tracker/__init__.py - config_name=development
-    goal_tracker_dev_server.py - app.config['SQLALCHEMY_DATABASE_URI']=sqlite:////<absolute-path-to->/goal-tracker/goal_tracker.db
+    dev_server.py - app.config['SQLALCHEMY_DATABASE_URI']=<the-value-of-GOAL_TRACKER_CONFIG-in-your-.env-file>
     * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
     ```
 
@@ -219,24 +226,24 @@ Next, we are going to document 4 different options for starting a process that s
 
 
     goal_tracker/__init__.py - config_name=development
-    goal_tracker_dev_server.py - app.config['SQLALCHEMY_DATABASE_URI']=sqlite:////<absolute-path-to->/goal-tracker/goal_tracker.db
-    * Serving Flask app "goal_tracker" (lazy loading)
-    * Environment: production
+    dev_server.py - app.config['SQLALCHEMY_DATABASE_URI']=<the-value-of-GOAL_TRACKER_CONFIG-in-your-.env-file>
+     * Serving Flask app "goal_tracker" (lazy loading)
+     * Environment: production
     WARNING: This is a development server. Do not use it in a production deployment.
     Use a production WSGI server instead.
-    * Debug mode: on
-    * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
+     * Debug mode: on
+     * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
     ```
 
 - option 3 - the "new way" of serving our backend application from VS Code is first to click on "Run and Debug" and then to launch the "[new way] Python Flask" run configuration:
     ```
-    (venv) $  cd /<absolute-path-to->/goal-tracker ; /usr/bin/env /<absolute-path-to->/goal-tracker/venv/bin/python3 ~/.vscode/extensions/ms-python.python-2021.1.502429796/pythonFiles/lib/python/debugpy/launcher 49168 -- -m flask run --no-debugger --no-reload 
-    * Serving Flask app "goal_tracker_dev_server.py"
-    * Environment: development
-    * Debug mode: off
+    (venv) $  cd <absolute-path-to-your-local-clone-of-this-repo> ; /usr/bin/env <absolute-path-to-your-local-clone-of-this-repo>/venv/bin/python3 ~/.vscode/extensions/ms-python.python-2021.2.636928669/pythonFiles/lib/python/debugpy/launcher 57576 -- -m flask run --no-debugger --no-reload 
+     * Serving Flask app "dev_server.py"
+     * Environment: development
+     * Debug mode: off
     goal_tracker/__init__.py - config_name=development
-    goal_tracker_dev_server.py - app.config['SQLALCHEMY_DATABASE_URI']=sqlite:////<absolute-path-to->/goal-tracker/goal_tracker.db
-    * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
+    dev_server.py - app.config['SQLALCHEMY_DATABASE_URI']=<the-value-of-GOAL_TRACKER_CONFIG-in-your-.env-file>
+     * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
     ```
 
 - option 4 - the "old way" of serving our backend application from VS Code is first to click on "Run and Debug" and then to launch the "[old way] Python Flask" run configuration:
@@ -245,13 +252,15 @@ Next, we are going to document 4 different options for starting a process that s
 
 
 
-    (venv) goal-tracker $  cd /<absolute-path-to->/goal-tracker ; /usr/bin/env /<absolute-path-to->/goal-tracker/venv/bin/python3 ~/.vscode/extensions/ms-python.python-20.1.502429796/pythonFiles/lib/python/debugpy/launcher 49196 -- -m goal_tracker_dev_server 
+    (venv) goal-tracker $  cd <absolute-path-to-your-local-clone-of-this-repo>/goal-tracker-public ; /usr/bin/env <absolute-path-to-your-local-clone-of-this-repo>/goal-tracker-public/venv/bin/python3 ~/.vscode/extensions/ms-python.python-2021.2.636928669/pythonFiles/lib/python/debugpy/launcher 57609 -- -m dev_server 
     goal_tracker/__init__.py - config_name=development
-    goal_tracker_dev_server.py - app.config['SQLALCHEMY_DATABASE_URI']=sqlite:////<absolute-path-to->/goal-tracker/goal_tracker.db
-    * Serving Flask app "goal_tracker" (lazy loading)
-    * Environment: development
-    * Debug mode: on
-    * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
+    dev_server.py - app.config['SQLALCHEMY_DATABASE_URI']=<the-value-of-GOAL_TRACKER_CONFIG-in-your-.env-file>
+     * Serving Flask app "goal_tracker" (lazy loading)
+     * Environment: production
+    WARNING: This is a development server. Do not use it in a production deployment.
+    Use a production WSGI server instead.
+     * Debug mode: on
+     * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
     ```
 
 # Future plans
