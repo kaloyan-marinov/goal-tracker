@@ -23,14 +23,12 @@
             "jinja": true
         },
         // Uses the app.run() function.
-        // The environment variables are not used, but they don't hurt anything, so it's OK to leave them here.
         {
             "name": "[old way] Python: Flask",
             "type": "python",
             "request": "launch",
-            "module": "dev_server",
-            "args": [],
+            "module": "dev_server",  // the name of your module (without the .py extension)
             "jinja": true
         }
     ]
-} 
+}

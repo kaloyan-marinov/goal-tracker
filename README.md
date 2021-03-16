@@ -6,7 +6,9 @@ This repository's documentation is organized as follows.
 
 2. [How to set up the project for local development](#how-to-set-up-the-project-for-local-development)
 
-3. [Future plans](#future-plans)
+3. [Different options for serving our backend application](#different-options-of-serving-a-flask-application)
+
+4. [Future plans](#future-plans)
 
 # Introduction
 
@@ -178,11 +180,23 @@ This repository's documentation is organized as follows.
         ```
         and a tab in your operating system's default web browser should open up and load the address localhost:3000/
 
-# `2021/02/04/06_53/28/backend/use-an-application-factory-function`
+# Different options for serving our backend application
 
-2. You can use the Flask development server to run/start//serve the application. That can be achieved in several (at-least-at-this-stage-insignificantly-different) ways:
+This section is relevant only if you wish to set up the project for local development _specifically_ in VS Code. The core information within this section is based on the "Setting Up a Flask Application in Visual Studio Code" article by [Miguel Grinberg](https://blog.miguelgrinberg.com/post/about-me); that article is available at https://blog.miguelgrinberg.com/post/setting-up-a-flask-application-in-visual-studio-code
 
-    (a) the "new way" of running/starting//serving a Flask application (i.e. invoking `flask run`) on the command line:
+As the article explains in its "Better Debug Configuration" section:
+
+- if you run your application outside of VS Code and your application crashes, it would:
+    - either show the in-browser debugger when you are in debug mode,
+    - or else just show an Internal Server Error page [in your browser] and log the exception to the terminal and/or log file;
+    
+- when working with/in VS Code, it would be desirable to have crashes reported in the VS Code debugger; unfortunately, one's first attempt at achieving that in VS Code is obstructed by an old bug in Flask
+
+- the problem is that Flask does not properly configure the bubbling up of errors into an external debugger
+
+Next, we are going to document 4 different options for starting a process that serves our Flask application: the first 2 of those options are done outside VS Code (and, obviously, can't and won't cause crashes to be reported in the VS Code debugger), whereas the last 2 options are done through VS Code but only the very last one causes crashes to be reported in the VS Code debugger. Those options are as follows:
+
+- option 1 - the "new way" of serving a Flask application (i.e. invoking `flask run`) on the command line:
     ```
     (venv) goal-tracker $ FLASK_APP=goal_tracker_dev_server.py flask run
 
@@ -198,7 +212,7 @@ This repository's documentation is organized as follows.
     * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
     ```
 
-    (b) the "old way" of running/starting//serving a Flask application (i.e. using `if __name__ == "__main__": app.run()` in a module where a `Flask` (application) object is created, and invoking `python`) on the command line:
+- option 2 - the "old way" of running/starting//serving a Flask application (i.e. using `if __name__ == "__main__": app.run()` in a module where a `Flask` (application) object is created, and invoking `python`) on the command line:
     ```
     (venv) goal-tracker $ python goal_tracker_dev_server.py 
 
@@ -214,7 +228,7 @@ This repository's documentation is organized as follows.
     * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
     ```
 
-    (c) the "new way" of running/starting//serving a Flask application from VS Code:
+- option 3 - the "new way" of running/starting//serving a Flask application from VS Code:
     ```
     [use VS Code to launch "[new way] Python Flask"]
 
@@ -229,7 +243,7 @@ This repository's documentation is organized as follows.
     * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
     ```
 
-    (d) the "old way" of running/starting//serving a Flask application from VS Code:
+- option 4 - the "old way" of running/starting//serving a Flask application from VS Code:
     ```
     [use VS Code to launch "[old way] Python Flask"]
 
