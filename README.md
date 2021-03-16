@@ -32,7 +32,7 @@ Furthermore, we all work hard to essentially earn two things: money and time tha
 
 (a) a prominent part of contemporary life is what can be aptly described as "open-ended forms of entertainment", which are pervasive and omnipresent; while open-ended forms of entertainment (such as TV series, video games, social media, etc.) are not inherently bad, we can easily allow them to consume too much of our waking hours; and
 
-(b) spending our free time "as we see fit" can include things that range from spending quality time with people we love or _exercising_ regularly; to _traveling_; to _developing a useful skill_ or _seeking out new opportunities_.
+(b) spending our free time "as we see fit" can include things that range from spending quality time with people we love or exercising regularly; to traveling; to developing a useful skill or seeking out new opportunities.
 
 # The functionality provided by the web application
 
@@ -42,7 +42,7 @@ For any activity that is meaningful to your vision of life, you can create a cor
 
 In addition to that, there is another important feature that `GoalTracker` provides - namely, it allows you to create _Interval_ records, which encapsulate how much time you have spent in pursuit of each of your _Goals_.
 
-In summary, `GoalTracker` enables you to shine a light on the things that make excessive demands on your time so that, if need be, you can re-prioritize your _Goals_ in order to begin investing your hard-earned free time in the _Goals_ that _are truly meaningful to your own vision of life_.
+In summary, `GoalTracker` enables you to shine a light on the things that make excessive demands on your time so that, if need be, you can re-prioritize your _Goals_ in order to begin investing your hard-earned free time in the _Goals_ that are truly valuable to your own vision of life.
 
 # How to set up the project for local development
 
