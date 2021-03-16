@@ -42,28 +42,35 @@ This repository's documentation is organized as follows.
 
     - run the tests:
 
-        ```
-        [option A: without coverage (and, obviously don't produce an HTML report)]
+        - option A - without coverage (which, obviously, can't and won't produce a coverage report in HTML format)
 
-        (venv) $ python -m unittest discover -v tests/
-        [or, in VS Code (Version: 1.53.0),
-        use the IDE's GUI by clicking on "Run All Tests";
-        once the tests have been executed, click on "Show Test Output"]
+            ```
+            (venv) $ python -m unittest discover -v tests/
+            
+            [or, in VS Code (Version: 1.53.0),
+            use the IDE's GUI by clicking on "Run All Tests";
+            once the tests have been executed, click on "Show Test Output"]
+            ```
 
-        [option B: with coverage but don't produce an HTML report]
+        - option B - with coverage but don't produce an HTML report
 
-        (venv) $ FLASK_APP=dev_server.py flask test
+            ```
+            (venv) $ FLASK_APP=dev_server.py flask test
+            ```
+        
+        - option C - with coverage and produce an HTML report
 
-        [option C: with coverage and produce an HTML report]
-
-        (venv) $ coverage run -m unittest discover -v tests/
-        (venv) $ coverage html --omit="venv/*","tests/*","__pycache__/*"
-        [
-            the last command doesn't output anything in the terminal,
-            but it creates a folder called `htmlcov`
-        ]
-        [open the `htmlcov/index.html` file in your web browser]       
-        ```
+            ```
+            (venv) $ coverage run -m unittest discover -v tests/
+            
+            (venv) $ coverage html --omit="venv/*","tests/*","__pycache__/*"
+            [
+                the last command doesn't output anything in the terminal,
+                but it creates a folder called `htmlcov`
+            ]
+            
+            [open the `htmlcov/index.html` file in your web browser]       
+            ```
     
     - create an empty SQLite database and apply all database migrations:
         ```
