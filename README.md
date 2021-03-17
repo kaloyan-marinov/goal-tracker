@@ -38,7 +38,11 @@ Furthermore, we all work hard to essentially earn two things: money and time tha
 
 In a nutshell, `GoalTracker` aims to help you protect your hard-earned free time from leaking out uncontrollably.
 
-For any activity that is meaningful to your vision of life, you can create a corresponding entity called a _Goal_. It is you and only you who gets to decide whether each new _Goal_ represents an activity that is continuous in nature (such as spending time with your family), or term-limited (such as attaining a Grade Point Average of at least 3.5 in the next semester). In addition to that, the web application allows you to create _Interval_ records, which encapsulate how much time you have spent or continue to spend in pursuit of each of your _Goals_.
+The first step is for you to create a `GoalTracker` account, which will store and protect your data.
+
+Next, for any activity that is meaningful to your vision of life, you can create a corresponding entity called a _Goal_. It is you and only you who gets to decide whether each new _Goal_ represents an activity that is continuous in nature (such as spending time with your family), or term-limited (such as attaining a Grade Point Average of at least 3.5 in the next semester).
+
+Last but not least, the web application allows you to create _Interval_ records, which encapsulate how much time you have spent or continue to spend in pursuit of each of your _Goals_.
 
 In summary:
 
@@ -46,7 +50,7 @@ In summary:
 
 - By making _Goal_ and _Interval_ records within your personal `GoalTracker` account, you shine a light on any _Goals_ that may silently be consuming an excessive fraction of your time.
 
-- If need be, you can re-prioritize your _Goals_ in order to begin investing more of your hard-earned free time in those _Goals_ that are truly valuable to your own vision of life.
+- If need be, you can then re-prioritize your _Goals_ in order to begin investing more of your hard-earned free time in those _Goals_ that are truly valuable to your own vision of life.
 
 # How to set up the project for local development
 
@@ -175,6 +179,7 @@ In summary:
         ```
         $ cd client
         client $ npm install
+        client $ cd ..
         ```
 
 5. start serving the backend application and the frontend application
@@ -312,4 +317,4 @@ Next, we are going to document 4 different options for starting a process that s
 
 - Add styling to the frontend application
 
-- Implement a mobile client
+- Implement a "mobile client" (i.e. a mobile application that consumes the backend API)
