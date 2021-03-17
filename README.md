@@ -16,37 +16,37 @@ This repository's documentation is organized as follows.
 
 # Introduction
 
-`GoalTracker` is a web application, which aims to help you _form a clear, focused idea of who you are today and who you want to be tomorrow_.
+`GoalTracker` is a web application, which aims to help you _remember the lessons of your past, so as to be more effective today_.
 
-I decided to build such an application after watching a YouTube video titled "Seneca - How To Manage Your Time (Stoicism)". That video was posted on August 26, 2019 in the "Philosophies for Life" channel on YouTube. More specifically, my motivation for building `GoalTracker` came about as a combination of (a) thoughts about work-life balance that are at the forefront of my mind, and (b) ideas that are presented in the video.
+I decided to build such an application after watching a video titled "Seneca - How To Manage Your Time (Stoicism)". That video was posted on August 26, 2019 in the "Philosophies for Life" channel on YouTube. More specifically, my motivation for building `GoalTracker` came about as a combination of (a) thoughts about work-life balance that are at the forefront of my mind, and (b) ideas that are presented in the video.
 
 # Motivation
 
 Seneca’s essay “On the shortness of life” offers us an urgent reminder about the non-renewability of our most important resource - our time. Time is our least renewable and therefore most valuable resource. To wit:
 
-- on the one hand, if you have time (such as 20, 30, or 40 years left in your life) but run out of money, _it is possible (albeit not always easy) for you to earn more money_;
+- if you have time (such as 20, 30, or 40 years left in your life) but run out of money, _it is possible (albeit not always easy) for you to earn more money_;
 
-- on the other hand, if you have money but your life is approaching its end, _there don't exist any ways for you to earn more time_.
+- on the flipside, if you have money but your life is approaching its end, _there don't exist any ways for you to earn more time_.
 
 Furthermore, we all work hard to essentially earn two things: money and time that we can spend as we see fit. In view of that as well as of the non-renewability of time, it logically follows that we should not waste the free time we earn. Unfortunately, achieving that in today's world is easier said than done, because:
 
 (a) a prominent part of contemporary life is what can be aptly described as "open-ended forms of entertainment", which are pervasive and omnipresent; while open-ended forms of entertainment (such as TV series, video games, social media, etc.) are not inherently bad, we can easily allow them to consume too much of our waking hours; and
 
-(b) spending our free time "as we see fit" can include things that range from spending quality time with people we love or exercising regularly; to traveling; to developing a useful skill or seeking out new opportunities.
+(b) spending our free time "as we see fit" can be done through a vast array of activities, which range from spending quality time with people we love or exercising regularly; to traveling; to developing a useful skill or seeking out new opportunities.
 
 # The functionality provided by the web application
 
 In a nutshell, `GoalTracker` aims to help you protect your hard-earned free time from leaking out uncontrollably.
 
-For any activity that is meaningful to your vision of life, you can create a corresponding entity called a _Goal_. Whether the underlying activity is continuous in nature (such as spending time with your family) or term-limited (such as attaining a Grade Point Average of at least 3.5 in the next semester) remains entirely within your control.
+For any activity that is meaningful to your vision of life, you can create a corresponding entity called a _Goal_. It is you and only you who gets to decide whether each new _Goal_ represents an activity that is continuous in nature (such as spending time with your family), or term-limited (such as attaining a Grade Point Average of at least 3.5 in the next semester). In addition to that, the web application allows you to create _Interval_ records, which encapsulate how much time you have spent or continue to spend in pursuit of each of your _Goals_.
 
-In addition to that, there is another important feature that `GoalTracker` provides - namely, it allows you to create _Interval_ records, which encapsulate how much time you have spent in pursuit of each of your _Goals_.
+In summary:
 
-In summary, `GoalTracker` enables you to maintain enough self-awareness to remember the lessons of your past, so as to be more effective today.
+- `GoalTracker` enables you to form a clear, focused idea of who you are today and who you want to be tomorrow.
 
-- Firstly, by making _Goal_ and _Interval_ records within your personal `GoalTracker` account, you shine a light on the things that make excessive demands on your time.
+- By making _Goal_ and _Interval_ records within your personal `GoalTracker` account, you shine a light on any _Goals_ that may silently be consuming an excessive fraction of your time.
 
-- Secondly and if need be, you can re-prioritize your _Goals_ in order to begin investing more of your hard-earned free time in those _Goals_ that are truly valuable to your own vision of life.
+- If need be, you can re-prioritize your _Goals_ in order to begin investing more of your hard-earned free time in those _Goals_ that are truly valuable to your own vision of life.
 
 # How to set up the project for local development
 
