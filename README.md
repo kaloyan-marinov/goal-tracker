@@ -124,7 +124,7 @@ In summary:
         (venv) $ FLASK_APP=goal_tracker:create_app flask db upgrade
         ```
 
-    - verify that the previous step was successful by issuing `$ sqlite3 <the-value-of-GOAL_TRACKER_CONFIG-in-your-.env-file>` and then issuing:
+    - verify that the previous step was successful by issuing `$ sqlite3 <the-value-of-DATABASE_URL-in-your-.env-file>` and then issuing:
         ```
         SQLite version 3.32.3 2020-06-18 14:16:19
         Enter ".help" for usage hints.
@@ -263,7 +263,7 @@ Next, we are going to document 4 different options for starting a process that s
     Use a production WSGI server instead.
      * Debug mode: off
     goal_tracker/__init__.py - config_name=development
-    dev_server.py - app.config['SQLALCHEMY_DATABASE_URI']=<the-value-of-GOAL_TRACKER_CONFIG-in-your-.env-file>
+    dev_server.py - app.config['SQLALCHEMY_DATABASE_URI']=<the-value-of-DATABASE_URL-in-your-.env-file>
     * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
     ```
 
@@ -274,7 +274,7 @@ Next, we are going to document 4 different options for starting a process that s
 
 
     goal_tracker/__init__.py - config_name=development
-    dev_server.py - app.config['SQLALCHEMY_DATABASE_URI']=<the-value-of-GOAL_TRACKER_CONFIG-in-your-.env-file>
+    dev_server.py - app.config['SQLALCHEMY_DATABASE_URI']=<the-value-of-DATABASE_URL-in-your-.env-file>
      * Serving Flask app "goal_tracker" (lazy loading)
      * Environment: production
     WARNING: This is a development server. Do not use it in a production deployment.
@@ -290,7 +290,7 @@ Next, we are going to document 4 different options for starting a process that s
      * Environment: development
      * Debug mode: off
     goal_tracker/__init__.py - config_name=development
-    dev_server.py - app.config['SQLALCHEMY_DATABASE_URI']=<the-value-of-GOAL_TRACKER_CONFIG-in-your-.env-file>
+    dev_server.py - app.config['SQLALCHEMY_DATABASE_URI']=<the-value-of-DATABASE_URL-in-your-.env-file>
      * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
     ```
 
@@ -302,7 +302,7 @@ Next, we are going to document 4 different options for starting a process that s
 
     (venv) goal-tracker $  cd <absolute-path-to-your-local-clone-of-this-repo>/goal-tracker-public ; /usr/bin/env <absolute-path-to-your-local-clone-of-this-repo>/goal-tracker-public/venv/bin/python3 ~/.vscode/extensions/ms-python.python-2021.2.636928669/pythonFiles/lib/python/debugpy/launcher 57609 -- -m dev_server 
     goal_tracker/__init__.py - config_name=development
-    dev_server.py - app.config['SQLALCHEMY_DATABASE_URI']=<the-value-of-GOAL_TRACKER_CONFIG-in-your-.env-file>
+    dev_server.py - app.config['SQLALCHEMY_DATABASE_URI']=<the-value-of-DATABASE_URL-in-your-.env-file>
      * Serving Flask app "goal_tracker" (lazy loading)
      * Environment: production
     WARNING: This is a development server. Do not use it in a production deployment.
