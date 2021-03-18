@@ -247,37 +247,73 @@ In summary:
         (venv) $ FLASK_APP=goal_tracker:create_app flask db upgrade
         ```
 
-    - verify that the previous step was successful by issuing `$ sqlite3 <the-value-of-DATABASE_URL-in-your-.env-file>` and then issuing:
+    - verify that the previous step was successful by issuing `$ mysql -u <goal-tracker-username> -p` and then issuing:
         ```
-        SQLite version 3.32.3 2020-06-18 14:16:19
-        Enter ".help" for usage hints.
-        sqlite> .tables
-        alembic_version  goals            intervals        users          
-        sqlite> .schema users
-        CREATE TABLE users (
-                id INTEGER NOT NULL, 
-                email VARCHAR(128), password_hash VARCHAR(128), 
-                PRIMARY KEY (id)
-        );
-        CREATE UNIQUE INDEX ix_users_email ON users (email);
-        sqlite> .schema goals
-        CREATE TABLE goals (
-                id INTEGER NOT NULL, 
-                description VARCHAR(256), 
-                user_id INTEGER, 
-                PRIMARY KEY (id), 
-                FOREIGN KEY(user_id) REFERENCES users (id)
-        );
-        sqlite> .schema intervals
-        CREATE TABLE intervals (
-                id INTEGER NOT NULL, 
-                start DATETIME, 
-                final DATETIME, 
-                goal_id INTEGER, 
-                PRIMARY KEY (id), 
-                FOREIGN KEY(goal_id) REFERENCES goals (id)
-        );
-        sqlite> .quit
+        mysql> show databases;
+        +-----------------------+
+        | Database              |
+        +-----------------------+
+        | <goal-tracker-database> |
+        | information_schema    |
+        +-----------------------+
+        2 rows in set (0.03 sec)
+
+        mysql> use <goal-tracker-database>;
+        Database changed
+        mysql> show tables;
+        Empty set (0.00 sec)
+
+        mysql> show tables;
+        Empty set (0.01 sec)
+
+        mysql> show tables;
+        +---------------------------------+
+        | Tables_in_<goal-tracker-database> |
+        +---------------------------------+
+        | alembic_version                 |
+        | goals                           |
+        | intervals                       |
+        | users                           |
+        +---------------------------------+
+        4 rows in set (0.01 sec)
+
+        mysql> show create table users;
+        +-------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+        | Table | Create Table                                                                                                                                                                                                                                                                  |
+        +-------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+        | users | CREATE TABLE `users` (
+          `id` int NOT NULL AUTO_INCREMENT,
+          `email` varchar(128) DEFAULT NULL,
+          `password_hash` varchar(128) DEFAULT NULL,
+          PRIMARY KEY (`id`),
+          UNIQUE KEY `ix_users_email` (`email`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci |
+        +-------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+        1 row in set (0.01 sec)
+
+        mysql> show create table goals;
+        +-------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+        | Table | Create Table                                                                                                                                                                                                                                                                                                                            |
+        +-------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+        | goals | CREATE TABLE `goals` (
+          `id` int NOT NULL AUTO_INCREMENT,
+          `description` varchar(256) DEFAULT NULL,
+          `user_id` int DEFAULT NULL,
+          PRIMARY KEY (`id`),
+          KEY `user_id` (`user_id`),
+          CONSTRAINT `goals_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci |
+        +-------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+        1 row in set (0.01 sec)
+
+        mysql> select * from users;
+        Empty set (0.00 sec)
+
+        mysql> select * from goals;
+        Empty set (0.00 sec)
+
+        mysql> select * from intervals;
+        Empty set (0.01 sec)
         ```
 
     - deactivate the Python virtual environment
