@@ -157,7 +157,7 @@ In summary:
         Bye
         $
         ```
-    - log in to the MySQL Server as the created user, and verify the new user is able to `USE` the new database as well as that the new database does not contain any tables yet:
+    - log in to the MySQL Server as the created user in order to verify that (1) the new user is able to `USE` the new database as well as (2) that the new database does not contain any tables:
         ```
         $ mysql -u <goal-tracker-username> -p
         Enter password:
