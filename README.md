@@ -61,7 +61,7 @@ In summary:
     GOAL_TRACKER_CONFIG=development
 
     SECRET_KEY=<specify-a-good-secret-key-here>
-    DATABASE_URL=mysql+pymysql://<goal-tracker-username>:<goal-tracker-password>@localhost/<goal-tracker-database>
+    DATABASE_URL=mysql+pymysql://<goal-tracker-username>:<goal-tracker-password>@localhost:3306/<goal-tracker-database>
     ```
 
     (For deployment, you should generate a "good secret key" and store that value in `SECRET_KEY` within the `.env` file; to achieve that, take a look at the "How to generate good secret keys" section on https://flask.palletsprojects.com/en/1.1.x/quickstart/ . For local development, something like `keep-this-value-known-only-to-the-deployment-machine` should suffice.)
