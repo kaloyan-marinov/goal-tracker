@@ -493,3 +493,78 @@ Next, we are going to document 4 different options for starting a process that s
 - Add styling to the frontend application
 
 - Implement a "mobile client" (i.e. a mobile application that consumes the backend API)
+
+# `2021/03/18/19_59/35/fix-the-bug-where-deleting-a-Goal-does-not-delete-its-Intervals`
+
+in terminal instance 1, start serving the backend application
+
+in terminal instance 2, make the following requests:
+```
+curl -i -X POST -H "Content-Type: application/json" -d '{"email": "john.doe@gmail.com", "password": "123"}' localhost:5000/api/v1.0/users
+
+201
+
+curl -i -X POST -u john.doe@gmail.com:123 localhost:5000/api/v1.0/tokens
+
+200
+
+export T1=<the-issued-JWS-token>
+
+curl -i -X POST -H "Content-Type: application/json" -H "Authorization: Bearer ${T1}" -d '{"description": "learn to dance"}' localhost:5000/api/v1.0/goals
+
+201
+
+curl -i -X POST -H "Content-Type: application/json" -H "Authorization: Bearer ${T1}" -d '{"goal_id": 1, "start": "1111-1-1 1:1", "final": "2222-2-2 2:2"}' localhost:5000/api/v1.0/intervals
+
+201
+
+curl -i -X DELETE -H "Authorization: Bearer ${T1}" localhost:5000/api/v1.0/goals/1
+
+204
+```
+
+in terminal instance 3, check the database itself (to find out that the DELETE request has caused 1 row in the `intervals` table to become an orphaned row:
+```
+mysql> show tables;
+Empty set (0.00 sec)
+
+mysql> select id, email from users;
++----+--------------------+
+| id | email              |
++----+--------------------+
+|  1 | john.doe@gmail.com |
++----+--------------------+
+1 row in set (0.01 sec)
+
+mysql> select * from goals;
++----+----------------+---------+
+| id | description    | user_id |
++----+----------------+---------+
+|  1 | learn to dance |       1 |
++----+----------------+---------+
+1 row in set (0.00 sec)
+
+mysql> select * from intervals;
+Empty set (0.01 sec)
+
+mysql> select * from intervals;
++----+---------------------+---------------------+---------+
+| id | start               | final               | goal_id |
++----+---------------------+---------------------+---------+
+|  1 | 1111-01-01 01:01:00 | 2222-02-02 02:02:00 |       1 |
++----+---------------------+---------------------+---------+
+1 row in set (0.00 sec)
+
+mysql> select * from intervals;
++----+---------------------+---------------------+---------+
+| id | start               | final               | goal_id |
++----+---------------------+---------------------+---------+
+|  1 | 1111-01-01 01:01:00 | 2222-02-02 02:02:00 |    NULL |
++----+---------------------+---------------------+---------+
+1 row in set (0.00 sec)
+
+mysql> select * from goals;
+Empty set (0.01 sec)
+
+mysql>
+```

@@ -9,6 +9,8 @@ from itsdangerous import SignatureExpired, BadSignature
 
 from goal_tracker import create_app, db
 
+from goal_tracker.models import Interval
+
 
 class TestBase(unittest.TestCase):
     def setUp(self):
@@ -16,7 +18,9 @@ class TestBase(unittest.TestCase):
         print(
             f"tests/tests.py - self.app.config['SQLALCHEMY_DATABASE_URI']={self.app.config['SQLALCHEMY_DATABASE_URI']}"
         )
-        print(f"tests/tests.py - self.app.config['TESTING']={self.app.config['TESTING']}")
+        print(
+            f"tests/tests.py - self.app.config['TESTING']={self.app.config['TESTING']}"
+        )
 
         self.ctx = self.app.app_context()
         self.ctx.push()
@@ -688,6 +692,53 @@ class TestIntervals(TestBase):
         # Delete an Interval resource.
         r, s, h = self.delete(url_4_interval_1, token_auth=self.token_4_john_doe)
         self.assertEqual(s, 204)
+
+        # ...
+        r, s, h = self.get("/api/v1.0/goals", token_auth=self.token_4_john_doe)
+
+        req_payload = {
+            "goal_id": 2,
+            "start": "2020-11-05 08:45",
+            "final": "2020-11-05 09:15",
+        }
+        r, s, h = self.post(
+            "/api/v1.0/intervals", data=req_payload, token_auth=self.token_4_john_doe
+        )
+        # self.assertEqual(s, 201)
+        # self.assertEqual(
+        #     r,
+        #     {
+        #         "id": 1,
+        #         "goal_id": 2,
+        #         "start": "2020-11-05 08:45",
+        #         "final": "2020-11-05 09:15",
+        #     },
+        # )
+        # url_4_interval_1 = h["Location"]
+
+        url_for_goal_2 = f"/api/v1.0/goals/{self.john_doe_goal_2_payload['id']}"
+        r, s, h = self.delete(url_for_goal_2, token_auth=self.token_4_john_doe)
+        self.assertEqual(s, 204)
+
+        r, s, h = self.get("/api/v1.0/intervals", token_auth=self.token_4_john_doe)
+        print(r)
+
+        interval_rows = Interval.query.all()
+        interval_dicts = [
+            {
+                "id": i_r.id,
+                "goal_id": i_r.goal_id,
+                "start": i_r.start,
+                "final": i_r.final,
+            }
+            for i_r in interval_rows
+        ]
+
+        try:
+            self.assertEqual(len(interval_rows), 0)
+        except AssertionError as e:
+            print(interval_dicts)
+            raise e
 
     def test_with_two_users(self):
         # Create an Interval resource for a goal of the first user's.
