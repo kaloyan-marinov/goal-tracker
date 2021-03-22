@@ -577,9 +577,6 @@ class TestIntervals(TestBase):
         )
         return s, r
 
-    def tearDown(self):
-        db.drop_all()
-
     def test_with_one_user(self):
         # Get all intervals.
         r, s, h = self.get("/api/v1.0/intervals", token_auth=self.token_4_john_doe)
