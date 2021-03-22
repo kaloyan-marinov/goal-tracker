@@ -690,52 +690,27 @@ class TestIntervals(TestBase):
         r, s, h = self.delete(url_4_interval_1, token_auth=self.token_4_john_doe)
         self.assertEqual(s, 204)
 
-        # ...
-        r, s, h = self.get("/api/v1.0/goals", token_auth=self.token_4_john_doe)
+    def test_deleting_goal_deletes_also_its_intervals(self):
+        # Create an Interval resource.
+        goal_id = self.john_doe_goal_2_payload["id"]
+        url_for_goal = f"/api/v1.0/goals/{goal_id}"
 
         req_payload = {
-            "goal_id": 2,
+            "goal_id": goal_id,
             "start": "2020-11-05 08:45",
             "final": "2020-11-05 09:15",
         }
         r, s, h = self.post(
             "/api/v1.0/intervals", data=req_payload, token_auth=self.token_4_john_doe
         )
-        # self.assertEqual(s, 201)
-        # self.assertEqual(
-        #     r,
-        #     {
-        #         "id": 1,
-        #         "goal_id": 2,
-        #         "start": "2020-11-05 08:45",
-        #         "final": "2020-11-05 09:15",
-        #     },
-        # )
-        # url_4_interval_1 = h["Location"]
 
-        url_for_goal_2 = f"/api/v1.0/goals/{self.john_doe_goal_2_payload['id']}"
-        r, s, h = self.delete(url_for_goal_2, token_auth=self.token_4_john_doe)
+        # Delete the Goal resource that the Interval resource is associated with.
+        r, s, h = self.delete(url_for_goal, token_auth=self.token_4_john_doe)
         self.assertEqual(s, 204)
 
-        r, s, h = self.get("/api/v1.0/intervals", token_auth=self.token_4_john_doe)
-        print(r)
-
+        # Ensure that also the Interval resource was deleted.
         interval_rows = Interval.query.all()
-        interval_dicts = [
-            {
-                "id": i_r.id,
-                "goal_id": i_r.goal_id,
-                "start": i_r.start,
-                "final": i_r.final,
-            }
-            for i_r in interval_rows
-        ]
-
-        try:
-            self.assertEqual(len(interval_rows), 0)
-        except AssertionError as e:
-            print(interval_dicts)
-            raise e
+        self.assertEqual(len(interval_rows), 0)
 
     def test_with_two_users(self):
         # Create an Interval resource for a goal of the first user's.
