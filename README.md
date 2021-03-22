@@ -523,7 +523,7 @@ curl -i -X DELETE -H "Authorization: Bearer ${T1}" localhost:5000/api/v1.0/goals
 204
 ```
 
-in terminal instance 3, check the database itself (to find out that the DELETE request has caused 1 row in the `intervals` table to become an orphaned row:
+in terminal instance 3, check the database itself (to find out that the DELETE request has caused 1 row in the `intervals` table to become an orphaned row):
 ```
 mysql> show tables;
 Empty set (0.00 sec)
