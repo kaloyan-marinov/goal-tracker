@@ -10,7 +10,9 @@ class User(db.Model):
     email = db.Column(db.String(128), index=True, unique=True)
     password_hash = db.Column(db.String(128))
 
-    goals = db.relationship("Goal", lazy="dynamic", backref="user")
+    goals = db.relationship(
+        "Goal", lazy="dynamic", backref="user", cascade="all, delete, delete-orphan"
+    )
 
     def set_password_hash(self, password):
         self.password_hash = generate_password_hash(password)
@@ -33,7 +35,9 @@ class Goal(db.Model):
 
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"))
 
-    intervals = db.relationship("Interval", lazy="dynamic", backref="goal")
+    intervals = db.relationship(
+        "Interval", lazy="dynamic", backref="goal", cascade="all, delete, delete-orphan"
+    )
 
     def __repr__(self):
         return f"<Goal '{self.description}'>"

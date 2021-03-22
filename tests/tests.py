@@ -9,6 +9,8 @@ from itsdangerous import SignatureExpired, BadSignature
 
 from goal_tracker import create_app, db
 
+from goal_tracker.models import Interval
+
 
 class TestBase(unittest.TestCase):
     def setUp(self):
@@ -16,7 +18,9 @@ class TestBase(unittest.TestCase):
         print(
             f"tests/tests.py - self.app.config['SQLALCHEMY_DATABASE_URI']={self.app.config['SQLALCHEMY_DATABASE_URI']}"
         )
-        print(f"tests/tests.py - self.app.config['TESTING']={self.app.config['TESTING']}")
+        print(
+            f"tests/tests.py - self.app.config['TESTING']={self.app.config['TESTING']}"
+        )
 
         self.ctx = self.app.app_context()
         self.ctx.push()
@@ -573,9 +577,6 @@ class TestIntervals(TestBase):
         )
         return s, r
 
-    def tearDown(self):
-        db.drop_all()
-
     def test_with_one_user(self):
         # Get all intervals.
         r, s, h = self.get("/api/v1.0/intervals", token_auth=self.token_4_john_doe)
@@ -688,6 +689,28 @@ class TestIntervals(TestBase):
         # Delete an Interval resource.
         r, s, h = self.delete(url_4_interval_1, token_auth=self.token_4_john_doe)
         self.assertEqual(s, 204)
+
+    def test_deleting_goal_deletes_also_its_intervals(self):
+        # Create an Interval resource.
+        goal_id = self.john_doe_goal_2_payload["id"]
+        url_for_goal = f"/api/v1.0/goals/{goal_id}"
+
+        req_payload = {
+            "goal_id": goal_id,
+            "start": "2020-11-05 08:45",
+            "final": "2020-11-05 09:15",
+        }
+        r, s, h = self.post(
+            "/api/v1.0/intervals", data=req_payload, token_auth=self.token_4_john_doe
+        )
+
+        # Delete the Goal resource that the Interval resource is associated with.
+        r, s, h = self.delete(url_for_goal, token_auth=self.token_4_john_doe)
+        self.assertEqual(s, 204)
+
+        # Ensure that also the Interval resource was deleted.
+        interval_rows = Interval.query.all()
+        self.assertEqual(len(interval_rows), 0)
 
     def test_with_two_users(self):
         # Create an Interval resource for a goal of the first user's.
