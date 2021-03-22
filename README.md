@@ -61,12 +61,135 @@ In summary:
     GOAL_TRACKER_CONFIG=development
 
     SECRET_KEY=<specify-a-good-secret-key-here>
-    DATABASE_URL=sqlite:///<absolute-path-starting-with-a-leading-slash-and-pointing-to-an-SQLite-file>
+    DATABASE_URL=mysql+pymysql://<goal-tracker-username>:<goal-tracker-password>@localhost:3306/<goal-tracker-database>
     ```
 
     (For deployment, you should generate a "good secret key" and store that value in `SECRET_KEY` within the `.env` file; to achieve that, take a look at the "How to generate good secret keys" section on https://flask.palletsprojects.com/en/1.1.x/quickstart/ . For local development, something like `keep-this-value-known-only-to-the-deployment-machine` should suffice.)
 
 3. set up the backend
+
+    - download MySQL Server, install it on your system, and secure the installation (all of which can be accomplished by following the instructions given in [this article](https://linuxize.com/post/how-to-install-mysql-on-ubuntu-18-04/))
+
+    - log in to MySQL Server as the root user in order to: create a new database; create a new user and set an associated password; and grant the new user all privileges on the new database;
+        ```
+        $ sudo mysql
+        [sudo] password for <your-OS-user>
+
+        mysql> SHOW DATABASES;
+        +--------------------+
+        | Database           |
+        +--------------------+
+        | information_schema |
+        | mysql              |
+        | performance_schema |
+        | sys                |
+        +--------------------+
+        4 rows in set (0.01 sec)
+
+        mysql> CREATE DATABASE IF NOT EXISTS `<goal-tracker-database>`;
+        Query OK, 1 row affected (0.04 sec)
+
+        mysql> SHOW DATABASES;
+        +-----------------------+
+        | Database              |
+        +-----------------------+
+        | <goal-tracker-database> |
+        | information_schema    |
+        | mysql                 |
+        | performance_schema    |
+        | sys                   |
+        +-----------------------+
+        5 rows in set (0.01 sec)
+        ```
+
+        ```
+        mysql> CREATE USER IF NOT EXISTS `<goal-tracker-username>`@`localhost` IDENTIFIED BY '<goal-tracker-password>';
+        Query OK, 0 rows affected (0.03 sec)
+
+        mysql> SELECT user, host, plugin FROM mysql.user;
+        +-----------------------+-----------+-----------------------+
+        | user                  | host      | plugin                |
+        +-----------------------+-----------+-----------------------+
+        | debian-sys-maint      | localhost | <omitted>             |
+        | <goal-tracker-username> | localhost | caching_sha2_password |
+        | mysql.infoschema      | localhost | <omitted>             |
+        | mysql.session         | localhost | <omitted>             |
+        | mysql.sys             | localhost | <omitted>             |
+        | root                  | localhost | auth_socket           |
+        +-----------------------+-----------+-----------------------+
+        6 rows in set (0.00 sec)
+        ```
+
+        ```
+        mysql> SHOW GRANTS FOR `<goal-tracker-username>`@`localhost`;
+        +-----------------------------------------------------------+
+        | Grants for <goal-tracker-username>@localhost                |
+        +-----------------------------------------------------------+
+        | GRANT USAGE ON *.* TO `<goal-tracker-username>`@`localhost` |
+        +-----------------------------------------------------------+
+        1 row in set (0.00 sec)
+
+        mysql> GRANT ALL PRIVILEGES ON `<goal-tracker-database>`.* TO `<goal-tracker-username>`@`localhost`;
+        Query OK, 0 rows affected (0.01 sec)
+
+        mysql> SHOW GRANTS FOR `<goal-tracker-username>`@`localhost`;
+        +------------------------------------------------------------------------------------------+
+        | Grants for <goal-tracker-username>@localhost                                               |
+        +------------------------------------------------------------------------------------------+
+        | GRANT USAGE ON *.* TO `<goal-tracker-username>`@`localhost`                                |
+        | GRANT ALL PRIVILEGES ON `<goal-tracker-database>`.* TO `<goal-tracker-username>`@`localhost` |
+        +------------------------------------------------------------------------------------------+
+        2 rows in set (0.00 sec)
+
+        mysql> FLUSH PRIVILEGES;
+        Query OK, 0 rows affected (0.01 sec)
+
+        mysql> SHOW GRANTS FOR `<goal-tracker-username>`@`localhost`;
+        +------------------------------------------------------------------------------------------+
+        | Grants for <goal-tracker-username>@localhost                                               |
+        +------------------------------------------------------------------------------------------+
+        | GRANT USAGE ON *.* TO `<goal-tracker-username>`@`localhost`                                |
+        | GRANT ALL PRIVILEGES ON `<goal-tracker-database>`.* TO `<goal-tracker-username>`@`localhost` |
+        +------------------------------------------------------------------------------------------+
+        2 rows in set (0.00 sec)
+
+        mysql> quit;
+        Bye
+        $
+        ```
+    - log in to the MySQL Server as the created user in order to verify that (1) the new user is able to `USE` the new database as well as (2) that the new database does not contain any tables:
+        ```
+        $ mysql -u <goal-tracker-username> -p
+        Enter password:
+        Welcome to the MySQL monitor.  Commands end with ; or \g.
+        Your MySQL connection id is 11
+        Server version: 8.0.23-0ubuntu0.20.04.1 (Ubuntu)
+
+        Copyright (c) 2000, 2021, Oracle and/or its affiliates.
+
+        Oracle is a registered trademark of Oracle Corporation and/or its
+        affiliates. Other names may be trademarks of their respective
+        owners.
+
+        Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+        mysql> SHOW DATABASES;
+        +-----------------------+
+        | Database              |
+        +-----------------------+
+        | <goal-tracker-database> |
+        | information_schema    |
+        +-----------------------+
+        2 rows in set (0.00 sec)
+
+        mysql> USE <goal-tracker-database>;
+        Database changed
+        mysql> SHOW TABLES;
+        Empty set (0.00 sec)
+
+        mysql> quit;
+        Bye
+        ```
 
     - create a Python virtual environment, activate it, and install all dependencies:
         ```
@@ -124,37 +247,89 @@ In summary:
         (venv) $ FLASK_APP=goal_tracker:create_app flask db upgrade
         ```
 
-    - verify that the previous step was successful by issuing `$ sqlite3 <the-value-of-DATABASE_URL-in-your-.env-file>` and then issuing:
+    - verify that the previous step was successful by issuing `$ mysql -u <goal-tracker-username> -p` and then issuing:
         ```
-        SQLite version 3.32.3 2020-06-18 14:16:19
-        Enter ".help" for usage hints.
-        sqlite> .tables
-        alembic_version  goals            intervals        users          
-        sqlite> .schema users
-        CREATE TABLE users (
-                id INTEGER NOT NULL, 
-                email VARCHAR(128), password_hash VARCHAR(128), 
-                PRIMARY KEY (id)
-        );
-        CREATE UNIQUE INDEX ix_users_email ON users (email);
-        sqlite> .schema goals
-        CREATE TABLE goals (
-                id INTEGER NOT NULL, 
-                description VARCHAR(256), 
-                user_id INTEGER, 
-                PRIMARY KEY (id), 
-                FOREIGN KEY(user_id) REFERENCES users (id)
-        );
-        sqlite> .schema intervals
-        CREATE TABLE intervals (
-                id INTEGER NOT NULL, 
-                start DATETIME, 
-                final DATETIME, 
-                goal_id INTEGER, 
-                PRIMARY KEY (id), 
-                FOREIGN KEY(goal_id) REFERENCES goals (id)
-        );
-        sqlite> .quit
+        mysql> SHOW DATABASES;
+        +-----------------------+
+        | Database              |
+        +-----------------------+
+        | <goal-tracker-database> |
+        | information_schema    |
+        +-----------------------+
+        2 rows in set (0.03 sec)
+
+        mysql> USE <goal-tracker-database>;
+        Database changed
+        mysql> SHOW TABLES;
+        Empty set (0.00 sec)
+
+        mysql> SHOW TABLES;
+        Empty set (0.01 sec)
+
+        mysql> SHOW TABLES;
+        +---------------------------------+
+        | Tables_in_<goal-tracker-database> |
+        +---------------------------------+
+        | alembic_version                 |
+        | goals                           |
+        | intervals                       |
+        | users                           |
+        +---------------------------------+
+        4 rows in set (0.01 sec)
+
+        mysql> SHOW CREATE TABLE users;
+        +-------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+        | Table | Create Table                                                                                                                                                                                                                                                                  |
+        +-------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+        | users | CREATE TABLE `users` (
+          `id` int NOT NULL AUTO_INCREMENT,
+          `email` varchar(128) DEFAULT NULL,
+          `password_hash` varchar(128) DEFAULT NULL,
+          PRIMARY KEY (`id`),
+          UNIQUE KEY `ix_users_email` (`email`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci |
+        +-------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+        1 row in set (0.01 sec)
+
+        mysql> SHOW CREATE TABLE goals;
+        +-------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+        | Table | Create Table                                                                                                                                                                                                                                                                                                                            |
+        +-------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+        | goals | CREATE TABLE `goals` (
+          `id` int NOT NULL AUTO_INCREMENT,
+          `description` varchar(256) DEFAULT NULL,
+          `user_id` int DEFAULT NULL,
+          PRIMARY KEY (`id`),
+          KEY `user_id` (`user_id`),
+          CONSTRAINT `goals_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci |
+        +-------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+        1 row in set (0.01 sec)
+
+        mysql> SHOW CREATE TABLE intervals;
+        +-----------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+        | Table     | Create Table                                                                                                                                                                                                                                                                                                                                                                            |
+        +-----------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+        | intervals | CREATE TABLE `intervals` (
+          `id` int NOT NULL AUTO_INCREMENT,
+          `start` datetime DEFAULT NULL,
+          `final` datetime DEFAULT NULL,
+          `goal_id` int DEFAULT NULL,
+          PRIMARY KEY (`id`),
+          KEY `goal_id` (`goal_id`),
+          CONSTRAINT `intervals_ibfk_1` FOREIGN KEY (`goal_id`) REFERENCES `goals` (`id`)
+        ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci |
+        +-----------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+        1 row in set (0.00 sec)
+
+        mysql> SELECT * FROM users;
+        Empty set (0.00 sec)
+
+        mysql> SELECT * FROM goals;
+        Empty set (0.00 sec)
+
+        mysql> SELECT * FROM intervals;
+        Empty set (0.01 sec)
         ```
 
     - deactivate the Python virtual environment
