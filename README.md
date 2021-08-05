@@ -357,6 +357,15 @@ In summary:
         client $ cd ..
         ```
 
+    - ensure that running the tests results in a PASS:
+
+        ```
+        $ npm test -- \
+            --watchAll \
+            --coverage \
+            --verbose
+        ```
+
 5. start serving the backend application and the frontend application
 
     - launch a terminal instance and, in it, start a process responsible for serving the backend application:
