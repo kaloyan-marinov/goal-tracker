@@ -9,7 +9,7 @@ import App from './App'
 import { expect } from '@jest/globals'
 
 describe('<App>', () => {
-  test("renders a 'WELCOME TO GoalTracker' message", () => {
+  xtest("renders a 'WELCOME TO GoalTracker' message", () => {
     /* Arrange. */
     const enhancer = applyMiddleware(thunkMiddleware)
     const realStore = createStore(rootReducer, enhancer)

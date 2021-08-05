@@ -1,10 +1,10 @@
 import { v4 as uuidv4 } from 'uuid'
 
-const initialState = {
+export const initialStateAlerts = {
   entities: {},
 }
 
-export default function alertsReducer(state = initialState, action) {
+export default function alertsReducer(state = initialStateAlerts, action) {
   switch (action.type) {
     case 'alerts/alertSet': {
       const alert = action.payload
