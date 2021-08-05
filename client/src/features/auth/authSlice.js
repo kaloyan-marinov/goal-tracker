@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { displayAlertTemporarily } from '../alerts/alertsSlice'
 
-const initialState = {
+export const initialStateAuth = {
   requestStatus: 'idle', // or: 'loading', 'succeeded', 'failed',
   requestError: null, // or: string
   token: localStorage.getItem('goal-tracker-token'),
@@ -9,7 +9,7 @@ const initialState = {
   currentUser: null,
 }
 
-export default function authReducer(state = initialState, action) {
+export default function authReducer(state = initialStateAuth, action) {
   switch (action.type) {
     case 'auth/createUser/pending': {
       return {
@@ -44,6 +44,7 @@ export default function authReducer(state = initialState, action) {
     case 'auth/issueJWSToken/fulfilled': {
       const token = action.payload
 
+      /* TODO: rectify this as part of g-t-i-34 */
       localStorage.setItem('goal-tracker-token', token)
 
       return {
@@ -91,6 +92,7 @@ export default function authReducer(state = initialState, action) {
     } /* end: auth/fetchUser/rejected */
 
     case 'auth/logout': {
+      /* TODO: rectify this as part of g-t-i-34 */
       localStorage.removeItem('goal-tracker-token')
 
       /* TODO: find out
@@ -110,43 +112,43 @@ export default function authReducer(state = initialState, action) {
 }
 
 /* Action creator functions */
-const createUserPending = () => ({
+export const createUserPending = () => ({
   type: 'auth/createUser/pending',
 })
 
-const createUserFulfilled = () => ({
+export const createUserFulfilled = () => ({
   type: 'auth/createUser/fulfilled',
 })
 
-const createUserRejected = (error) => ({
+export const createUserRejected = (error) => ({
   type: 'auth/createUser/rejected',
   error,
 })
 
-const issueJWSTokenPending = () => ({
+export const issueJWSTokenPending = () => ({
   type: 'auth/issueJWSToken/pending',
 })
 
-const issueJWSTokenFulfilled = (token) => ({
+export const issueJWSTokenFulfilled = (token) => ({
   type: 'auth/issueJWSToken/fulfilled',
   payload: token,
 })
 
-const issueJWSTokenRejected = (error) => ({
+export const issueJWSTokenRejected = (error) => ({
   type: 'auth/issueJWSToken/rejected',
   error,
 })
 
-const fetchUserPending = () => ({
+export const fetchUserPending = () => ({
   type: 'auth/fetchUser/pending',
 })
 
-const fetchUserFulfilled = (user) => ({
+export const fetchUserFulfilled = (user) => ({
   type: 'auth/fetchUser/fulfilled',
   payload: user,
 })
 
-const fetchUserRejected = (error) => ({
+export const fetchUserRejected = (error) => ({
   type: 'auth/fetchUser/rejected',
   error,
 })
