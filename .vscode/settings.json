@@ -21,5 +21,10 @@
 
   // Controls if suggestions should be accepted 'Enter' - in addition to 'Tab'.
   // Helps to avoid ambiguity between inserting new lines or accepting suggestions.
-  "editor.acceptSuggestionOnEnter": "off"
+  "editor.acceptSuggestionOnEnter": "off",
+
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true
+}
 }
