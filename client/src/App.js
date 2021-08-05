@@ -30,16 +30,14 @@ const App = () => {
              fetchUser() "thunk" action, whose latest version is introduced in the same
              commit as this comment.
     */
-    return promise.then((
-      
-    ) => {}).catch(() => {})
+    return promise.then(() => {}).catch(() => {})
   }, [])
 
   return (
     <BrowserRouter>
       <Fragment>
         <NavigationBar />
-        <Route exact path='/' component={Landing} />
+        <Route exact path="/" component={Landing} />
         <section className="container">
           <Alert />
           <Switch>

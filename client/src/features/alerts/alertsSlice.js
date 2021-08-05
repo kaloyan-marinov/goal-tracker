@@ -46,16 +46,16 @@ export const alertRemoved = (alertId) => ({
 
 /* "Thunk action creator" functions */
 
-export const displayAlertTemporarily = (message, timeout = 5000) => (
-  dispatch
-) => {
-  const alertId = uuidv4()
+export const displayAlertTemporarily =
+  (message, timeout = 5000) =>
+  (dispatch) => {
+    const alertId = uuidv4()
 
-  const alert = {
-    id: alertId,
-    message: message,
+    const alert = {
+      id: alertId,
+      message: message,
+    }
+    dispatch(alertSet(alert))
+
+    setTimeout(() => dispatch(alertRemoved(alert.id)), timeout)
   }
-  dispatch(alertSet(alert))
-
-  setTimeout(() => dispatch(alertRemoved(alert.id)), timeout)
-}

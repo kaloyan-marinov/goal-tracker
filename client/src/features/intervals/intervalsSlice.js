@@ -192,37 +192,34 @@ const deleteIntervalRejected = (error) => ({
 })
 
 /* "Thunk action creator" functions */
-export const createInterval = (
-  goalId,
-  startTimestamp,
-  finalTimestamp
-) => async (dispatch) => {
-  const body = {
-    goal_id: Number(goalId),
-    start: startTimestamp,
-    final: finalTimestamp,
-  }
+export const createInterval =
+  (goalId, startTimestamp, finalTimestamp) => async (dispatch) => {
+    const body = {
+      goal_id: Number(goalId),
+      start: startTimestamp,
+      final: finalTimestamp,
+    }
 
-  const token = localStorage.getItem('goal-tracker-token')
-  const config = {
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    },
-  }
+    const token = localStorage.getItem('goal-tracker-token')
+    const config = {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    }
 
-  dispatch(createIntervalPending())
-  try {
-    const response = await axios.post('/api/v1.0/intervals', body, config)
-    dispatch(createIntervalFulfilled(response.data))
-    return Promise.resolve()
-  } catch (err) {
-    const errorPayload = err.response.data
-    const actionError = errorPayload.message || 'ERROR NOT FROM BACKEND'
-    dispatch(createIntervalRejected(actionError))
-    return Promise.reject(actionError)
+    dispatch(createIntervalPending())
+    try {
+      const response = await axios.post('/api/v1.0/intervals', body, config)
+      dispatch(createIntervalFulfilled(response.data))
+      return Promise.resolve()
+    } catch (err) {
+      const errorPayload = err.response.data
+      const actionError = errorPayload.message || 'ERROR NOT FROM BACKEND'
+      dispatch(createIntervalRejected(actionError))
+      return Promise.reject(actionError)
+    }
   }
-}
 
 export const fetchIntervals = () => async (dispatch) => {
   const token = localStorage.getItem('goal-tracker-token')
@@ -246,42 +243,38 @@ export const fetchIntervals = () => async (dispatch) => {
   }
 }
 
-export const editInterval = (
-  intervalId,
-  goalId,
-  startTimestamp,
-  finalTimestamp
-) => async (dispatch) => {
-  const body = {
-    goal_id: Number(goalId),
-    start: startTimestamp,
-    final: finalTimestamp,
-  }
+export const editInterval =
+  (intervalId, goalId, startTimestamp, finalTimestamp) => async (dispatch) => {
+    const body = {
+      goal_id: Number(goalId),
+      start: startTimestamp,
+      final: finalTimestamp,
+    }
 
-  const token = localStorage.getItem('goal-tracker-token')
-  const config = {
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    },
-  }
+    const token = localStorage.getItem('goal-tracker-token')
+    const config = {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    }
 
-  dispatch(editIntervalPending())
-  try {
-    const response = await axios.put(
-      `/api/v1.0/intervals/${intervalId}`,
-      body,
-      config
-    )
-    dispatch(editIntervalFulfilled(response.data))
-    return Promise.resolve()
-  } catch (err) {
-    const errorPayload = err.response.data
-    const actionError = errorPayload.message || 'ERROR NOT FROM BACKEND'
-    dispatch(editIntervalRejected(actionError))
-    return Promise.reject(actionError)
+    dispatch(editIntervalPending())
+    try {
+      const response = await axios.put(
+        `/api/v1.0/intervals/${intervalId}`,
+        body,
+        config
+      )
+      dispatch(editIntervalFulfilled(response.data))
+      return Promise.resolve()
+    } catch (err) {
+      const errorPayload = err.response.data
+      const actionError = errorPayload.message || 'ERROR NOT FROM BACKEND'
+      dispatch(editIntervalRejected(actionError))
+      return Promise.reject(actionError)
+    }
   }
-}
 
 export const deleteInterval = (intervalId) => async (dispatch) => {
   const token = localStorage.getItem('goal-tracker-token')
