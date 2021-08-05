@@ -1,13 +1,13 @@
 import axios from 'axios'
 
-const initialState = {
+export const initialStateGoals = {
   requestStatus: 'idle', // or: 'loading', 'succeeded', 'failed'
   requestError: null,
   ids: [],
   entities: {},
 }
 
-export default function goalsReducer(state = initialState, action) {
+export default function goalsReducer(state = initialStateGoals, action) {
   switch (action.type) {
     case 'goals/createGoal/pending': {
       return {
@@ -76,7 +76,7 @@ export default function goalsReducer(state = initialState, action) {
     } /* end: goals/fetchGoals/rejected */
 
     case 'goals/reinitializeGoalsSlice': {
-      return initialState
+      return initialStateGoals
     } /* end: goals/reinitializeGoalsSlice */
 
     case 'goals/editGoal/pending': {
@@ -111,6 +111,7 @@ export default function goalsReducer(state = initialState, action) {
     } /* end: goals/editGoal/rejected */
 
     case 'goals/deleteGoal/pending': {
+      /* TODO: rectify this as part of g-t-i-37 */
       return {
         ...state,
         requestStatus: 'pending',
@@ -148,30 +149,30 @@ export default function goalsReducer(state = initialState, action) {
 }
 
 /* Action creator functions */
-const createGoalPending = () => ({
+export const createGoalPending = () => ({
   type: 'goals/createGoal/pending',
 })
 
-const createGoalFulfilled = (goal) => ({
+export const createGoalFulfilled = (goal) => ({
   type: 'goals/createGoal/fulfilled',
   payload: goal,
 })
 
-const createGoalRejected = (error) => ({
+export const createGoalRejected = (error) => ({
   type: 'goals/createGoal/rejected',
   error,
 })
 
-const fetchGoalsPending = () => ({
+export const fetchGoalsPending = () => ({
   type: 'goals/fetchGoals/pending',
 })
 
-const fetchGoalsFulfilled = (goals) => ({
+export const fetchGoalsFulfilled = (goals) => ({
   type: 'goals/fetchGoals/fulfilled',
   payload: goals,
 })
 
-const fetchGoalsRejected = (error) => ({
+export const fetchGoalsRejected = (error) => ({
   type: 'goals/fetchGoals/rejected',
   error,
 })
@@ -180,30 +181,30 @@ export const reinitializeGoalsSlice = () => ({
   type: 'goals/reinitializeGoalsSlice',
 })
 
-const editGoalPending = () => ({
+export const editGoalPending = () => ({
   type: 'goals/editGoal/pending',
 })
 
-const editGoalFulfilled = (editedGoal) => ({
+export const editGoalFulfilled = (editedGoal) => ({
   type: 'goals/editGoal/fulfilled',
   payload: editedGoal,
 })
 
-const editGoalRejected = (error) => ({
+export const editGoalRejected = (error) => ({
   type: 'goals/editGoal/rejected',
   error,
 })
 
-const deleteGoalPending = () => ({
+export const deleteGoalPending = () => ({
   type: 'goals/deleteGoal/pending',
 })
 
-const deleteGoalFulfilled = (goalId) => ({
+export const deleteGoalFulfilled = (goalId) => ({
   type: 'goals/deleteGoal/fulfilled',
   payload: goalId,
 })
 
-const deleteGoalRejected = (error) => ({
+export const deleteGoalRejected = (error) => ({
   type: 'goals/deleteGoal/rejected',
   error,
 })
