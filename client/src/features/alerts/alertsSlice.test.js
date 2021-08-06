@@ -1,13 +1,8 @@
-import {
-  alertSet,
-  alertRemoved,
-  initialStateAlerts,
-  displayAlertTemporarily,
-} from './alertsSlice'
+import { alertSet, alertRemoved, initialStateAlerts } from './alertsSlice'
 import alertsReducer from './alertsSlice'
 
-import thunkMiddleware from 'redux-thunk'
-import configureMockStore from 'redux-mock-store'
+import { createStoreMock } from '../../testHelpers'
+import { displayAlertTemporarily } from './alertsSlice'
 
 const ALERT = {
   id: 'alert-id-17',
@@ -78,8 +73,6 @@ describe('slice reducer', () => {
     })
   })
 })
-
-const createStoreMock = configureMockStore([thunkMiddleware])
 
 describe('thunk-action creators', () => {
   beforeEach(() => {

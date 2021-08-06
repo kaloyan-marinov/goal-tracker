@@ -15,7 +15,11 @@ import {
   logout,
 } from './authSlice'
 import authReducer from './authSlice'
-import { expect } from '@jest/globals'
+
+import { rest } from 'msw'
+import { setupServer } from 'msw/node'
+import { createStoreMock } from '../../testHelpers'
+import { createUser } from './authSlice'
 
 const USER = {
   id: 17,
@@ -315,5 +319,59 @@ describe('slice reducer', () => {
       isAuthenticated: null,
       currentUser: null,
     })
+  })
+})
+
+/* Describe what requests should be mocked. */
+const requestHandlersToMock = [
+  rest.post('/api/v1.0/users', (req, res, ctx) => {
+    return res.once(
+      ctx.status(201),
+      ctx.json({
+        id: 1,
+        email: 'mary.smith@protonmail.com',
+      })
+    )
+  }),
+]
+
+/* Create an MSW "request-interception layer". */
+const quasiServer = setupServer(...requestHandlersToMock)
+
+describe('thunk-action creators', () => {
+  let storeMock
+
+  beforeAll(() => {
+    // Enable API mocking.
+    quasiServer.listen()
+  })
+
+  beforeEach(() => {
+    storeMock = createStoreMock({
+      auth: {
+        ...initialStateAuth,
+      },
+    })
+  })
+
+  afterEach(() => {
+    quasiServer.resetHandlers()
+  })
+
+  afterAll(() => {
+    // Disable API mocking.
+    quasiServer.close()
+  })
+
+  test('createUser + its HTTP request is mocked to succeed', async () => {
+    const createUserPromise = storeMock.dispatch(
+      createUser('mocked-mary.smith@protonmail.com', 'mocked-456')
+    )
+
+    await expect(createUserPromise).resolves.toEqual(undefined)
+    expect(storeMock.getActions()).toEqual([
+      { type: 'auth/createUser/pending' },
+      { type: 'auth/createUser/fulfilled' },
+    ])
   })
 })
