@@ -18,7 +18,10 @@ import authReducer from './authSlice'
 
 import { rest } from 'msw'
 import { setupServer } from 'msw/node'
-import { createStoreMock } from '../../testHelpers'
+import {
+  mockHandlerForCreateUserRequest,
+  createStoreMock,
+} from '../../testHelpers'
 import { createUser } from './authSlice'
 
 const USER = {
@@ -322,17 +325,8 @@ describe('slice reducer', () => {
   })
 })
 
-/* Describe what requests should be mocked. */
 const requestHandlersToMock = [
-  rest.post('/api/v1.0/users', (req, res, ctx) => {
-    return res.once(
-      ctx.status(201),
-      ctx.json({
-        id: 1,
-        email: 'mary.smith@protonmail.com',
-      })
-    )
-  }),
+  rest.post('/api/v1.0/users', mockHandlerForCreateUserRequest),
 ]
 
 /* Create an MSW "request-interception layer". */
@@ -372,6 +366,35 @@ describe('thunk-action creators', () => {
     expect(storeMock.getActions()).toEqual([
       { type: 'auth/createUser/pending' },
       { type: 'auth/createUser/fulfilled' },
+    ])
+  })
+
+  test('createUser + its HTTP request is mocked to fail', async () => {
+    quasiServer.use(
+      rest.post('/api/v1.0/users', (req, res, ctx) => {
+        return res(
+          ctx.status(400),
+          ctx.json({
+            error: 'Bad Request',
+            message: 'There already exists a user with the provided email.',
+          })
+        )
+      })
+    )
+
+    const createUserPromise = storeMock.dispatch(
+      createUser('mocker-mary.smith@protonmail.com', 'mocked-456')
+    )
+
+    await expect(createUserPromise).rejects.toEqual(
+      'There already exists a user with the provided email.'
+    )
+    expect(storeMock.getActions()).toEqual([
+      { type: 'auth/createUser/pending' },
+      {
+        type: 'auth/createUser/rejected',
+        error: 'There already exists a user with the provided email.',
+      },
     ])
   })
 })
