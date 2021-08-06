@@ -1,4 +1,5 @@
-import { expect, test } from '@jest/globals'
+import { INTERVAL_1, INTERVAL_2 } from '../../testHelpers'
+
 import {
   initialStateIntervals,
   selectIntervalIds,
@@ -19,19 +20,21 @@ import {
 } from './intervalsSlice'
 import intervalsReducer from './intervalsSlice'
 
-const INTERVAL_1 = {
-  id: 1,
-  goal_id: 17,
-  start: '2021-08-05 18:54',
-  final: '2021-08-05 19:46',
-}
-
-const INTERVAL_2 = {
-  id: 2,
-  goal_id: 27,
-  start: '2021-08-05 19:53',
-  end: '2021-08-05 20:41',
-}
+import { rest } from 'msw'
+import { setupServer } from 'msw/node'
+import {
+  createStoreMock,
+  mockHandlerForCreateIntervalRequest,
+  mockHandlerForFetchIntervalsRequest,
+  mockHandlerForEditIntervalRequest,
+  mockHandlerForDeleteIntervalRequest,
+} from '../../testHelpers'
+import {
+  createInterval,
+  fetchIntervals,
+  editInterval,
+  deleteInterval,
+} from './intervalsSlice'
 
 describe('selectors', () => {
   const initSt = {
@@ -447,5 +450,212 @@ describe('slice reducer', () => {
       ids: [],
       entities: {},
     })
+  })
+})
+
+const requestHandlersToMock = [
+  rest.post('/api/v1.0/intervals', mockHandlerForCreateIntervalRequest),
+  rest.get('/api/v1.0/intervals', mockHandlerForFetchIntervalsRequest),
+  rest.put('/api/v1.0/intervals/:id', mockHandlerForEditIntervalRequest),
+  rest.delete('/api/v1.0/intervals/:id', mockHandlerForDeleteIntervalRequest),
+]
+
+/* Create an MSW "request-interception layer". */
+const quasiServer = setupServer(...requestHandlersToMock)
+
+describe('thunk-action creators', () => {
+  let storeMock
+
+  beforeAll(() => {
+    /* Enable API mocking. */
+    quasiServer.listen()
+  })
+
+  beforeEach(() => {
+    storeMock = createStoreMock({
+      intervals: {
+        ...initialStateIntervals,
+      },
+    })
+  })
+
+  afterEach(() => {
+    quasiServer.resetHandlers()
+  })
+
+  afterAll(() => {
+    /* Disable API mocking. */
+    quasiServer.close()
+  })
+
+  test('createInterval + its HTTP request is mocked to succeed', async () => {
+    const createIntervalPromise = storeMock.dispatch(
+      createInterval(1717, '2021-08-06 17:17', '2021-08-06 18:16')
+    )
+
+    await expect(createIntervalPromise).resolves.toEqual(undefined)
+    expect(storeMock.getActions()).toEqual([
+      { type: 'intervals/createInterval/pending' },
+      {
+        type: 'intervals/createInterval/fulfilled',
+        payload: INTERVAL_1,
+      },
+    ])
+  })
+
+  test('createInterval + its HTTP request is mocked to fail', async () => {
+    quasiServer.use(
+      rest.post('/api/v1.0/intervals', (req, res, ctx) => {
+        return res(
+          ctx.status(401),
+          ctx.json({
+            error: 'Unauthorized',
+            message: 'mocked-authentication required',
+          })
+        )
+      })
+    )
+
+    const createIntervalPromise = storeMock.dispatch(
+      createInterval(1717, '2021-08-06 17:17', '2021-08-06 18:16')
+    )
+
+    await expect(createIntervalPromise).rejects.toEqual(
+      'mocked-authentication required'
+    )
+    expect(storeMock.getActions()).toEqual([
+      { type: 'intervals/createInterval/pending' },
+      {
+        type: 'intervals/createInterval/rejected',
+        error: 'mocked-authentication required',
+      },
+    ])
+  })
+
+  test('fetchIntervals + its HTTP request is mocked to succeed', async () => {
+    const fetchIntervalsPromise = storeMock.dispatch(fetchIntervals())
+
+    await expect(fetchIntervalsPromise).resolves.toEqual(undefined)
+    expect(storeMock.getActions()).toEqual([
+      { type: 'intervals/fetchIntervals/pending' },
+      {
+        type: 'intervals/fetchIntervals/fulfilled',
+        payload: [INTERVAL_1, INTERVAL_2],
+      },
+    ])
+  })
+
+  test('fetchIntervals + its HTTP request is mocked to fail', async () => {
+    quasiServer.use(
+      rest.get('/api/v1.0/intervals', (req, res, ctx) => {
+        return res(
+          ctx.status(401),
+          ctx.json({
+            error: 'Unauthorized',
+            message: 'mocked-authentication required',
+          })
+        )
+      })
+    )
+
+    const fetchIntervalsPromise = storeMock.dispatch(fetchIntervals())
+
+    await expect(fetchIntervalsPromise).rejects.toEqual(
+      'mocked-authentication required'
+    )
+    expect(storeMock.getActions()).toEqual([
+      { type: 'intervals/fetchIntervals/pending' },
+      {
+        type: 'intervals/fetchIntervals/rejected',
+        error: 'mocked-authentication required',
+      },
+    ])
+  })
+
+  test('editInterval + its HTTP request is mocked to succeed', async () => {
+    const editIntervalPromise = storeMock.dispatch(
+      editInterval(171717, 1717, '2021-08-06 17:17', '2021-08-06 18:16')
+    )
+
+    await expect(editIntervalPromise).resolves.toEqual(undefined)
+    expect(storeMock.getActions()).toEqual([
+      { type: 'intervals/editInterval/pending' },
+      {
+        type: 'intervals/editInterval/fulfilled',
+        payload: {
+          ...INTERVAL_1,
+          id: 171717,
+        },
+      },
+    ])
+  })
+
+  test('editInterval + its HTTP request is mocked to fail', async () => {
+    quasiServer.use(
+      rest.put('/api/v1.0/intervals/:id', (req, res, ctx) => {
+        return res(
+          ctx.status(401),
+          ctx.json({
+            error: 'Unauthorized',
+            message: 'mocked-authentication required',
+          })
+        )
+      })
+    )
+
+    const editIntervalPromise = storeMock.dispatch(
+      editInterval(171717, 1717, '2021-08-06 17:17', '2021-08-06 18:16')
+    )
+
+    await expect(editIntervalPromise).rejects.toEqual(
+      'mocked-authentication required'
+    )
+    expect(storeMock.getActions()).toEqual([
+      { type: 'intervals/editInterval/pending' },
+      {
+        type: 'intervals/editInterval/rejected',
+        error: 'mocked-authentication required',
+      },
+    ])
+  })
+
+  test('deleteInterval + its HTTP request is mocked to succeed', async () => {
+    const deleteIntervalPromise = storeMock.dispatch(deleteInterval(171717))
+
+    await expect(deleteIntervalPromise).resolves.toEqual(undefined)
+    expect(storeMock.getActions()).toEqual([
+      { type: 'intervals/deleteInterval/pending' },
+      {
+        type: 'intervals/deleteInterval/fulfilled',
+        payload: 171717,
+      },
+    ])
+  })
+
+  test('deleteInterval + its HTTP request is mocked to fail', async () => {
+    quasiServer.use(
+      rest.delete('/api/v1.0/intervals/:id', (req, res, ctx) => {
+        return res(
+          ctx.status(401),
+          ctx.json({
+            error: 'Unauthorized',
+            message: 'mocked-authentication required',
+          })
+        )
+      })
+    )
+
+    const deleteIntervalPromise = storeMock.dispatch(deleteInterval(171717))
+
+    await expect(deleteIntervalPromise).rejects.toEqual(
+      'mocked-authentication required'
+    )
+    expect(storeMock.getActions()).toEqual([
+      { type: 'intervals/deleteInterval/pending' },
+      {
+        type: 'intervals/deleteInterval/rejected',
+        error: 'mocked-authentication required',
+      },
+    ])
   })
 })

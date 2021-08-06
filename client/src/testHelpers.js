@@ -64,3 +64,49 @@ export const mockHandlerForEditGoalRequest = (req, res, ctx) => {
 export const mockHandlerForDeleteGoalRequest = (req, res, ctx) => {
   return res.once(ctx.status(204))
 }
+
+export const INTERVAL_1 = {
+  id: 1,
+  goal_id: 17,
+  start: '2021-08-05 18:54',
+  final: '2021-08-05 19:46',
+}
+
+export const INTERVAL_2 = {
+  id: 2,
+  goal_id: 27,
+  start: '2021-08-05 19:53',
+  end: '2021-08-05 20:41',
+}
+
+export const mockHandlerForCreateIntervalRequest = (req, res, ctx) => {
+  return res.once(ctx.status(201), ctx.json(INTERVAL_1))
+}
+
+export const mockHandlerForFetchIntervalsRequest = (req, res, ctx) => {
+  return res.once(
+    ctx.status(200),
+    ctx.json({
+      intervals: [INTERVAL_1, INTERVAL_2],
+    })
+  )
+}
+
+export const mockHandlerForEditIntervalRequest = (req, res, ctx) => {
+  const { id: intervalIdStr } = req.params
+  const intervalId = parseInt(intervalIdStr)
+
+  const editedInterval = intervalId != INTERVAL_1.id ? INTERVAL_1 : INTERVAL_2
+
+  return res.once(
+    ctx.status(200),
+    ctx.json({
+      ...editedInterval,
+      id: intervalId,
+    })
+  )
+}
+
+export const mockHandlerForDeleteIntervalRequest = (req, res, ctx) => {
+  return res.once(ctx.status(204))
+}
