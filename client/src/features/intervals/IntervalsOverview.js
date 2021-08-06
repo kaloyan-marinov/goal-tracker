@@ -11,6 +11,10 @@ import { Fragment } from 'react'
 import { Link } from 'react-router-dom'
 
 const IntervalsOverview = () => {
+  console.log(
+    `${new Date().toISOString()} - React is rendering <IntervalsOverview>`
+  )
+
   const dispatch = useDispatch()
 
   useEffect(() => {

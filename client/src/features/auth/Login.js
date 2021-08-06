@@ -9,6 +9,8 @@ import { fetchUser } from './authSlice'
 import { displayAlertTemporarily } from '../alerts/alertsSlice'
 
 const Login = () => {
+  console.log(`${new Date().toISOString()} - React is rendering <Login>`)
+
   const dispatch = useDispatch()
   const isAuthenticated = useSelector(selectIsAuthenticated)
 

@@ -26,6 +26,10 @@ export const mockHandlerForFetchUserRequest = (req, res, ctx) => {
   return res.once(ctx.status(200), ctx.json(MOCK_USER_1))
 }
 
+export const mockHandlerForMultipleFetchUserRequests = (req, res, ctx) => {
+  return res(ctx.status(200), ctx.json(MOCK_USER_1))
+}
+
 const MOCK_GOAL_10 = {
   id: 10,
   description: 'mocked-write tests for thunk-action creators',

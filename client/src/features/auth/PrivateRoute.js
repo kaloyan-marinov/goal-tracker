@@ -4,6 +4,8 @@ import { selectIsAuthenticated, selectRequestStatus } from './authSlice'
 import { Route, Redirect } from 'react-router-dom'
 
 const PrivateRoute = ({ component: Component, ...rest }) => {
+  console.log(`${new Date().toISOString()} - React is rendering <PrivateRoute>`)
+
   const isAuthenticated = useSelector(selectIsAuthenticated)
   const requestStatus = useSelector(selectRequestStatus)
 

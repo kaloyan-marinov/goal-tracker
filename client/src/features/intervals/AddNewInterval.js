@@ -10,6 +10,10 @@ import { Redirect } from 'react-router-dom'
 import { createInterval } from './intervalsSlice'
 
 const AddNewInterval = () => {
+  console.log(
+    `${new Date().toISOString()} - React is rendering <AddNewInterval>`
+  )
+
   /* TODO: add logic for validating the data entered into the input fields
    */
   const dispatch = useDispatch()

@@ -9,6 +9,8 @@ import { displayAlertTemporarily } from '../alerts/alertsSlice'
 import { Link } from 'react-router-dom'
 
 const EditGoal = (props) => {
+  console.log(`${new Date().toISOString()} - React is rendering <EditGoal>`)
+
   const dispatch = useDispatch()
 
   const goalId = props.match.params.id

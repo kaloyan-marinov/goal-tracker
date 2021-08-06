@@ -10,6 +10,10 @@ import { deleteInterval } from './intervalsSlice'
 import { displayAlertTemporarily } from '../alerts/alertsSlice'
 
 const DeleteInterval = (props) => {
+  console.log(
+    `${new Date().toISOString()} - React is rendering <DeleteInterval>`
+  )
+
   const dispatch = useDispatch()
 
   const intervalId = props.match.params.id

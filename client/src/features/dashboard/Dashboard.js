@@ -6,6 +6,8 @@ import { selectCurrentUser } from '../auth/authSlice'
 import { Link } from 'react-router-dom'
 
 const Dashboard = () => {
+  console.log(`${new Date().toISOString()} - React is rendering <Dashboard>`)
+
   const currentUser = useSelector(selectCurrentUser)
 
   return (

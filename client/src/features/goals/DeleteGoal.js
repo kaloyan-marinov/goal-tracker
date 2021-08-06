@@ -9,6 +9,8 @@ import { deleteGoal } from './goalsSlice'
 import { displayAlertTemporarily } from '../alerts/alertsSlice'
 
 const DeleteGoal = (props) => {
+  console.log(`${new Date().toISOString()} - React is rendering <DeleteGoal>`)
+
   const dispatch = useDispatch()
 
   const goalId = props.match.params.id

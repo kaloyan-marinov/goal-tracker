@@ -6,6 +6,8 @@ import { displayAlertTemporarily } from '../alerts/alertsSlice'
 import { Redirect } from 'react-router-dom'
 
 const AddNewGoal = () => {
+  console.log(`${new Date().toISOString()} - React is rendering <AddNewGoal>`)
+
   const dispatch = useDispatch()
   const [description, setDescription] = useState('')
   const [toGoalsOverview, setToGoalsOverview] = useState(false)

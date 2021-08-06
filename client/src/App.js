@@ -22,15 +22,25 @@ import EditInterval from './features/intervals/EditInterval'
 import DeleteInterval from './features/intervals/DeleteInterval'
 
 const App = () => {
+  console.log(`${new Date().toISOString()} - React is rendering <App>`)
+
   const dispatch = useDispatch()
 
   useEffect(() => {
+    console.log('    running its effect function')
+
     const promise = dispatch(fetchUser())
     /* TODO: find out if the next instruction is an acceptable way of dealing with the
              fetchUser() "thunk" action, whose latest version is introduced in the same
              commit as this comment.
     */
-    return promise.then(() => {}).catch(() => {})
+    return promise
+      .then(() => {
+        console.log('    the promise has resolved')
+      })
+      .catch(() => {
+        console.log('    the promise has rejected')
+      })
   }, [])
 
   return (

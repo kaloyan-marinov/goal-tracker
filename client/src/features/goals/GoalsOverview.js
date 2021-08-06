@@ -10,6 +10,10 @@ import { selectGoalIds, selectGoalEntities } from './goalsSlice'
 import { displayAlertTemporarily } from '../alerts/alertsSlice'
 
 const GoalsOverview = () => {
+  console.log(
+    `${new Date().toISOString()} - React is rendering <GoalsOverview>`
+  )
+
   const dispatch = useDispatch()
 
   useEffect(() => {

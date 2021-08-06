@@ -11,6 +11,8 @@ import { Fragment } from 'react'
 import { Link } from 'react-router-dom'
 
 const EditInterval = (props) => {
+  console.log(`${new Date().toISOString()} - React is rendering <EditInterval>`)
+
   const dispatch = useDispatch()
 
   const intervalId = props.match.params.id

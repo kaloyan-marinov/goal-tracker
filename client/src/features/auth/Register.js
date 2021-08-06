@@ -9,6 +9,8 @@ import { Redirect } from 'react-router-dom'
 import { fetchUser } from './authSlice'
 
 const Register = () => {
+  console.log(`${new Date().toISOString()} - React is rendering <Register>`)
+
   const dispatch = useDispatch()
   const isAuthenticated = useSelector(selectIsAuthenticated)
 
