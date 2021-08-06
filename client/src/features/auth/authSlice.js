@@ -157,7 +157,7 @@ export const logout = () => ({
   type: 'auth/logout',
 })
 
-/* "Thunk action creator" functions */
+/* Thunk-action creator functions */
 export const createUser = (email, password) => async (dispatch) => {
   const config = {
     headers: {

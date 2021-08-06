@@ -36,7 +36,6 @@ export default function alertsReducer(state = initialStateAlerts, action) {
 }
 
 /* Action creator functions */
-
 export const alertSet = (alert) => ({ type: 'alerts/alertSet', payload: alert })
 
 export const alertRemoved = (alertId) => ({
@@ -44,8 +43,7 @@ export const alertRemoved = (alertId) => ({
   payload: alertId,
 })
 
-/* "Thunk action creator" functions */
-
+/* Thunk-action creator functions */
 export const displayAlertTemporarily =
   (message, timeout = 5000) =>
   (dispatch) => {

@@ -209,7 +209,7 @@ export const deleteGoalRejected = (error) => ({
   error,
 })
 
-/* "Thunk action creator" functions */
+/* Thunk-action creator functions */
 export const createGoal = (description) => async (dispatch) => {
   const body = { description }
 

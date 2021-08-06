@@ -201,7 +201,7 @@ export const deleteIntervalRejected = (error) => ({
   error,
 })
 
-/* "Thunk action creator" functions */
+/* Thunk-action creator functions */
 export const createInterval =
   (goalId, startTimestamp, finalTimestamp) => async (dispatch) => {
     const body = {
