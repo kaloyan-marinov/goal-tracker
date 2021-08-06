@@ -9,7 +9,26 @@ export const mockHandlerForCreateUserRequest = (req, res, ctx) => {
     ctx.status(201),
     ctx.json({
       id: 1,
-      email: 'mary.smith@protonmail.com',
+      email: 'mocked-mary.smith@protonmail.com',
+    })
+  )
+}
+
+export const mockHandlerForIssueJWSTokenRequest = (req, res, ctx) => {
+  return res.once(
+    ctx.status(200),
+    ctx.json({
+      token: 'mocked-jws-token',
+    })
+  )
+}
+
+export const mockHandlerForFetchUserRequest = (req, res, ctx) => {
+  return res(
+    ctx.status(200),
+    ctx.json({
+      id: 1,
+      email: 'mocked-mary.smith@protonmail.com',
     })
   )
 }

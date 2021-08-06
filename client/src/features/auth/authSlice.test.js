@@ -19,10 +19,12 @@ import authReducer from './authSlice'
 import { rest } from 'msw'
 import { setupServer } from 'msw/node'
 import {
-  mockHandlerForCreateUserRequest,
   createStoreMock,
+  mockHandlerForCreateUserRequest,
+  mockHandlerForIssueJWSTokenRequest,
+  mockHandlerForFetchUserRequest,
 } from '../../testHelpers'
-import { createUser } from './authSlice'
+import { createUser, issueJWSToken, fetchUser } from './authSlice'
 
 const USER = {
   id: 17,
@@ -327,6 +329,8 @@ describe('slice reducer', () => {
 
 const requestHandlersToMock = [
   rest.post('/api/v1.0/users', mockHandlerForCreateUserRequest),
+  rest.post('/api/v1.0/tokens', mockHandlerForIssueJWSTokenRequest),
+  rest.get('/api/v1.0/user', mockHandlerForFetchUserRequest),
 ]
 
 /* Create an MSW "request-interception layer". */
@@ -336,7 +340,7 @@ describe('thunk-action creators', () => {
   let storeMock
 
   beforeAll(() => {
-    // Enable API mocking.
+    /* Enable API mocking. */
     quasiServer.listen()
   })
 
@@ -353,13 +357,13 @@ describe('thunk-action creators', () => {
   })
 
   afterAll(() => {
-    // Disable API mocking.
+    /* Disable API mocking. */
     quasiServer.close()
   })
 
   test('createUser + its HTTP request is mocked to succeed', async () => {
     const createUserPromise = storeMock.dispatch(
-      createUser('mocked-mary.smith@protonmail.com', 'mocked-456')
+      createUser('mary.smith@protonmail.com', '456')
     )
 
     await expect(createUserPromise).resolves.toEqual(undefined)
@@ -383,7 +387,7 @@ describe('thunk-action creators', () => {
     )
 
     const createUserPromise = storeMock.dispatch(
-      createUser('mocker-mary.smith@protonmail.com', 'mocked-456')
+      createUser('mary.smith@protonmail.com', '456')
     )
 
     await expect(createUserPromise).rejects.toEqual(
@@ -394,6 +398,88 @@ describe('thunk-action creators', () => {
       {
         type: 'auth/createUser/rejected',
         error: 'There already exists a user with the provided email.',
+      },
+    ])
+  })
+
+  test('issueJWSToken + its HTTP request is mocked to succeed', async () => {
+    const issueJWSTokenPromise = storeMock.dispatch(
+      issueJWSToken('mary.smith@protonmail.com', '456')
+    )
+
+    await expect(issueJWSTokenPromise).resolves.toEqual(undefined)
+    expect(storeMock.getActions()).toEqual([
+      { type: 'auth/issueJWSToken/pending' },
+      {
+        type: 'auth/issueJWSToken/fulfilled',
+        payload: 'mocked-jws-token',
+      },
+    ])
+  })
+
+  test('issueJWSToken + its HTTP request is mocked to fail', async () => {
+    quasiServer.use(
+      rest.post('/api/v1.0/tokens', (req, res, ctx) => {
+        return res(
+          ctx.status(401),
+          ctx.json({
+            error: 'authentication required',
+          })
+        )
+      })
+    )
+
+    const issueJWSTokenPromise = storeMock.dispatch(
+      issueJWSToken('mary.smith@protonmail.com', '456')
+    )
+
+    await expect(issueJWSTokenPromise).rejects.toEqual(
+      'authentication required'
+    )
+    expect(storeMock.getActions()).toEqual([
+      { type: 'auth/issueJWSToken/pending' },
+      {
+        type: 'auth/issueJWSToken/rejected',
+        error: 'authentication required',
+      },
+    ])
+  })
+
+  test('fetchUser + its HTTP request is mocked to succeed', async () => {
+    const fetchUserPromise = storeMock.dispatch(fetchUser())
+
+    await expect(fetchUserPromise).resolves.toEqual(undefined)
+    expect(storeMock.getActions()).toEqual([
+      { type: 'auth/fetchUser/pending' },
+      {
+        type: 'auth/fetchUser/fulfilled',
+        payload: {
+          id: 1,
+          email: 'mocked-mary.smith@protonmail.com',
+        },
+      },
+    ])
+  })
+
+  test('fetchUser + its HTTP request is mocked to fail', async () => {
+    quasiServer.use(
+      rest.get('/api/v1.0/user', (req, res, ctx) => {
+        return res(
+          ctx.status(401),
+          ctx.json({
+            error: 'authentication required',
+          })
+        )
+      })
+    )
+    const fetchUserPromise = storeMock.dispatch(fetchUser())
+
+    await expect(fetchUserPromise).rejects.toEqual('authentication required')
+    expect(storeMock.getActions()).toEqual([
+      { type: 'auth/fetchUser/pending' },
+      {
+        type: 'auth/fetchUser/rejected',
+        error: 'authentication required',
       },
     ])
   })

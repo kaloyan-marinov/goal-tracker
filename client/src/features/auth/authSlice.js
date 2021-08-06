@@ -235,7 +235,6 @@ export const fetchUser = () => async (dispatch) => {
 }
 
 /* Selector functions */
-
 export const selectIsAuthenticated = (state) => {
   /*
   TODO:
