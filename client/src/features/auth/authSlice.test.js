@@ -423,7 +423,7 @@ describe('thunk-action creators', () => {
         return res(
           ctx.status(401),
           ctx.json({
-            error: 'authentication required',
+            error: 'mocked-authentication required',
           })
         )
       })
@@ -434,13 +434,13 @@ describe('thunk-action creators', () => {
     )
 
     await expect(issueJWSTokenPromise).rejects.toEqual(
-      'authentication required'
+      'mocked-authentication required'
     )
     expect(storeMock.getActions()).toEqual([
       { type: 'auth/issueJWSToken/pending' },
       {
         type: 'auth/issueJWSToken/rejected',
-        error: 'authentication required',
+        error: 'mocked-authentication required',
       },
     ])
   })
@@ -467,19 +467,21 @@ describe('thunk-action creators', () => {
         return res(
           ctx.status(401),
           ctx.json({
-            error: 'authentication required',
+            error: 'mocked-authentication required',
           })
         )
       })
     )
     const fetchUserPromise = storeMock.dispatch(fetchUser())
 
-    await expect(fetchUserPromise).rejects.toEqual('authentication required')
+    await expect(fetchUserPromise).rejects.toEqual(
+      'mocked-authentication required'
+    )
     expect(storeMock.getActions()).toEqual([
       { type: 'auth/fetchUser/pending' },
       {
         type: 'auth/fetchUser/rejected',
-        error: 'authentication required',
+        error: 'mocked-authentication required',
       },
     ])
   })

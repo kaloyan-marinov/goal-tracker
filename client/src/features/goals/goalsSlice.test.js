@@ -17,7 +17,17 @@ import {
   deleteGoalRejected,
 } from './goalsSlice'
 import goalsReducer from './goalsSlice'
-import { expect, test } from '@jest/globals'
+
+import { rest } from 'msw'
+import { setupServer } from 'msw/node'
+import {
+  createStoreMock,
+  mockHandlerForCreateGoalRequest,
+  mockHandlerForFetchGoalsRequest,
+  mockHandlerForEditGoalRequest,
+  mockHandlerForDeleteGoalRequest,
+} from '../../testHelpers'
+import { createGoal, fetchGoals, editGoal, deleteGoal } from './goalsSlice'
 
 const GOAL_17 = {
   id: 17,
@@ -469,5 +479,224 @@ describe('slice reducer', () => {
       requestStatus: 'failed',
       requestError: 'goals-deleteGoal-rejected',
     })
+  })
+})
+
+const requestHandlersToMock = [
+  rest.post('/api/v1.0/goals', mockHandlerForCreateGoalRequest),
+  rest.get('/api/v1.0/goals', mockHandlerForFetchGoalsRequest),
+  rest.put('/api/v1.0/goals/:id', mockHandlerForEditGoalRequest),
+  rest.delete('/api/v1.0/goals/:id', mockHandlerForDeleteGoalRequest),
+]
+
+/* Create an MSW "request-interception layer". */
+const quasiServer = setupServer(...requestHandlersToMock)
+
+describe('thunk-action creators', () => {
+  let storeMock
+
+  beforeAll(() => {
+    /* Enable API mocking. */
+    quasiServer.listen()
+  })
+
+  beforeEach(() => {
+    storeMock = createStoreMock({
+      goals: {
+        ...initialStateGoals,
+      },
+    })
+  })
+
+  afterEach(() => {
+    quasiServer.resetHandlers()
+  })
+
+  afterAll(() => {
+    /* Disable API mocking. */
+    quasiServer.close()
+  })
+
+  test('createGoal + its HTTP request is mocked to succeed', async () => {
+    const createGoalPromise = storeMock.dispatch(
+      createGoal('write tests for thunk-action creators')
+    )
+
+    await expect(createGoalPromise).resolves.toEqual(undefined)
+    expect(storeMock.getActions()).toEqual([
+      { type: 'goals/createGoal/pending' },
+      {
+        type: 'goals/createGoal/fulfilled',
+        payload: {
+          id: 10,
+          description: 'mocked-write tests for thunk-action creators',
+        },
+      },
+    ])
+  })
+
+  test('createGoal + its HTTP request is mocked to fail', async () => {
+    quasiServer.use(
+      rest.post('/api/v1.0/goals', (req, res, ctx) => {
+        return res(
+          ctx.status(401),
+          ctx.json({
+            error: 'Unauthorized',
+            message: 'mocked-authentication required',
+          })
+        )
+      })
+    )
+
+    const createGoalPromise = storeMock.dispatch(
+      createGoal('write tests for thunk-action creators')
+    )
+
+    await expect(createGoalPromise).rejects.toEqual(
+      'mocked-authentication required'
+    )
+    expect(storeMock.getActions()).toEqual([
+      { type: 'goals/createGoal/pending' },
+      {
+        type: 'goals/createGoal/rejected',
+        error: 'mocked-authentication required',
+      },
+    ])
+  })
+
+  test('fetchGoals + its HTTP request is mocked to succeed', async () => {
+    const fetchGoalsPromise = storeMock.dispatch(fetchGoals())
+
+    await expect(fetchGoalsPromise).resolves.toEqual(undefined)
+    expect(storeMock.getActions()).toEqual([
+      { type: 'goals/fetchGoals/pending' },
+      {
+        type: 'goals/fetchGoals/fulfilled',
+        payload: [
+          {
+            id: 10,
+            description: 'mocked-write tests for thunk-action creators',
+          },
+          {
+            id: 20,
+            description: 'mocked-cook dinner',
+          },
+        ],
+      },
+    ])
+  })
+
+  test('fetchGoals + its HTTP request is mocked to fail', async () => {
+    quasiServer.use(
+      rest.get('/api/v1.0/goals', (req, res, ctx) => {
+        return res(
+          ctx.status(401),
+          ctx.json({
+            error: 'Unauthorized',
+            message: 'mocked-authentication required',
+          })
+        )
+      })
+    )
+
+    const fetchGoalsPromise = storeMock.dispatch(fetchGoals())
+
+    await expect(fetchGoalsPromise).rejects.toEqual(
+      'mocked-authentication required'
+    )
+    expect(storeMock.getActions()).toEqual([
+      { type: 'goals/fetchGoals/pending' },
+      {
+        type: 'goals/fetchGoals/rejected',
+        error: 'mocked-authentication required',
+      },
+    ])
+  })
+
+  test('editGoal + its HTTP request is mocked to succeed', async () => {
+    const editGoalPromise = storeMock.dispatch(
+      editGoal(17, 'clean up the dinner table')
+    )
+
+    await expect(editGoalPromise).resolves.toEqual(undefined)
+    expect(storeMock.getActions()).toEqual([
+      { type: 'goals/editGoal/pending' },
+      {
+        type: 'goals/editGoal/fulfilled',
+        payload: {
+          id: 17,
+          description: 'mocked-cook dinner - its edited version',
+        },
+      },
+    ])
+  })
+
+  test('editGoal + its HTTP request is mocked to fail', async () => {
+    quasiServer.use(
+      rest.put('/api/v1.0/goals/:id', (req, res, ctx) => {
+        return res(
+          ctx.status(401),
+          ctx.json({
+            error: 'Unauthorized',
+            message: 'mocked-authentication required',
+          })
+        )
+      })
+    )
+
+    const editGoalPromise = storeMock.dispatch(
+      editGoal(17, 'clean up the dinner table')
+    )
+
+    await expect(editGoalPromise).rejects.toEqual(
+      'mocked-authentication required'
+    )
+    expect(storeMock.getActions()).toEqual([
+      { type: 'goals/editGoal/pending' },
+      {
+        type: 'goals/editGoal/rejected',
+        error: 'mocked-authentication required',
+      },
+    ])
+  })
+
+  test('deleteGoal + its HTTP request is mocked to succeed', async () => {
+    const deleteGoalPromise = storeMock.dispatch(deleteGoal(17))
+
+    await expect(deleteGoalPromise).resolves.toEqual(undefined)
+    expect(storeMock.getActions()).toEqual([
+      { type: 'goals/deleteGoal/pending' },
+      {
+        type: 'goals/deleteGoal/fulfilled',
+        payload: 17,
+      },
+    ])
+  })
+
+  test('deleteGoal + its HTTP request is mocked to fail', async () => {
+    quasiServer.use(
+      rest.delete('/api/v1.0/goals/:id', (req, res, ctx) => {
+        return res(
+          ctx.status(401),
+          ctx.json({
+            error: 'Unauthorized',
+            message: 'mocked-authorization required',
+          })
+        )
+      })
+    )
+
+    const deleteGoalPromise = storeMock.dispatch(deleteGoal(17))
+
+    await expect(deleteGoalPromise).rejects.toEqual(
+      'mocked-authorization required'
+    )
+    expect(storeMock.getActions()).toEqual([
+      { type: 'goals/deleteGoal/pending' },
+      {
+        type: 'goals/deleteGoal/rejected',
+        error: 'mocked-authorization required',
+      },
+    ])
   })
 })
