@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom'
-import { cleanup, fireEvent, render, screen } from '@testing-library/react'
+import { fireEvent, render, screen } from '@testing-library/react'
 
 import thunkMiddleware from 'redux-thunk'
 import { Provider } from 'react-redux'
@@ -83,46 +83,49 @@ describe('<App> + mocking of HTTP requests', () => {
     expect(element).toBeInTheDocument()
   })
 
-  test('tbd', async () => {
-    const enhancer = applyMiddleware(thunkMiddleware)
-    const realStore = createStore(rootReducer, enhancer)
+  test(
+    'renders <Login> for an unauthenticated user,' +
+      ' and then renders an <Alert>' +
+      ' if the login form is submitted with incorrect credentials',
+    async () => {
+      /* Arrange. */
+      const enhancer = applyMiddleware(thunkMiddleware)
+      const realStore = createStore(rootReducer, enhancer)
 
-    const history = createMemoryHistory()
+      const history = createMemoryHistory()
 
-    /* Act. */
-    cleanup()
+      render(
+        <Provider store={realStore}>
+          <Router history={history}>
+            <App />
+          </Router>
+        </Provider>
+      )
 
-    render(
-      <Provider store={realStore}>
-        <Router history={history}>
-          <App />
-        </Router>
-      </Provider>
-    )
+      const loginAnchor = await screen.findByText('Login')
+      fireEvent.click(loginAnchor)
 
-    /* Assert. */
-    const loginAnchor = await screen.findByText('Login')
-    fireEvent.click(loginAnchor)
+      /* Act. */
+      const emailInput = screen.getByPlaceholderText('Enter email')
+      fireEvent.change(emailInput, {
+        target: { value: 'mary.smith@protonmail.com' },
+      })
 
-    /* Act. */
-    const emailInput = screen.getByPlaceholderText('Enter email')
-    fireEvent.change(emailInput, {
-      target: { value: 'mary.smith@protonmail.com' },
-    })
+      const passwordInput = screen.getByPlaceholderText('Enter password')
+      fireEvent.change(passwordInput, {
+        target: { value: '456' },
+      })
 
-    const passwordInput = screen.getByPlaceholderText('Enter password')
-    fireEvent.change(passwordInput, {
-      target: { value: '456' },
-    })
+      const loginButton = await screen.findByRole('button', {
+        name: 'Login',
+      })
+      fireEvent.click(loginButton)
 
-    const loginButton = await screen.findByRole('button', {
-      name: 'Login',
-    })
-    fireEvent.click(loginButton)
-
-    const element = await screen.findByText('AUTHENTICATION FAILED')
-    expect(element).toBeInTheDocument()
-  })
+      /* Assert. */
+      const element = await screen.findByText('AUTHENTICATION FAILED')
+      expect(element).toBeInTheDocument()
+    }
+  )
 
   test('renders <Dashboard> for an authenticated user', async () => {
     /* Arrange. */
