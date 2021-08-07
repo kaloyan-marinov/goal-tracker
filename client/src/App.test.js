@@ -9,46 +9,27 @@ import App from './App'
 
 import { rest } from 'msw'
 import { setupServer } from 'msw/node'
-import { mockHandlerForMultipleFetchUserRequests } from './testHelpers'
-
-describe('<App>', () => {
-  test('renders <Landing> for an unauthenticated user', () => {
-    /* Arrange. */
-    quasiServer.use(
-      rest.get('/api/v1.0/user', (req, res, ctx) => {
-        return res.once(
-          ctx.status(401),
-          ctx.json({
-            error: 'Unauthorized',
-            message: 'mocked-authentication required',
-          })
-        )
-      })
-    )
-
-    const enhancer = applyMiddleware(thunkMiddleware)
-    const realStore = createStore(rootReducer, enhancer)
-
-    /* Act. */
-    render(
-      <Provider store={realStore}>
-        <App />
-      </Provider>
-    )
-
-    /* Assert. */
-    const headingElement = screen.getByText('WELCOME TO GoalTracker')
-    expect(headingElement).toBeInTheDocument()
-
-    const paragraphElement = screen.getByText(
-      'Start keeping track of how much time you spend in pursuit of your goals!'
-    )
-    expect(paragraphElement).toBeInTheDocument()
-  })
-})
+import { mockHandlerForFetchUserRequest } from './testHelpers'
 
 const requestHandlersToMock = [
-  rest.get('/api/v1.0/user', mockHandlerForMultipleFetchUserRequests),
+  rest.get('/api/v1.0/user', (req, res, ctx) => {
+    return res(
+      ctx.status(401),
+      ctx.json({
+        error: 'Unauthorized',
+        message: 'mocked-authentication required',
+      })
+    )
+  }),
+  rest.get('/api/v1.0/tokens', (req, res, ctx) => {
+    return res(
+      ctx.status(401),
+      ctx.json({
+        error: 'Unauthorized',
+        message: 'mocked-authentication required',
+      })
+    )
+  }),
 ]
 
 /* Create an MSW "request-interception layer". */
@@ -69,20 +50,30 @@ describe('<App> + mocking of HTTP requests', () => {
     quasiServer.close()
   })
 
-  test('renders <Login> for an unauthenticated user', async () => {
+  test('renders <Landing> for an unauthenticated user', async () => {
     /* Arrange. */
-    quasiServer.use(
-      rest.get('/api/v1.0/user', (req, res, ctx) => {
-        return res.once(
-          ctx.status(401),
-          ctx.json({
-            error: 'Unauthorized',
-            message: 'mocked-authentication required',
-          })
-        )
-      })
+    const enhancer = applyMiddleware(thunkMiddleware)
+    const realStore = createStore(rootReducer, enhancer)
+
+    /* Act. */
+    render(
+      <Provider store={realStore}>
+        <App />
+      </Provider>
     )
 
+    /* Assert. */
+    const headingElement = await screen.findByText('WELCOME TO GoalTracker')
+    expect(headingElement).toBeInTheDocument()
+
+    const paragraphElement = screen.getByText(
+      'Start keeping track of how much time you spend in pursuit of your goals!'
+    )
+    expect(paragraphElement).toBeInTheDocument()
+  })
+
+  test('renders <Login> for an unauthenticated user', async () => {
+    /* Arrange. */
     const enhancer = applyMiddleware(thunkMiddleware)
     const realStore = createStore(rootReducer, enhancer)
 
@@ -111,30 +102,6 @@ describe('<App> + mocking of HTTP requests', () => {
       ' when an unauthenticated user attempts to log in via incorrect credentials',
     async () => {
       /* Arrange. */
-      quasiServer.use(
-        rest.get('/api/v1.0/user', (req, res, ctx) => {
-          return res.once(
-            ctx.status(401),
-            ctx.json({
-              error: 'Unauthorized',
-              message: 'mocked-authentication required',
-            })
-          )
-        })
-      )
-
-      quasiServer.use(
-        rest.get('/api/v1.0/tokens', (req, res, ctx) => {
-          return res.once(
-            ctx.status(401),
-            ctx.json({
-              error: 'Unauthorized',
-              message: 'mocked-authentication required',
-            })
-          )
-        })
-      )
-
       const enhancer = applyMiddleware(thunkMiddleware)
       const realStore = createStore(rootReducer, enhancer)
 
@@ -145,6 +112,9 @@ describe('<App> + mocking of HTTP requests', () => {
       )
 
       /* Act. */
+      const loginAnchor = screen.getByText('Login')
+      fireEvent.click(loginAnchor)
+
       const loginButton = await screen.findByRole('button', {
         name: 'Login',
       })
@@ -158,6 +128,8 @@ describe('<App> + mocking of HTTP requests', () => {
 
   test('renders <Dashboard> for an authenticated user', async () => {
     /* Arrange. */
+    quasiServer.use(rest.get('/api/v1.0/user', mockHandlerForFetchUserRequest))
+
     const enhancer = applyMiddleware(thunkMiddleware)
     const realStore = createStore(rootReducer, enhancer)
 
