@@ -50,7 +50,7 @@ describe('<App> + mocking of HTTP requests', () => {
     quasiServer.close()
   })
 
-  test('renders <Landing> for an unauthenticated user', async () => {
+  xtest('renders <Landing> for an unauthenticated user', async () => {
     /* Arrange. */
     const enhancer = applyMiddleware(thunkMiddleware)
     const realStore = createStore(rootReducer, enhancer)
@@ -72,7 +72,7 @@ describe('<App> + mocking of HTTP requests', () => {
     expect(paragraphElement).toBeInTheDocument()
   })
 
-  test('renders <Login> for an unauthenticated user', async () => {
+  xtest('renders <Login> for an unauthenticated user', async () => {
     /* Arrange. */
     const enhancer = applyMiddleware(thunkMiddleware)
     const realStore = createStore(rootReducer, enhancer)
@@ -97,7 +97,7 @@ describe('<App> + mocking of HTTP requests', () => {
     expect(element).toBeInTheDocument()
   })
 
-  test(
+  xtest(
     'causes an alert to be rendered' +
       ' when an unauthenticated user attempts to log in via incorrect credentials',
     async () => {
@@ -126,7 +126,7 @@ describe('<App> + mocking of HTTP requests', () => {
     }
   )
 
-  test('renders <Dashboard> for an authenticated user', async () => {
+  xtest('renders <Dashboard> for an authenticated user', async () => {
     /* Arrange. */
     quasiServer.use(rest.get('/api/v1.0/user', mockHandlerForFetchUserRequest))
 
