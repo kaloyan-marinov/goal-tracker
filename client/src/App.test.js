@@ -14,6 +14,18 @@ import { mockHandlerForMultipleFetchUserRequests } from './testHelpers'
 describe('<App>', () => {
   test('renders <Landing> for an unauthenticated user', () => {
     /* Arrange. */
+    quasiServer.use(
+      rest.get('/api/v1.0/user', (req, res, ctx) => {
+        return res.once(
+          ctx.status(401),
+          ctx.json({
+            error: 'Unauthorized',
+            message: 'mocked-authentication required',
+          })
+        )
+      })
+    )
+
     const enhancer = applyMiddleware(thunkMiddleware)
     const realStore = createStore(rootReducer, enhancer)
 
@@ -101,6 +113,18 @@ describe('<App> + mocking of HTTP requests', () => {
       /* Arrange. */
       quasiServer.use(
         rest.get('/api/v1.0/user', (req, res, ctx) => {
+          return res.once(
+            ctx.status(401),
+            ctx.json({
+              error: 'Unauthorized',
+              message: 'mocked-authentication required',
+            })
+          )
+        })
+      )
+
+      quasiServer.use(
+        rest.get('/api/v1.0/tokens', (req, res, ctx) => {
           return res.once(
             ctx.status(401),
             ctx.json({
