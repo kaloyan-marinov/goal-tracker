@@ -17,6 +17,8 @@ const GoalsOverview = () => {
   const dispatch = useDispatch()
 
   useEffect(() => {
+    console.log('    <GoalsOverview> is running its effect function')
+
     /* TODO: consider the commit immediately before this function was implemented in its
              present form; there was an issue with that commit; the issue could be
              demonstrated by using the UI in the following way:

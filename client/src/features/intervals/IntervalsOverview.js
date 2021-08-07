@@ -18,6 +18,8 @@ const IntervalsOverview = () => {
   const dispatch = useDispatch()
 
   useEffect(() => {
+    console.log('    <IntervalsOverview> is running its effect function')
+
     /* TODO: [identical to the TODO, which is within the useEffect() call in
              <GoalsOverview>]
     

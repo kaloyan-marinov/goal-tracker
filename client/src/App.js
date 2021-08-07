@@ -27,7 +27,7 @@ const App = () => {
   const dispatch = useDispatch()
 
   useEffect(() => {
-    console.log('    running its effect function')
+    console.log('    <App> is running its effect function')
 
     const promise = dispatch(fetchUser())
     /* TODO: find out if the next instruction is an acceptable way of dealing with the

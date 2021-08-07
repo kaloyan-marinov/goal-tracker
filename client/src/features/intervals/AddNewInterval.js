@@ -25,6 +25,8 @@ const AddNewInterval = () => {
            following call of useEffect
   */
   useEffect(() => {
+    console.log('    <AddNewInterval> is running its effect function')
+
     const promise = dispatch(fetchGoals())
     return promise
       .then(() => {})
