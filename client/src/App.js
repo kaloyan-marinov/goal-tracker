@@ -1,6 +1,6 @@
 // import React from "react";
 import { Fragment } from 'react'
-import { BrowserRouter, Route, Switch } from 'react-router-dom'
+import { Route, Switch } from 'react-router-dom'
 import NavigationBar from './features/navigationbar/NavigationBar'
 import Landing from './features/landing/Landing'
 import Register from './features/auth/Register'
@@ -44,52 +44,46 @@ const App = () => {
   }, [])
 
   return (
-    <BrowserRouter>
-      <Fragment>
-        <NavigationBar />
-        <Route exact path="/" component={Landing} />
-        <section className="container">
-          <Alert />
-          <Switch>
-            <Route exact path="/register" component={Register} />
-            <Route exact path="/login" component={Login} />
-            <PrivateRoute exact path="/dashboard" component={Dashboard} />
-            <PrivateRoute
-              exact
-              path="/goals-overview"
-              component={GoalsOverview}
-            />
-            <PrivateRoute exact path="/add-new-goal" component={AddNewGoal} />
-            <PrivateRoute exact path="/edit-goal/:id" component={EditGoal} />
-            <PrivateRoute
-              exact
-              path="/delete-goal/:id"
-              component={DeleteGoal}
-            />
-            <PrivateRoute
-              exact
-              path="/intervals-overview"
-              component={IntervalsOverview}
-            />
-            <PrivateRoute
-              exact
-              path="/add-new-interval"
-              component={AddNewInterval}
-            />
-            <PrivateRoute
-              exact
-              path="/edit-interval/:id"
-              component={EditInterval}
-            />
-            <PrivateRoute
-              exact
-              path="/delete-interval/:id"
-              component={DeleteInterval}
-            />
-          </Switch>
-        </section>
-      </Fragment>
-    </BrowserRouter>
+    <Fragment>
+      <NavigationBar />
+      <Route exact path="/" component={Landing} />
+      <section className="container">
+        <Alert />
+        <Switch>
+          <Route exact path="/register" component={Register} />
+          <Route exact path="/login" component={Login} />
+          <PrivateRoute exact path="/dashboard" component={Dashboard} />
+          <PrivateRoute
+            exact
+            path="/goals-overview"
+            component={GoalsOverview}
+          />
+          <PrivateRoute exact path="/add-new-goal" component={AddNewGoal} />
+          <PrivateRoute exact path="/edit-goal/:id" component={EditGoal} />
+          <PrivateRoute exact path="/delete-goal/:id" component={DeleteGoal} />
+          <PrivateRoute
+            exact
+            path="/intervals-overview"
+            component={IntervalsOverview}
+          />
+          <PrivateRoute
+            exact
+            path="/add-new-interval"
+            component={AddNewInterval}
+          />
+          <PrivateRoute
+            exact
+            path="/edit-interval/:id"
+            component={EditInterval}
+          />
+          <PrivateRoute
+            exact
+            path="/delete-interval/:id"
+            component={DeleteInterval}
+          />
+        </Switch>
+      </section>
+    </Fragment>
   )
 }
 

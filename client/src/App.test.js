@@ -1,10 +1,14 @@
 import '@testing-library/jest-dom'
-import { fireEvent, render, screen } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 
 import thunkMiddleware from 'redux-thunk'
 import { Provider } from 'react-redux'
 import { applyMiddleware, createStore } from 'redux'
 import rootReducer from './reducer'
+
+import { createMemoryHistory } from 'history'
+import { Router } from 'react-router-dom'
+
 import App from './App'
 
 import { rest } from 'msw'
@@ -50,14 +54,18 @@ describe('<App> + mocking of HTTP requests', () => {
     quasiServer.close()
   })
 
-  xtest('renders <Login> for an unauthenticated user', async () => {
+  test('renders <Login> for an unauthenticated user', async () => {
     /* Arrange. */
     const enhancer = applyMiddleware(thunkMiddleware)
     const realStore = createStore(rootReducer, enhancer)
 
+    const history = createMemoryHistory()
+
     render(
       <Provider store={realStore}>
-        <App />
+        <Router history={history}>
+          <App />
+        </Router>
       </Provider>
     )
 
@@ -75,14 +83,20 @@ describe('<App> + mocking of HTTP requests', () => {
     expect(element).toBeInTheDocument()
   })
 
-  xtest('tbd', async () => {
+  test('tbd', async () => {
     const enhancer = applyMiddleware(thunkMiddleware)
     const realStore = createStore(rootReducer, enhancer)
 
+    const history = createMemoryHistory()
+
     /* Act. */
+    cleanup()
+
     render(
       <Provider store={realStore}>
-        <App />
+        <Router history={history}>
+          <App />
+        </Router>
       </Provider>
     )
 
@@ -110,17 +124,21 @@ describe('<App> + mocking of HTTP requests', () => {
     expect(element).toBeInTheDocument()
   })
 
-  xtest('renders <Dashboard> for an authenticated user', async () => {
+  test('renders <Dashboard> for an authenticated user', async () => {
     /* Arrange. */
     quasiServer.use(rest.get('/api/v1.0/user', mockHandlerForFetchUserRequest))
 
     const enhancer = applyMiddleware(thunkMiddleware)
     const realStore = createStore(rootReducer, enhancer)
 
+    const history = createMemoryHistory()
+
     /* Act. */
     render(
       <Provider store={realStore}>
-        <App />
+        <Router history={history}>
+          <App />
+        </Router>
       </Provider>
     )
 

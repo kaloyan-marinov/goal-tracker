@@ -51,7 +51,7 @@ describe('<Login> + mocking of HTTP requests', () => {
     quasiServer.close()
   })
 
-  test('renders for an unauthenticated user', () => {
+  xtest('renders for an unauthenticated user', () => {
     /* Arrange. */
     const enhancer = applyMiddleware(thunkMiddleware)
     const realStore = createStore(rootReducer, enhancer)
@@ -71,7 +71,7 @@ describe('<Login> + mocking of HTTP requests', () => {
     expect(passwordElement).toBeInTheDocument()
   })
 
-  test('tbd', async () => {
+  xtest('tbd', async () => {
     /* Arrange. */
     const enhancer = applyMiddleware(thunkMiddleware)
     const realStore = createStore(rootReducer, enhancer)
