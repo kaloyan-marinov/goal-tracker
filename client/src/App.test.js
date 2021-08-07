@@ -75,6 +75,55 @@ describe('<App> + mocking of HTTP requests', () => {
     expect(element).toBeInTheDocument()
   })
 
+  test('tbd', async () => {
+    /*
+    I've noticed that he following strange thing happens
+    - when I run just this file and just this test,
+    two copies of the following warning are logged to the console:
+
+    console.warn
+    [MSW] Warning: captured a request without a matching request handler:
+    
+      • POST http://localhost/api/v1.0/tokens
+    
+    If you still wish to intercept this unhandled request, please create a request handler for it.
+    Read more: https://mswjs.io/docs/getting-started/mocks
+    */
+
+    const enhancer = applyMiddleware(thunkMiddleware)
+    const realStore = createStore(rootReducer, enhancer)
+
+    /* Act. */
+    render(
+      <Provider store={realStore}>
+        <App />
+      </Provider>
+    )
+
+    /* Assert. */
+    const loginAnchor = await screen.findByText('Login')
+    fireEvent.click(loginAnchor)
+
+    /* Act. */
+    const emailInput = screen.getByPlaceholderText('Enter email')
+    fireEvent.change(emailInput, {
+      target: { value: 'mary.smith@protonmail.com' },
+    })
+
+    const passwordInput = screen.getByPlaceholderText('Enter password')
+    fireEvent.change(passwordInput, {
+      target: { value: '456' },
+    })
+
+    const loginButton = await screen.findByRole('button', {
+      name: 'Login',
+    })
+    fireEvent.click(loginButton)
+
+    const element = await screen.findByText('AUTHENTICATION FAILED')
+    expect(element).toBeInTheDocument()
+  })
+
   test('renders <Dashboard> for an authenticated user', async () => {
     /* Arrange. */
     quasiServer.use(rest.get('/api/v1.0/user', mockHandlerForFetchUserRequest))
