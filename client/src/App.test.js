@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom'
-import { fireEvent, render, screen } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 
 import thunkMiddleware from 'redux-thunk'
 import { Provider } from 'react-redux'
@@ -23,6 +23,8 @@ import {
   MOCK_GOAL_10,
   mockHandlerForEditGoalRequest,
   mockHandlerForDeleteGoalRequest,
+  mockHandlerForCreateIntervalRequest,
+  MOCK_INTERVAL_300,
 } from './testHelpers'
 
 const requestHandlersToMock = [
@@ -1221,6 +1223,259 @@ describe('<App> + mocking of HTTP requests', () => {
       let element
 
       element = await screen.findByText('FAILED TO FETCH INTERVALS')
+      expect(element).toBeInTheDocument()
+    }
+  )
+
+  test(
+    "an authenticated user clicks on 'Intervals Overview'," +
+      " then clicks on 'Add a new interval'," +
+      ' and finally fills out the form and submits it',
+    async () => {
+      /* Arrange. */
+      quasiServer.use(
+        rest.get('/api/v1.0/user', mockHandlerForFetchUserRequest),
+        rest.get('/api/v1.0/goals', mockHandlerForFetchGoalsRequest),
+        rest.get('/api/v1.0/intervals', mockHandlerForFetchIntervalsRequest),
+
+        rest.get('/api/v1.0/goals', mockHandlerForFetchGoalsRequest), // consumed by <AddNewInterval>'s effect function
+
+        rest.post('/api/v1.0/intervals', mockHandlerForCreateIntervalRequest),
+        rest.get('/api/v1.0/goals', mockHandlerForFetchGoalsRequest)
+        // rest.get('/api/v1.0/intervals', mockHandlerForFetchIntervalsRequest)
+      )
+      /*
+      The previous statement uses the following request-handlers:
+        mockHandlerForCreateGoalRequest
+        mockHandlerForFetchGoalsRequest
+      whose current implementation causes this test to generate the following:
+
+      console.error
+        Warning: Encountered two children with the same key, `100`. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is unsupported and could change in a future version.
+            at tbody
+            at table
+            at div
+            at IntervalsOverview (/Users/is4e1pmmt/Documents/repos/goal-tracker/client/src/features/intervals/IntervalsOverview.js:18:20)
+            at Route (/Users/is4e1pmmt/Documents/repos/goal-tracker/client/node_modules/react-router/cjs/react-router.js:470:29)
+            at PrivateRoute (/Users/is4e1pmmt/Documents/repos/goal-tracker/client/src/features/auth/PrivateRoute.js:8:22)
+            at Switch (/Users/is4e1pmmt/Documents/repos/goal-tracker/client/node_modules/react-router/cjs/react-router.js:676:29)
+            at section
+            at App (/Users/is4e1pmmt/Documents/repos/goal-tracker/client/src/App.js:27:20)
+            at Router (/Users/is4e1pmmt/Documents/repos/goal-tracker/client/node_modules/react-router/cjs/react-router.js:99:30)
+            at Provider (/Users/is4e1pmmt/Documents/repos/goal-tracker/client/node_modules/react-redux/lib/components/Provider.js:19:20)
+      */
+
+      const enhancer = applyMiddleware(thunkMiddleware)
+      const realStore = createStore(rootReducer, enhancer)
+
+      const history = createMemoryHistory()
+
+      render(
+        <Provider store={realStore}>
+          <Router history={history}>
+            <App />
+          </Router>
+        </Provider>
+      )
+
+      const goalsOverviewAnchor = await screen.findByText('Intervals Overview')
+      fireEvent.click(goalsOverviewAnchor)
+
+      await waitFor(() => {
+        const rows = screen.queryAllByText('Edit')
+        expect(rows.length).toEqual(2)
+      })
+
+      const addNewIntervalAnchor = screen.getByText('Add a new interval')
+      fireEvent.click(addNewIntervalAnchor)
+
+      let optionElement1
+      optionElement1 = await screen.findByText(MOCK_GOAL_10.description)
+      expect(optionElement1).toBeInTheDocument()
+
+      let optionElement2
+      optionElement2 = screen.getByText(MOCK_GOAL_10.description)
+      expect(optionElement2).toBeInTheDocument()
+
+      /* Act. */
+      const selectOne = screen.getByRole('combobox')
+      fireEvent.change(selectOne, {
+        target: { value: MOCK_GOAL_10.description },
+      })
+
+      const timestampInputs = screen.getAllByPlaceholderText('YYYY-MM-DD HH:MM')
+      expect(timestampInputs.length).toEqual(2)
+      const [startTimestampInput, finalTimestampInput] = timestampInputs
+
+      fireEvent.change(startTimestampInput, {
+        target: { value: MOCK_INTERVAL_300.start },
+      })
+      fireEvent.change(finalTimestampInput, {
+        target: { value: MOCK_INTERVAL_300.final },
+      })
+
+      const addIntervalButton = screen.getByRole('button', {
+        name: 'Add interval',
+      })
+      fireEvent.click(addIntervalButton)
+
+      /* Assert. */
+      const element = await screen.findByText('NEW INTERVAL ADDED')
+      expect(element).toBeInTheDocument()
+    }
+  )
+
+  test(
+    "an authenticated user clicks on 'Intervals Overview'," +
+      " then clicks on 'Add a new interval'" +
+      ' but the JWS token expires' +
+      " before <AddNewInterval>'s effect function issues its GET request for Goals",
+    async () => {
+      /* Arrange. */
+      quasiServer.use(
+        rest.get('/api/v1.0/user', mockHandlerForFetchUserRequest),
+        rest.get('/api/v1.0/goals', mockHandlerForFetchGoalsRequest),
+        rest.get('/api/v1.0/intervals', mockHandlerForFetchIntervalsRequest),
+
+        rest.get('/api/v1.0/goals', (req, res, ctx) => {
+          return res(
+            ctx.status(401),
+            ctx.json({
+              error: 'Unauthorized',
+              message: 'mocked-authentication required',
+            })
+          )
+        }),
+
+        rest.get('/api/v1.0/intervals', mockHandlerForFetchIntervalsRequest)
+      )
+      /*
+      Because the previous statement doesn't add a request handler for
+      GET /api/v1.0/intervals , running this test case generates the following:
+
+      console.warn
+        [MSW] Warning: captured a request without a matching request handler:
+        
+          • GET http://localhost/api/v1.0/intervals
+        
+        If you still wish to intercept this unhandled request, please create a request handler for it.
+        Read more: https://mswjs.io/docs/getting-started/mocks
+      */
+
+      const enhancer = applyMiddleware(thunkMiddleware)
+      const realStore = createStore(rootReducer, enhancer)
+
+      const history = createMemoryHistory()
+
+      render(
+        <Provider store={realStore}>
+          <Router history={history}>
+            <App />
+          </Router>
+        </Provider>
+      )
+
+      /* Act. */
+      const goalsOverviewAnchor = await screen.findByText('Intervals Overview')
+      fireEvent.click(goalsOverviewAnchor)
+
+      await waitFor(() => {
+        const rows = screen.queryAllByText('Edit')
+        expect(rows.length).toEqual(2)
+      })
+
+      const addNewIntervalAnchor = screen.getByText('Add a new interval')
+      fireEvent.click(addNewIntervalAnchor)
+
+      /* Assert. */
+      let element
+
+      element = await screen.findByText('FAILED TO FETCH GOALS')
+      expect(element).toBeInTheDocument()
+    }
+  )
+
+  test(
+    "an authenticated user clicks on 'Intervals Overview'," +
+      " then clicks on 'Add a new interval'," +
+      ' fills out the form and submits it' +
+      ' but the JWS token expires before the POST request is issued',
+    async () => {
+      /* Arrange. */
+      quasiServer.use(
+        rest.get('/api/v1.0/user', mockHandlerForFetchUserRequest),
+        rest.get('/api/v1.0/goals', mockHandlerForFetchGoalsRequest),
+        rest.get('/api/v1.0/intervals', mockHandlerForFetchIntervalsRequest),
+
+        rest.get('/api/v1.0/goals', mockHandlerForFetchGoalsRequest), // consumed by <AddNewInterval>'s effect function
+
+        rest.post('/api/v1.0/intervals', (req, res, ctx) => {
+          return res(
+            ctx.status(401),
+            ctx.json({
+              error: 'Unauthorized',
+              message: 'mocked-authentication required',
+            })
+          )
+        })
+      )
+
+      const enhancer = applyMiddleware(thunkMiddleware)
+      const realStore = createStore(rootReducer, enhancer)
+
+      const history = createMemoryHistory()
+
+      render(
+        <Provider store={realStore}>
+          <Router history={history}>
+            <App />
+          </Router>
+        </Provider>
+      )
+
+      const goalsOverviewAnchor = await screen.findByText('Intervals Overview')
+      fireEvent.click(goalsOverviewAnchor)
+
+      await waitFor(() => {
+        const rows = screen.queryAllByText('Edit')
+        expect(rows.length).toEqual(2)
+      })
+
+      const addNewIntervalAnchor = screen.getByText('Add a new interval')
+      fireEvent.click(addNewIntervalAnchor)
+
+      let optionElement1
+      optionElement1 = await screen.findByText(MOCK_GOAL_10.description)
+      expect(optionElement1).toBeInTheDocument()
+
+      let optionElement2
+      optionElement2 = screen.getByText(MOCK_GOAL_10.description)
+      expect(optionElement2).toBeInTheDocument()
+
+      /* Act. */
+      const selectOne = screen.getByRole('combobox')
+      fireEvent.change(selectOne, {
+        target: { value: MOCK_GOAL_10.description },
+      })
+
+      const timestampInputs = screen.getAllByPlaceholderText('YYYY-MM-DD HH:MM')
+      expect(timestampInputs.length).toEqual(2)
+      const [startTimestampInput, finalTimestampInput] = timestampInputs
+
+      fireEvent.change(startTimestampInput, {
+        target: { value: MOCK_INTERVAL_300.start },
+      })
+      fireEvent.change(finalTimestampInput, {
+        target: { value: MOCK_INTERVAL_300.final },
+      })
+
+      const addIntervalButton = screen.getByRole('button', {
+        name: 'Add interval',
+      })
+      fireEvent.click(addIntervalButton)
+
+      /* Assert. */
+      const element = await screen.findByText('mocked-authentication required')
       expect(element).toBeInTheDocument()
     }
   )

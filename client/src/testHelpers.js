@@ -83,6 +83,13 @@ export const MOCK_INTERVAL_200 = {
   final: '2021-08-05 20:41',
 }
 
+export const MOCK_INTERVAL_300 = {
+  id: 300,
+  goal_id: 10,
+  start: '1999-08-05 18:54',
+  final: '1999-08-05 19:46',
+}
+
 export const mockHandlerForCreateIntervalRequest = (req, res, ctx) => {
   return res.once(ctx.status(201), ctx.json(MOCK_INTERVAL_100))
 }
