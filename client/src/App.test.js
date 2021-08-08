@@ -20,6 +20,8 @@ import {
   mockHandlerForFetchGoalsRequest,
   mockHandlerForFetchIntervalsRequest,
   mockHandlerForCreateGoalRequest,
+  MOCK_GOAL_10,
+  mockHandlerForEditGoalRequest,
 } from './testHelpers'
 
 const requestHandlersToMock = [
@@ -42,6 +44,15 @@ const requestHandlersToMock = [
     )
   }),
   rest.post('/api/v1.0/goals', (req, res, ctx) => {
+    return res(
+      ctx.status(401),
+      ctx.json({
+        error: 'Unauthorized',
+        message: 'mocked-authentication required',
+      })
+    )
+  }),
+  rest.put('/api/v1.0/goals/:id', (req, res, ctx) => {
     return res(
       ctx.status(401),
       ctx.json({
@@ -586,7 +597,7 @@ describe('<App> + mocking of HTTP requests', () => {
 
   test(
     "an authenticated user clicks on 'Goals Overview'," +
-      " then clicks on 'Add a new goal'" +
+      " then clicks on 'Add a new goal'," +
       ' and finally fills out the form and submits it',
     async () => {
       /* Arrange. */
@@ -663,7 +674,7 @@ describe('<App> + mocking of HTTP requests', () => {
 
   test(
     "an authenticated user clicks on 'Goals Overview'," +
-      " then clicks on 'Add a new goal'" +
+      " then clicks on 'Add a new goal'," +
       ' and finally submits an empty form',
     async () => {
       /* Arrange. */
@@ -698,6 +709,150 @@ describe('<App> + mocking of HTTP requests', () => {
 
       /* Assert. */
       const element = await screen.findByText('FAILED TO ADD A NEW GOAL')
+      expect(element).toBeInTheDocument()
+    }
+  )
+
+  test(
+    "an authenticated user clicks on 'Goals Overview'," +
+      " then clicks on the 1st 'Edit' anchor tag," +
+      ' and finally fills out the form and submits it',
+    async () => {
+      /* Arrange. */
+      quasiServer.use(
+        rest.get('/api/v1.0/user', mockHandlerForFetchUserRequest),
+        rest.get('/api/v1.0/goals', mockHandlerForFetchGoalsRequest),
+        rest.get('/api/v1.0/intervals', mockHandlerForFetchIntervalsRequest),
+
+        rest.put('/api/v1.0/goals/:id', mockHandlerForEditGoalRequest)
+      )
+      /*
+      Because the previous statement doesn't add a request handler for
+      GET /api/v1.0/intervals , running this test case generates the following:
+
+      console.warn
+        [MSW] Warning: captured a request without a matching request handler:
+        
+          • GET http://localhost/api/v1.0/goals
+        
+        If you still wish to intercept this unhandled request, please create a request handler for it.
+        Read more: https://mswjs.io/docs/getting-started/mocks
+      */
+
+      const enhancer = applyMiddleware(thunkMiddleware)
+      const realStore = createStore(rootReducer, enhancer)
+
+      const history = createMemoryHistory()
+
+      render(
+        <Provider store={realStore}>
+          <Router history={history}>
+            <App />
+          </Router>
+        </Provider>
+      )
+
+      const goalsOverviewAnchor = await screen.findByText('Goals Overview')
+      fireEvent.click(goalsOverviewAnchor)
+
+      /* Act. */
+      const editAnchorTags = await screen.findAllByText('Edit')
+      const editAnchorTag = editAnchorTags[0]
+      fireEvent.click(editAnchorTag)
+
+      const descriptionInputs = screen.getAllByDisplayValue(
+        MOCK_GOAL_10.description
+      )
+      expect(descriptionInputs.length).toEqual(2)
+
+      const newDescriptionInput = descriptionInputs[1]
+      fireEvent.change(newDescriptionInput, {
+        target: { value: 'mocked-cook dinner - its edited version' },
+      })
+
+      const editButton = screen.getByRole('button', { name: 'Edit' })
+      fireEvent.click(editButton)
+
+      /* Assert. */
+      let element
+
+      element = await screen.findByText('GOAL SUCCESSFULLY EDITED')
+      expect(element).toBeInTheDocument()
+
+      element = screen.getByText('mocked-cook dinner - its edited version')
+      expect(element).toBeInTheDocument()
+
+      element = screen.getByText('mocked-cook dinner')
+      expect(element).toBeInTheDocument()
+    }
+  )
+
+  test(
+    "an authenticated user clicks on 'Goals Overview'," +
+      " then clicks on the 1st 'Edit' anchor tag," +
+      ' fills out the form and submits it' +
+      ' but the JWS token expires before the PUT request is issued',
+    async () => {
+      console.log('wooo!')
+
+      /* Arrange. */
+      quasiServer.use(
+        rest.get('/api/v1.0/user', mockHandlerForFetchUserRequest),
+        rest.get('/api/v1.0/goals', mockHandlerForFetchGoalsRequest),
+        rest.get('/api/v1.0/intervals', mockHandlerForFetchIntervalsRequest),
+
+        rest.get('/api/v1.0/goals', mockHandlerForFetchGoalsRequest),
+        rest.get('/api/v1.0/intervals', mockHandlerForFetchIntervalsRequest)
+      )
+
+      const enhancer = applyMiddleware(thunkMiddleware)
+      const realStore = createStore(rootReducer, enhancer)
+
+      const history = createMemoryHistory()
+
+      render(
+        <Provider store={realStore}>
+          <Router history={history}>
+            <App />
+          </Router>
+        </Provider>
+      )
+
+      const goalsOverviewAnchor = await screen.findByText('Goals Overview')
+      fireEvent.click(goalsOverviewAnchor)
+
+      /* Act. */
+      const editAnchorTags = await screen.findAllByText('Edit')
+      const editAnchorTag = editAnchorTags[0]
+      fireEvent.click(editAnchorTag)
+
+      const descriptionInputs = screen.getAllByDisplayValue(
+        MOCK_GOAL_10.description
+      )
+      expect(descriptionInputs.length).toEqual(2)
+
+      const newDescriptionInput = descriptionInputs[1]
+      fireEvent.change(newDescriptionInput, {
+        target: { value: 'mocked-cook dinner - its edited version' },
+      })
+
+      const editButton = screen.getByRole('button', { name: 'Edit' })
+      fireEvent.click(editButton)
+
+      /* Assert. */
+      let element
+
+      element = await screen.findByText('FAILED TO EDIT THE SELECTED GOAL')
+      expect(element).toBeInTheDocument()
+
+      element = screen.getByDisplayValue(
+        'mocked-write tests for thunk-action creators'
+      )
+      expect(element).toBeInTheDocument()
+
+      element = screen.getByDisplayValue(
+        'mocked-cook dinner - its edited version'
+      )
       expect(element).toBeInTheDocument()
     }
   )
