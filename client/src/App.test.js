@@ -22,6 +22,7 @@ import {
   mockHandlerForCreateGoalRequest,
   MOCK_GOAL_10,
   mockHandlerForEditGoalRequest,
+  mockHandlerForDeleteGoalRequest,
 } from './testHelpers'
 
 const requestHandlersToMock = [
@@ -53,6 +54,15 @@ const requestHandlersToMock = [
     )
   }),
   rest.put('/api/v1.0/goals/:id', (req, res, ctx) => {
+    return res(
+      ctx.status(401),
+      ctx.json({
+        error: 'Unauthorized',
+        message: 'mocked-authentication required',
+      })
+    )
+  }),
+  rest.delete('/api/v1.0/goals/:id', (req, res, ctx) => {
     return res(
       ctx.status(401),
       ctx.json({
@@ -728,7 +738,7 @@ describe('<App> + mocking of HTTP requests', () => {
       )
       /*
       Because the previous statement doesn't add a request handler for
-      GET /api/v1.0/intervals , running this test case generates the following:
+      GET /api/v1.0/goals , running this test case generates the following:
 
       console.warn
         [MSW] Warning: captured a request without a matching request handler:
@@ -793,8 +803,6 @@ describe('<App> + mocking of HTTP requests', () => {
       ' fills out the form and submits it' +
       ' but the JWS token expires before the PUT request is issued',
     async () => {
-      console.log('wooo!')
-
       /* Arrange. */
       quasiServer.use(
         rest.get('/api/v1.0/user', mockHandlerForFetchUserRequest),
@@ -854,6 +862,217 @@ describe('<App> + mocking of HTTP requests', () => {
         'mocked-cook dinner - its edited version'
       )
       expect(element).toBeInTheDocument()
+    }
+  )
+
+  test(
+    "an authenticated user clicks on 'Goals Overview'," +
+      " then clicks on the 1st 'Delete' anchor tag," +
+      " and finally clicks on the 'Yes' button",
+    async () => {
+      /* Arrange. */
+      quasiServer.use(
+        rest.get('/api/v1.0/user', mockHandlerForFetchUserRequest),
+        rest.get('/api/v1.0/goals', mockHandlerForFetchGoalsRequest),
+        rest.get('/api/v1.0/intervals', mockHandlerForFetchIntervalsRequest),
+
+        rest.delete('/api/v1.0/goals/:id', mockHandlerForDeleteGoalRequest)
+      )
+      /*
+      Because the previous statement doesn't add a request handler for
+      GET /api/v1.0/goals , running this test case generates the following:
+
+      console.warn
+        [MSW] Warning: captured a request without a matching request handler:
+        
+          • GET http://localhost/api/v1.0/goals
+        
+        If you still wish to intercept this unhandled request, please create a request handler for it.
+        Read more: https://mswjs.io/docs/getting-started/mocks
+      */
+
+      const enhancer = applyMiddleware(thunkMiddleware)
+      const realStore = createStore(rootReducer, enhancer)
+
+      const history = createMemoryHistory()
+
+      render(
+        <Provider store={realStore}>
+          <Router history={history}>
+            <App />
+          </Router>
+        </Provider>
+      )
+
+      const goalsOverviewAnchor = await screen.findByText('Goals Overview')
+      fireEvent.click(goalsOverviewAnchor)
+
+      /* Act. */
+      const deleteAnchors = await screen.findAllByText('Delete')
+      expect(deleteAnchors.length).toEqual(2)
+
+      const deleteAnchor = deleteAnchors[0]
+      fireEvent.click(deleteAnchor)
+
+      let element
+
+      element = screen.getByText('Description of the selected goal:')
+      expect(element).toBeInTheDocument()
+
+      element = screen.getByText('Do you want to delete the selected goal?')
+      expect(element).toBeInTheDocument()
+
+      const descriptionInput = screen.getByDisplayValue(
+        MOCK_GOAL_10.description
+      )
+      expect(descriptionInput).toBeInTheDocument()
+
+      const yesButton = screen.getByText('Yes')
+      fireEvent.click(yesButton)
+
+      /* Assert. */
+      element = await screen.findByText('GOAL SUCCESSFULLY DELETED')
+      expect(element).toBeInTheDocument()
+
+      const descriptionOfDeletedGoal = screen.queryByText(
+        MOCK_GOAL_10.description
+      )
+      expect(descriptionOfDeletedGoal).not.toBeInTheDocument()
+    }
+  )
+
+  test(
+    "an authenticated user clicks on 'Goals Overview'," +
+      " then clicks on the 1st 'Delete' anchor tag," +
+      " and finally clicks on the 'Yes' button" +
+      ' but the JWS token expires before the DELETE request is issued',
+    async () => {
+      /* Arrange. */
+      quasiServer.use(
+        rest.get('/api/v1.0/user', mockHandlerForFetchUserRequest),
+        rest.get('/api/v1.0/goals', mockHandlerForFetchGoalsRequest),
+        rest.get('/api/v1.0/intervals', mockHandlerForFetchIntervalsRequest),
+
+        rest.get('/api/v1.0/goals', mockHandlerForFetchGoalsRequest),
+        rest.get('/api/v1.0/intervals', mockHandlerForFetchIntervalsRequest)
+      )
+
+      const enhancer = applyMiddleware(thunkMiddleware)
+      const realStore = createStore(rootReducer, enhancer)
+
+      const history = createMemoryHistory()
+
+      render(
+        <Provider store={realStore}>
+          <Router history={history}>
+            <App />
+          </Router>
+        </Provider>
+      )
+
+      const goalsOverviewAnchor = await screen.findByText('Goals Overview')
+      fireEvent.click(goalsOverviewAnchor)
+
+      /* Act. */
+      const deleteAnchors = await screen.findAllByText('Delete')
+      expect(deleteAnchors.length).toEqual(2)
+
+      const deleteAnchor = deleteAnchors[0]
+      fireEvent.click(deleteAnchor)
+
+      let element
+
+      element = screen.getByText('Description of the selected goal:')
+      expect(element).toBeInTheDocument()
+
+      element = screen.getByText('Do you want to delete the selected goal?')
+      expect(element).toBeInTheDocument()
+
+      const descriptionInput = screen.getByDisplayValue(
+        MOCK_GOAL_10.description
+      )
+      expect(descriptionInput).toBeInTheDocument()
+
+      const yesButton = screen.getByText('Yes')
+      fireEvent.click(yesButton)
+
+      /* Assert. */
+      element = await screen.findByText('FAILED TO DELETE THE SELECTED GOAL')
+      expect(element).toBeInTheDocument()
+
+      const descriptionOfDeletedGoal = screen.getByDisplayValue(
+        MOCK_GOAL_10.description
+      )
+      expect(descriptionOfDeletedGoal).toBeInTheDocument()
+    }
+  )
+
+  test(
+    "an authenticated user clicks on 'Goals Overview'," +
+      " then clicks on the 1st 'Delete' anchor tag," +
+      " and finally clicks on the 'No' button",
+    async () => {
+      /* Arrange. */
+      quasiServer.use(
+        rest.get('/api/v1.0/user', mockHandlerForFetchUserRequest),
+        rest.get('/api/v1.0/goals', mockHandlerForFetchGoalsRequest),
+        rest.get('/api/v1.0/intervals', mockHandlerForFetchIntervalsRequest)
+      )
+      /*
+      Because the previous statement doesn't add a request handler for
+      GET /api/v1.0/goals , running this test case generates the following:
+
+      console.warn
+        [MSW] Warning: captured a request without a matching request handler:
+        
+          • GET http://localhost/api/v1.0/goals
+        
+        If you still wish to intercept this unhandled request, please create a request handler for it.
+        Read more: https://mswjs.io/docs/getting-started/mocks
+      */
+
+      const enhancer = applyMiddleware(thunkMiddleware)
+      const realStore = createStore(rootReducer, enhancer)
+
+      const history = createMemoryHistory()
+
+      render(
+        <Provider store={realStore}>
+          <Router history={history}>
+            <App />
+          </Router>
+        </Provider>
+      )
+
+      const goalsOverviewAnchor = await screen.findByText('Goals Overview')
+      fireEvent.click(goalsOverviewAnchor)
+
+      /* Act. */
+      const deleteAnchors = await screen.findAllByText('Delete')
+      expect(deleteAnchors.length).toEqual(2)
+
+      const deleteAnchor = deleteAnchors[0]
+      fireEvent.click(deleteAnchor)
+
+      let element
+
+      element = screen.getByText('Description of the selected goal:')
+      expect(element).toBeInTheDocument()
+
+      element = screen.getByText('Do you want to delete the selected goal?')
+      expect(element).toBeInTheDocument()
+
+      const descriptionInput = screen.getByDisplayValue(
+        MOCK_GOAL_10.description
+      )
+      expect(descriptionInput).toBeInTheDocument()
+
+      const noButton = screen.getByText('No')
+      fireEvent.click(noButton)
+
+      /* Assert. */
+      const deleteAnchorElements = await screen.findAllByText('Delete')
+      expect(deleteAnchorElements.length).toEqual(2)
     }
   )
 })
