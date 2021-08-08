@@ -223,6 +223,8 @@ export const createGoal = (description) => async (dispatch) => {
 
   dispatch(createGoalPending())
   try {
+    console.log('issuing the following request: POST /api/v1.0/goals')
+
     const response = await axios.post('/api/v1.0/goals', body, config)
     dispatch(createGoalFulfilled(response.data))
     return Promise.resolve()
@@ -245,6 +247,8 @@ export const fetchGoals = () => async (dispatch) => {
 
   dispatch(fetchGoalsPending())
   try {
+    console.log('issuing the following request: GET /api/v1.0/goals')
+
     const response = await axios.get('/api/v1.0/goals', config)
     dispatch(fetchGoalsFulfilled(response.data.goals))
     return Promise.resolve()
@@ -269,6 +273,8 @@ export const editGoal = (id, newDescription) => async (dispatch) => {
 
   dispatch(editGoalPending())
   try {
+    console.log(`issuing the following request: PUT /api/v1.0/goals/${id}`)
+
     const response = await axios.put(`/api/v1.0/goals/${id}`, body, config)
     dispatch(editGoalFulfilled(response.data))
     return Promise.resolve()
@@ -291,6 +297,10 @@ export const deleteGoal = (goalId) => async (dispatch) => {
 
   dispatch(deleteGoalPending())
   try {
+    console.log(
+      `issuing the following request: DELETE /api/v1.0/goals/${goalId}`
+    )
+
     const response = await axios.delete(`/api/v1.0/goals/${goalId}`, config)
     dispatch(deleteGoalFulfilled(goalId))
     return Promise.resolve()

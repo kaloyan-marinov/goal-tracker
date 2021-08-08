@@ -169,6 +169,8 @@ export const createUser = (email, password) => async (dispatch) => {
 
   dispatch(createUserPending())
   try {
+    console.log('issuing the following request: POST /api/v1.0/user')
+
     const response = await axios.post('/api/v1.0/users', body, config)
     dispatch(createUserFulfilled())
     return Promise.resolve()

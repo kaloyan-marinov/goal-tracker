@@ -220,6 +220,8 @@ export const createInterval =
 
     dispatch(createIntervalPending())
     try {
+      console.log(`issuing the following request: POST /api/v1.0/intervals`)
+
       const response = await axios.post('/api/v1.0/intervals', body, config)
       dispatch(createIntervalFulfilled(response.data))
       return Promise.resolve()
@@ -242,6 +244,8 @@ export const fetchIntervals = () => async (dispatch) => {
 
   dispatch(fetchIntervalsPending())
   try {
+    console.log(`issuing the following request: GET /api/v1.0/intervals`)
+
     const response = await axios.get('/api/v1.0/intervals', config)
     dispatch(fetchIntervalsFulfilled(response.data.intervals))
     return Promise.resolve()
@@ -271,6 +275,10 @@ export const editInterval =
 
     dispatch(editIntervalPending())
     try {
+      console.log(
+        `issuing the following request: PUT /api/v1.0/intervals/${intervalId}`
+      )
+
       const response = await axios.put(
         `/api/v1.0/intervals/${intervalId}`,
         body,
@@ -297,6 +305,10 @@ export const deleteInterval = (intervalId) => async (dispatch) => {
 
   dispatch(deleteIntervalPending())
   try {
+    console.log(
+      `issuing the following request: DELETE /api/v1.0/intervals/${intervalId}`
+    )
+
     const response = await axios.delete(
       `/api/v1.0/intervals/${intervalId}`,
       config

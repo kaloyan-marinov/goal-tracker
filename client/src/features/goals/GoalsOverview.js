@@ -88,12 +88,14 @@ const GoalsOverview = () => {
         </div>
         <br />
         <table border="1">
-          <tr>
-            <th>[Column-1]</th>
-            <th>[Column-2]</th>
-            <th>Description</th>
-          </tr>
-          {goalTableRows}
+          <thead>
+            <tr>
+              <th>[Column-1]</th>
+              <th>[Column-2]</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>{goalTableRows}</tbody>
         </table>
       </div>
     </Fragment>
