@@ -19,6 +19,7 @@ import {
   mockHandlerForIssueJWSTokenRequest,
   mockHandlerForFetchGoalsRequest,
   mockHandlerForFetchIntervalsRequest,
+  mockHandlerForCreateGoalRequest,
 } from './testHelpers'
 
 const requestHandlersToMock = [
@@ -32,6 +33,15 @@ const requestHandlersToMock = [
     )
   }),
   rest.post('/api/v1.0/tokens', (req, res, ctx) => {
+    return res(
+      ctx.status(401),
+      ctx.json({
+        error: 'Unauthorized',
+        message: 'mocked-authentication required',
+      })
+    )
+  }),
+  rest.post('/api/v1.0/goals', (req, res, ctx) => {
     return res(
       ctx.status(401),
       ctx.json({
@@ -570,6 +580,124 @@ describe('<App> + mocking of HTTP requests', () => {
       let element
 
       element = await screen.findByText('FAILED TO FETCH INTERVALS')
+      expect(element).toBeInTheDocument()
+    }
+  )
+
+  test(
+    "an authenticated user clicks on 'Goals Overview'," +
+      " then clicks on 'Add a new goal'" +
+      ' and finally fills out the form and submits it',
+    async () => {
+      /* Arrange. */
+      quasiServer.use(
+        rest.get('/api/v1.0/user', mockHandlerForFetchUserRequest),
+        rest.get('/api/v1.0/goals', mockHandlerForFetchGoalsRequest),
+        rest.get('/api/v1.0/intervals', mockHandlerForFetchIntervalsRequest),
+
+        rest.post('/api/v1.0/goals', mockHandlerForCreateGoalRequest),
+        rest.get('/api/v1.0/goals', mockHandlerForFetchGoalsRequest),
+        rest.get('/api/v1.0/intervals', mockHandlerForFetchIntervalsRequest)
+      )
+      /*
+      The previous statement uses the following request-handlers:
+        mockHandlerForCreateGoalRequest
+        mockHandlerForFetchGoalsRequest
+      whose current implementation causes this test to generate the following:
+
+        console.error
+    Warning: Encountered two children with the same key, `10`. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is unsupported and could change in a future version.
+        at tbody
+        at table
+        at div
+        at GoalsOverview (/Users/is4e1pmmt/Documents/repos/goal-tracker/client/src/features/goals/GoalsOverview.js:17:20)
+        at Route (/Users/is4e1pmmt/Documents/repos/goal-tracker/client/node_modules/react-router/cjs/react-router.js:470:29)
+        at PrivateRoute (/Users/is4e1pmmt/Documents/repos/goal-tracker/client/src/features/auth/PrivateRoute.js:8:22)
+        at Switch (/Users/is4e1pmmt/Documents/repos/goal-tracker/client/node_modules/react-router/cjs/react-router.js:676:29)
+        at section
+        at App (/Users/is4e1pmmt/Documents/repos/goal-tracker/client/src/App.js:27:20)
+        at Router (/Users/is4e1pmmt/Documents/repos/goal-tracker/client/node_modules/react-router/cjs/react-router.js:99:30)
+        at Provider (/Users/is4e1pmmt/Documents/repos/goal-tracker/client/node_modules/react-redux/lib/components/Provider.js:19:20)
+      */
+
+      const enhancer = applyMiddleware(thunkMiddleware)
+      const realStore = createStore(rootReducer, enhancer)
+
+      const history = createMemoryHistory()
+
+      render(
+        <Provider store={realStore}>
+          <Router history={history}>
+            <App />
+          </Router>
+        </Provider>
+      )
+
+      const goalsOverviewAnchor = await screen.findByText('Goals Overview')
+      fireEvent.click(goalsOverviewAnchor)
+
+      /* Act. */
+      const addNewGoalAnchor = screen.getByText('Add a new goal')
+      fireEvent.click(addNewGoalAnchor)
+
+      const descriptionInput = screen.getByPlaceholderText(
+        'Enter description of goal'
+      )
+      fireEvent.change(descriptionInput, {
+        target: { value: 'mocked-go for a swim' },
+      })
+
+      const addGoalButton = screen.getByRole('button', { name: 'Add goal' })
+      fireEvent.click(addGoalButton)
+
+      /* Assert. */
+      const elements = await screen.findAllByText(
+        'mocked-write tests for thunk-action creators'
+      )
+      expect(elements.length).toEqual(2)
+
+      const element = await screen.findByText('mocked-cook dinner')
+      expect(element).toBeInTheDocument()
+    }
+  )
+
+  test(
+    "an authenticated user clicks on 'Goals Overview'," +
+      " then clicks on 'Add a new goal'" +
+      ' and finally submits an empty form',
+    async () => {
+      /* Arrange. */
+      quasiServer.use(
+        rest.get('/api/v1.0/user', mockHandlerForFetchUserRequest),
+        rest.get('/api/v1.0/goals', mockHandlerForFetchGoalsRequest),
+        rest.get('/api/v1.0/intervals', mockHandlerForFetchIntervalsRequest)
+      )
+
+      const enhancer = applyMiddleware(thunkMiddleware)
+      const realStore = createStore(rootReducer, enhancer)
+
+      const history = createMemoryHistory()
+
+      render(
+        <Provider store={realStore}>
+          <Router history={history}>
+            <App />
+          </Router>
+        </Provider>
+      )
+
+      const goalsOverviewAnchor = await screen.findByText('Goals Overview')
+      fireEvent.click(goalsOverviewAnchor)
+
+      /* Act. */
+      const addNewGoalAnchor = screen.getByText('Add a new goal')
+      fireEvent.click(addNewGoalAnchor)
+
+      const addGoalButton = screen.getByRole('button', { name: 'Add goal' })
+      fireEvent.click(addGoalButton)
+
+      /* Assert. */
+      const element = await screen.findByText('FAILED TO ADD A NEW GOAL')
       expect(element).toBeInTheDocument()
     }
   )
