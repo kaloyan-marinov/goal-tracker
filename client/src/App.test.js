@@ -1075,4 +1075,153 @@ describe('<App> + mocking of HTTP requests', () => {
       expect(deleteAnchorElements.length).toEqual(2)
     }
   )
+
+  test("an authenticated user clicks on 'Intervals Overview'", async () => {
+    /* Arrange. */
+    quasiServer.use(
+      rest.get('/api/v1.0/user', mockHandlerForFetchUserRequest),
+      rest.get('/api/v1.0/goals', mockHandlerForFetchGoalsRequest),
+      rest.get('/api/v1.0/intervals', mockHandlerForFetchIntervalsRequest),
+
+      rest.get('/api/v1.0/goals', mockHandlerForFetchGoalsRequest),
+      rest.get('/api/v1.0/intervals', mockHandlerForFetchIntervalsRequest)
+    )
+
+    const enhancer = applyMiddleware(thunkMiddleware)
+    const realStore = createStore(rootReducer, enhancer)
+
+    const history = createMemoryHistory()
+
+    render(
+      <Provider store={realStore}>
+        <Router history={history}>
+          <App />
+        </Router>
+      </Provider>
+    )
+
+    /* Act. */
+    const goalsOverviewAnchor = await screen.findByText('Intervals Overview')
+    fireEvent.click(goalsOverviewAnchor)
+
+    /* Assert. */
+    let elementForInterval1
+
+    elementForInterval1 = await screen.findByText(
+      'mocked-write tests for thunk-action creators'
+    )
+    expect(elementForInterval1).toBeInTheDocument()
+    elementForInterval1 = screen.getByText('2021-08-05 18:54')
+    expect(elementForInterval1).toBeInTheDocument()
+    elementForInterval1 = screen.getByText('2021-08-05 19:46')
+    expect(elementForInterval1).toBeInTheDocument()
+
+    let elementForInterval2
+
+    elementForInterval2 = await screen.findByText('mocked-cook dinner')
+    expect(elementForInterval2).toBeInTheDocument()
+    elementForInterval2 = screen.getByText('2021-08-05 19:53')
+    expect(elementForInterval2).toBeInTheDocument()
+    elementForInterval2 = screen.getByText('2021-08-05 20:41')
+    expect(elementForInterval2).toBeInTheDocument()
+  })
+
+  test(
+    "an authenticated user clicks on 'Intervals Overview'," +
+      ' but JWS token expires before the GET request for Goals is issued',
+    async () => {
+      /* Arrange. */
+      quasiServer.use(
+        rest.get('/api/v1.0/user', mockHandlerForFetchUserRequest),
+        rest.get('/api/v1.0/goals', (req, res, ctx) => {
+          return res(
+            ctx.status(401),
+            ctx.json({
+              error: 'Unauthorized',
+              message: 'mocked-authentication required',
+            })
+          )
+        })
+      )
+      /*
+      Because the previous statement doesn't add a request handler for
+      GET /api/v1.0/intervals , running this test case generates the following:
+
+      console.warn
+        [MSW] Warning: captured a request without a matching request handler:
+        
+          • GET http://localhost/api/v1.0/intervals
+        
+        If you still wish to intercept this unhandled request, please create a request handler for it.
+        Read more: https://mswjs.io/docs/getting-started/mocks
+      */
+
+      const enhancer = applyMiddleware(thunkMiddleware)
+      const realStore = createStore(rootReducer, enhancer)
+
+      const history = createMemoryHistory()
+
+      render(
+        <Provider store={realStore}>
+          <Router history={history}>
+            <App />
+          </Router>
+        </Provider>
+      )
+
+      /* Act. */
+      const goalsOverviewAnchor = await screen.findByText('Intervals Overview')
+      fireEvent.click(goalsOverviewAnchor)
+
+      /* Assert. */
+      let element
+
+      element = await screen.findByText('FAILED TO FETCH GOALS')
+      expect(element).toBeInTheDocument()
+    }
+  )
+
+  test(
+    "an authenticated user clicks on 'Intervals Overview'," +
+      ' but JWS token expires before the GET request for Intervals is issued',
+    async () => {
+      /* Arrange. */
+      quasiServer.use(
+        rest.get('/api/v1.0/user', mockHandlerForFetchUserRequest),
+        rest.get('/api/v1.0/goals', mockHandlerForFetchGoalsRequest),
+        rest.get('/api/v1.0/intervals', (req, res, ctx) => {
+          return res(
+            ctx.status(401),
+            ctx.json({
+              error: 'Unauthorized',
+              message: 'mocked-authentication required',
+            })
+          )
+        })
+      )
+
+      const enhancer = applyMiddleware(thunkMiddleware)
+      const realStore = createStore(rootReducer, enhancer)
+
+      const history = createMemoryHistory()
+
+      render(
+        <Provider store={realStore}>
+          <Router history={history}>
+            <App />
+          </Router>
+        </Provider>
+      )
+
+      /* Act. */
+      const goalsOverviewAnchor = await screen.findByText('Intervals Overview')
+      fireEvent.click(goalsOverviewAnchor)
+
+      /* Assert. */
+      let element
+
+      element = await screen.findByText('FAILED TO FETCH INTERVALS')
+      expect(element).toBeInTheDocument()
+    }
+  )
 })

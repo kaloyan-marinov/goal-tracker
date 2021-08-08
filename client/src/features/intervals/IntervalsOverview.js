@@ -71,14 +71,16 @@ const IntervalsOverview = () => {
         </div>
         <br />
         <table border="1">
-          <tr>
-            <th>[Column-1]</th>
-            <th>[Column-2]</th>
-            <th>Start</th>
-            <th>End</th>
-            <th>Goal Description</th>
-          </tr>
-          {intervalTableRows}
+          <thead>
+            <tr>
+              <th>[Column-1]</th>
+              <th>[Column-2]</th>
+              <th>Start</th>
+              <th>End</th>
+              <th>Goal Description</th>
+            </tr>
+          </thead>
+          <tbody>{intervalTableRows}</tbody>
         </table>
       </div>
     </Fragment>
