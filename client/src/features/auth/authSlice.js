@@ -195,6 +195,8 @@ export const issueJWSToken = (email, password) => async (dispatch) => {
 
   dispatch(issueJWSTokenPending())
   try {
+    console.log('issuing the following request: POST /api/v1.0/tokens')
+
     const response = await axios.post('/api/v1.0/tokens', body, config)
     dispatch(issueJWSTokenFulfilled(response.data.token))
     return Promise.resolve()
@@ -223,6 +225,8 @@ export const fetchUser = () => async (dispatch) => {
 
   dispatch(fetchUserPending())
   try {
+    console.log('issuing the following request: GET /api/v1.0/user')
+
     const response = await axios.get('/api/v1.0/user', config)
     dispatch(fetchUserFulfilled(response.data))
     return Promise.resolve()
