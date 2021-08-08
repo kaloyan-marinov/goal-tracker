@@ -404,4 +404,35 @@ describe('<App> + mocking of HTTP requests', () => {
       expect(element).toBeInTheDocument()
     }
   )
+
+  test("an authenticated user clicks the 'Logout' link", async () => {
+    /* Arrange. */
+    quasiServer.use(rest.get('/api/v1.0/user', mockHandlerForFetchUserRequest))
+
+    const enhancer = applyMiddleware(thunkMiddleware)
+    const realStore = createStore(rootReducer, enhancer)
+
+    const history = createMemoryHistory()
+
+    render(
+      <Provider store={realStore}>
+        <Router history={history}>
+          <App />
+        </Router>
+      </Provider>
+    )
+
+    /* Act. */
+    const logoutAnchor = await screen.findByText('Logout')
+    fireEvent.click(logoutAnchor)
+
+    /* Assert. */
+    let element
+
+    element = screen.getByPlaceholderText('Enter email')
+    expect(element).toBeInTheDocument()
+
+    element = screen.getByPlaceholderText('Enter password')
+    expect(element).toBeInTheDocument()
+  })
 })
