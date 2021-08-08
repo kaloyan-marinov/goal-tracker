@@ -1,4 +1,4 @@
-import { INTERVAL_1, INTERVAL_2 } from '../../testHelpers'
+import { MOCK_INTERVAL_100, MOCK_INTERVAL_200 } from '../../testHelpers'
 
 import {
   initialStateIntervals,
@@ -41,10 +41,10 @@ describe('selectors', () => {
     intervals: {
       ...initialStateIntervals,
       requestStatus: 'succeeded',
-      ids: [INTERVAL_1.id, INTERVAL_2.id],
+      ids: [MOCK_INTERVAL_100.id, MOCK_INTERVAL_200.id],
       entities: {
-        [INTERVAL_1.id]: INTERVAL_1,
-        [INTERVAL_2.id]: INTERVAL_2,
+        [MOCK_INTERVAL_100.id]: MOCK_INTERVAL_100,
+        [MOCK_INTERVAL_200.id]: MOCK_INTERVAL_200,
       },
     },
   }
@@ -52,24 +52,24 @@ describe('selectors', () => {
   test('selectIntervalIds', () => {
     const intervalIds = selectIntervalIds(initSt)
 
-    expect(intervalIds).toEqual([1, 2])
+    expect(intervalIds).toEqual([100, 200])
   })
 
   test('selectIntervalEntities', () => {
     const intervalEntities = selectIntervalEntities(initSt)
 
     expect(intervalEntities).toEqual({
-      1: {
-        id: 1,
-        goal_id: 17,
+      100: {
+        id: 100,
+        goal_id: 10,
         start: '2021-08-05 18:54',
         final: '2021-08-05 19:46',
       },
-      2: {
-        id: 2,
-        goal_id: 27,
+      200: {
+        id: 200,
+        goal_id: 20,
         start: '2021-08-05 19:53',
-        end: '2021-08-05 20:41',
+        final: '2021-08-05 20:41',
       },
     })
   })
@@ -85,11 +85,11 @@ describe('action creators', () => {
   })
 
   test('createIntervalFulfilled', () => {
-    const action = createIntervalFulfilled(INTERVAL_1)
+    const action = createIntervalFulfilled(MOCK_INTERVAL_100)
 
     expect(action).toEqual({
       type: 'intervals/createInterval/fulfilled',
-      payload: INTERVAL_1,
+      payload: MOCK_INTERVAL_100,
     })
   })
 
@@ -111,11 +111,14 @@ describe('action creators', () => {
   })
 
   test('fetchIntervalsFulfilled', () => {
-    const action = fetchIntervalsFulfilled([INTERVAL_1, INTERVAL_2])
+    const action = fetchIntervalsFulfilled([
+      MOCK_INTERVAL_100,
+      MOCK_INTERVAL_200,
+    ])
 
     expect(action).toEqual({
       type: 'intervals/fetchIntervals/fulfilled',
-      payload: [INTERVAL_1, INTERVAL_2],
+      payload: [MOCK_INTERVAL_100, MOCK_INTERVAL_200],
     })
   })
 
@@ -145,11 +148,11 @@ describe('action creators', () => {
   })
 
   test('editIntervalFulfilled', () => {
-    const action = editIntervalFulfilled(INTERVAL_1)
+    const action = editIntervalFulfilled(MOCK_INTERVAL_100)
 
     expect(action).toEqual({
       type: 'intervals/editInterval/fulfilled',
-      payload: INTERVAL_1,
+      payload: MOCK_INTERVAL_100,
     })
   })
 
@@ -171,11 +174,11 @@ describe('action creators', () => {
   })
 
   test('deleteIntervalFulfilled', () => {
-    const action = deleteIntervalFulfilled(INTERVAL_2.id)
+    const action = deleteIntervalFulfilled(MOCK_INTERVAL_200.id)
 
     expect(action).toEqual({
       type: 'intervals/deleteInterval/fulfilled',
-      payload: INTERVAL_2.id,
+      payload: MOCK_INTERVAL_200.id,
     })
   })
 
@@ -214,7 +217,7 @@ describe('slice reducer', () => {
     }
     const action = {
       type: 'intervals/createInterval/fulfilled',
-      payload: INTERVAL_1,
+      payload: MOCK_INTERVAL_100,
     }
 
     const newSt = intervalsReducer(initStIntervals, action)
@@ -222,9 +225,9 @@ describe('slice reducer', () => {
     expect(newSt).toEqual({
       requestStatus: 'succeeded',
       requestError: null,
-      ids: [INTERVAL_1.id],
+      ids: [MOCK_INTERVAL_100.id],
       entities: {
-        [INTERVAL_1.id]: INTERVAL_1,
+        [MOCK_INTERVAL_100.id]: MOCK_INTERVAL_100,
       },
     })
   })
@@ -272,7 +275,7 @@ describe('slice reducer', () => {
     }
     const action = {
       type: 'intervals/fetchIntervals/fulfilled',
-      payload: [INTERVAL_1, INTERVAL_2],
+      payload: [MOCK_INTERVAL_100, MOCK_INTERVAL_200],
     }
 
     const newSt = intervalsReducer(initStIntervals, action)
@@ -280,10 +283,10 @@ describe('slice reducer', () => {
     expect(newSt).toEqual({
       requestStatus: 'fulfilled',
       requestError: null,
-      ids: [INTERVAL_1.id, INTERVAL_2.id],
+      ids: [MOCK_INTERVAL_100.id, MOCK_INTERVAL_200.id],
       entities: {
-        [INTERVAL_1.id]: INTERVAL_1,
-        [INTERVAL_2.id]: INTERVAL_2,
+        [MOCK_INTERVAL_100.id]: MOCK_INTERVAL_100,
+        [MOCK_INTERVAL_200.id]: MOCK_INTERVAL_200,
       },
     })
   })
@@ -312,9 +315,9 @@ describe('slice reducer', () => {
       ...initialStateIntervals,
       requestStatus: 'succeeded',
       requestError: null,
-      ids: [INTERVAL_2.id],
+      ids: [MOCK_INTERVAL_200.id],
       entities: {
-        [INTERVAL_2.id]: INTERVAL_2,
+        [MOCK_INTERVAL_200.id]: MOCK_INTERVAL_200,
       },
     }
     const action = {
@@ -349,9 +352,9 @@ describe('slice reducer', () => {
       ...initialStateIntervals,
       requestStatus: 'using this value is illustrative but unrealistic',
       requestError: 'using this value is illustrative but unrealistic',
-      ids: [INTERVAL_2.id],
+      ids: [MOCK_INTERVAL_200.id],
       entities: {
-        [INTERVAL_2.id]: INTERVAL_2,
+        [MOCK_INTERVAL_200.id]: MOCK_INTERVAL_200,
       },
     }
     const action = {
@@ -363,9 +366,9 @@ describe('slice reducer', () => {
     expect(newSt).toEqual({
       requestStatus: 'succeeded',
       requestError: null,
-      ids: [INTERVAL_2.id],
+      ids: [MOCK_INTERVAL_200.id],
       entities: {
-        [INTERVAL_2.id]: INTERVAL_2,
+        [MOCK_INTERVAL_200.id]: MOCK_INTERVAL_200,
       },
     })
   })
@@ -412,9 +415,9 @@ describe('slice reducer', () => {
       ...initialStateIntervals,
       requestStatus: 'using this value is illustrative but unrealistic',
       requestError: 'using this value is illustrative but unrealistic',
-      ids: [INTERVAL_2.id],
+      ids: [MOCK_INTERVAL_200.id],
       entities: {
-        [INTERVAL_2.id]: INTERVAL_2,
+        [MOCK_INTERVAL_200.id]: MOCK_INTERVAL_200,
       },
     }
     const action = {
@@ -426,9 +429,9 @@ describe('slice reducer', () => {
     expect(newSt).toEqual({
       requestStatus: 'succeeded',
       requestError: null,
-      ids: [INTERVAL_2.id],
+      ids: [MOCK_INTERVAL_200.id],
       entities: {
-        [INTERVAL_2.id]: INTERVAL_2,
+        [MOCK_INTERVAL_200.id]: MOCK_INTERVAL_200,
       },
     })
   })
@@ -498,7 +501,7 @@ describe('thunk-action creators', () => {
       { type: 'intervals/createInterval/pending' },
       {
         type: 'intervals/createInterval/fulfilled',
-        payload: INTERVAL_1,
+        payload: MOCK_INTERVAL_100,
       },
     ])
   })
@@ -540,7 +543,7 @@ describe('thunk-action creators', () => {
       { type: 'intervals/fetchIntervals/pending' },
       {
         type: 'intervals/fetchIntervals/fulfilled',
-        payload: [INTERVAL_1, INTERVAL_2],
+        payload: [MOCK_INTERVAL_100, MOCK_INTERVAL_200],
       },
     ])
   })
@@ -583,7 +586,7 @@ describe('thunk-action creators', () => {
       {
         type: 'intervals/editInterval/fulfilled',
         payload: {
-          ...INTERVAL_1,
+          ...MOCK_INTERVAL_100,
           id: 171717,
         },
       },
