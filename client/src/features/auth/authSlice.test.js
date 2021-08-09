@@ -24,13 +24,9 @@ import {
   mockHandlerForIssueJWSTokenRequest,
   mockHandlerForFetchUserRequest,
   mockHandlerForMultipleFailures,
+  MOCK_USER_1,
 } from '../../testHelpers'
 import { createUser, issueJWSToken, fetchUser } from './authSlice'
-
-const USER = {
-  id: 17,
-  email: 'mary.smith@protonmail.com',
-}
 
 describe('selectors', () => {
   test('selectIsAuthenticated', () => {
@@ -63,13 +59,13 @@ describe('selectors', () => {
     const initSt = {
       auth: {
         ...initialStateAuth,
-        currentUser: USER,
+        currentUser: MOCK_USER_1,
       },
     }
 
     const currentUser = selectCurrentUser(initSt)
 
-    expect(currentUser).toEqual(USER)
+    expect(currentUser).toEqual(MOCK_USER_1)
   })
 })
 
@@ -143,11 +139,11 @@ describe('action creators', () => {
   })
 
   test('fetchUserFulfilled', () => {
-    const action = fetchUserFulfilled(USER)
+    const action = fetchUserFulfilled(MOCK_USER_1)
 
     expect(action).toEqual({
       type: 'auth/fetchUser/fulfilled',
-      payload: USER,
+      payload: MOCK_USER_1,
     })
   })
 
@@ -291,7 +287,7 @@ describe('slice reducer', () => {
     }
     const action = {
       type: 'auth/fetchUser/fulfilled',
-      payload: USER,
+      payload: MOCK_USER_1,
     }
 
     const newStAuth = authReducer(initStAuth, action)
@@ -301,7 +297,7 @@ describe('slice reducer', () => {
       requestError: null,
       token: null,
       isAuthenticated: true,
-      currentUser: USER,
+      currentUser: MOCK_USER_1,
     })
   })
 

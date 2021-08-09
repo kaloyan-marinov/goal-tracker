@@ -448,12 +448,10 @@ describe('<App> + mocking of HTTP requests', () => {
     /* Assert. */
     let element
 
-    element = await screen.findByText(
-      'mocked-write tests for thunk-action creators'
-    )
+    element = await screen.findByText(MOCK_GOAL_10.description)
     expect(element).toBeInTheDocument()
 
-    element = await screen.findByText('mocked-cook dinner')
+    element = await screen.findByText(MOCK_GOAL_20.description)
     expect(element).toBeInTheDocument()
   })
 
@@ -607,12 +605,10 @@ describe('<App> + mocking of HTTP requests', () => {
       fireEvent.click(addGoalButton)
 
       /* Assert. */
-      const elements = await screen.findAllByText(
-        'mocked-write tests for thunk-action creators'
-      )
+      const elements = await screen.findAllByText(MOCK_GOAL_10.description)
       expect(elements.length).toEqual(2)
 
-      const element = await screen.findByText('mocked-cook dinner')
+      const element = await screen.findByText(MOCK_GOAL_20.description)
       expect(element).toBeInTheDocument()
     }
   )
@@ -713,7 +709,7 @@ describe('<App> + mocking of HTTP requests', () => {
 
       const newDescriptionInput = descriptionInputs[1]
       fireEvent.change(newDescriptionInput, {
-        target: { value: 'mocked-cook dinner - its edited version' },
+        target: { value: MOCK_GOAL_20.description + ' - its edited version' },
       })
 
       const editButton = screen.getByRole('button', { name: 'Edit' })
@@ -725,10 +721,12 @@ describe('<App> + mocking of HTTP requests', () => {
       element = await screen.findByText('GOAL SUCCESSFULLY EDITED')
       expect(element).toBeInTheDocument()
 
-      element = screen.getByText('mocked-cook dinner - its edited version')
+      element = screen.getByText(
+        MOCK_GOAL_20.description + ' - its edited version'
+      )
       expect(element).toBeInTheDocument()
 
-      element = screen.getByText('mocked-cook dinner')
+      element = screen.getByText(MOCK_GOAL_20.description)
       expect(element).toBeInTheDocument()
     }
   )
@@ -777,7 +775,7 @@ describe('<App> + mocking of HTTP requests', () => {
 
       const newDescriptionInput = descriptionInputs[1]
       fireEvent.change(newDescriptionInput, {
-        target: { value: 'mocked-cook dinner - its edited version' },
+        target: { value: '[mocked] cook dinner' },
       })
 
       const editButton = screen.getByRole('button', { name: 'Edit' })
@@ -789,14 +787,10 @@ describe('<App> + mocking of HTTP requests', () => {
       element = await screen.findByText('FAILED TO EDIT THE SELECTED GOAL')
       expect(element).toBeInTheDocument()
 
-      element = screen.getByDisplayValue(
-        'mocked-write tests for thunk-action creators'
-      )
+      element = screen.getByDisplayValue(MOCK_GOAL_10.description)
       expect(element).toBeInTheDocument()
 
-      element = screen.getByDisplayValue(
-        'mocked-cook dinner - its edited version'
-      )
+      element = screen.getByDisplayValue('[mocked] cook dinner')
       expect(element).toBeInTheDocument()
     }
   )
@@ -1043,9 +1037,7 @@ describe('<App> + mocking of HTTP requests', () => {
     /* Assert. */
     let elementForInterval1
 
-    elementForInterval1 = await screen.findByText(
-      'mocked-write tests for thunk-action creators'
-    )
+    elementForInterval1 = await screen.findByText(MOCK_GOAL_10.description)
     expect(elementForInterval1).toBeInTheDocument()
     elementForInterval1 = screen.getByText('2021-08-05 18:54')
     expect(elementForInterval1).toBeInTheDocument()
@@ -1054,7 +1046,7 @@ describe('<App> + mocking of HTTP requests', () => {
 
     let elementForInterval2
 
-    elementForInterval2 = await screen.findByText('mocked-cook dinner')
+    elementForInterval2 = await screen.findByText(MOCK_GOAL_20.description)
     expect(elementForInterval2).toBeInTheDocument()
     elementForInterval2 = screen.getByText('2021-08-05 19:53')
     expect(elementForInterval2).toBeInTheDocument()

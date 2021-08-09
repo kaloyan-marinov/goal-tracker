@@ -24,7 +24,7 @@ export const mockHandlerForMultipleFailures = (req, res, ctx) => {
 }
 
 /* Mock handlers for HTTP requests. */
-const MOCK_USER_1 = {
+export const MOCK_USER_1 = {
   id: 1,
   email: 'mocked-mary.smith@protonmail.com',
 }
@@ -52,12 +52,12 @@ export const mockHandlerForMultipleFetchUserRequests = (req, res, ctx) => {
 
 export const MOCK_GOAL_10 = {
   id: 10,
-  description: 'mocked-write tests for thunk-action creators',
+  description: '[mocked] build a backend application',
 }
 
 export const MOCK_GOAL_20 = {
   id: 20,
-  description: 'mocked-cook dinner',
+  description: '[mocked] build a frontend application',
 }
 
 export const mockHandlerForCreateGoalRequest = (req, res, ctx) => {
