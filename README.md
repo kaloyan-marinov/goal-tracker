@@ -228,17 +228,17 @@ In summary:
         - option C - with coverage and produce an HTML report
 
             ```
-            (venv) $ coverage run -m unittest discover -v tests/
-            [
-                the last command creates a file called `.coverage`
-            ]
-            
-            (venv) $ coverage html --omit="venv/*","tests/*","__pycache__/*"
-            [
-                the last command doesn't output anything in the terminal,
-                but it creates a folder called `htmlcov`
-            ]
-            
+            (venv) $ coverage run \
+                --source=./ \
+                --omit=venv/*,tests/*,__pycache__/* \
+                -m unittest \
+                discover -v \
+                .
+
+            (venv) backend $ coverage report
+
+            (venv) backend $ coverage html
+
             [open the `htmlcov/index.html` file in your web browser]       
             ```
     

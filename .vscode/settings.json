@@ -1,15 +1,31 @@
 {
-    "editor.rulers": [
-        88, 100
-    ],
-    "python.testing.unittestArgs": [
-        "-v",
-        "-s",
-        "./tests",
-        "-p",
-        "*test*.py"
-    ],
-    "python.testing.pytestEnabled": false,
-    "python.testing.nosetestsEnabled": false,
-    "python.testing.unittestEnabled": true
+  "editor.rulers": [
+    88, 100
+  ],
+  "python.testing.unittestArgs": [
+    "-v",
+    "-s",
+    "./tests",
+    "-p",
+    "*test*.py"
+  ],
+  "python.testing.pytestEnabled": false,
+  "python.testing.nosetestsEnabled": false,
+  "python.testing.unittestEnabled": true,
+  
+  "python.formatting.provider": "black",
+  "python.formatting.blackPath": "venv/bin/black",
+
+  "[python]": {
+    "editor.formatOnSave": true
+  },
+
+  // Controls if suggestions should be accepted 'Enter' - in addition to 'Tab'.
+  // Helps to avoid ambiguity between inserting new lines or accepting suggestions.
+  "editor.acceptSuggestionOnEnter": "off",
+
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true
+}
 }

@@ -50,7 +50,8 @@ class TestBase(unittest.TestCase):
 
     def get(self, url, basic_auth=None, token_auth=None):
         rv = self.client.get(
-            url, headers=self.get_headers(basic_auth=basic_auth, token_auth=token_auth),
+            url,
+            headers=self.get_headers(basic_auth=basic_auth, token_auth=token_auth),
         )
 
         # Clean up the database session,
@@ -110,7 +111,8 @@ class TestBase(unittest.TestCase):
 
     def delete(self, url, data=None, basic_auth=None, token_auth=None):
         rv = self.client.delete(
-            url, headers=self.get_headers(basic_auth=basic_auth, token_auth=token_auth),
+            url,
+            headers=self.get_headers(basic_auth=basic_auth, token_auth=token_auth),
         )
 
         # Clean up the database session,
@@ -254,12 +256,16 @@ class TestUsersAndGoals(TestBase):
         self.assertEqual(s, 400)
 
         # Delete an existing user with the wrong password.
-        r, s, h = self.delete(url_4_created_user, basic_auth="john.doe@gmail.com:789",)
+        r, s, h = self.delete(
+            url_4_created_user,
+            basic_auth="john.doe@gmail.com:789",
+        )
         self.assertEqual(s, 401)
 
         # Delete an existing user.
         r, s, h = self.delete(
-            url_4_created_user, basic_auth="john.doe@gmail.com:123456",
+            url_4_created_user,
+            basic_auth="john.doe@gmail.com:123456",
         )
         self.assertEqual(s, 204)
 
@@ -306,12 +312,18 @@ class TestUsersAndGoals(TestBase):
         url_4_john_doe = h["Location"]
 
         # Request a token.
-        r, s, h = self.post("/api/v1.0/tokens", basic_auth="john.doe@gmail.com:123456",)
+        r, s, h = self.post(
+            "/api/v1.0/tokens",
+            basic_auth="john.doe@gmail.com:123456",
+        )
         self.assertEqual(s, 200)
         token = r["token"]
 
         # Request a token with the wrong password.
-        r, s, h = self.post("/api/v1.0/tokens", basic_auth="john.doe@gmail.com:789",)
+        r, s, h = self.post(
+            "/api/v1.0/tokens",
+            basic_auth="john.doe@gmail.com:789",
+        )
         self.assertEqual(s, 401)
 
         # Access a token-restricted resource.
@@ -563,17 +575,25 @@ class TestIntervals(TestBase):
         ]:
             r, s, h = self.post("/api/v1.0/users", data=data)
 
-        r, s, h = self.post("/api/v1.0/tokens", basic_auth="john.doe@gmail.com:123456",)
+        r, s, h = self.post(
+            "/api/v1.0/tokens",
+            basic_auth="john.doe@gmail.com:123456",
+        )
         token_4_john_doe = r["token"]
 
-        r, s, h = self.post("/api/v1.0/tokens", basic_auth="mary.smith@yahoo.com:789",)
+        r, s, h = self.post(
+            "/api/v1.0/tokens",
+            basic_auth="mary.smith@yahoo.com:789",
+        )
         token_4_mary_smith = r["token"]
 
         return token_4_john_doe, token_4_mary_smith
 
     def create_goal(self, token, description):
         r, s, h = self.post(
-            "/api/v1.0/goals", data={"description": description}, token_auth=token,
+            "/api/v1.0/goals",
+            data={"description": description},
+            token_auth=token,
         )
         return s, r
 
@@ -623,9 +643,15 @@ class TestIntervals(TestBase):
         # Attempt to create an Interval resource in an invalid way.
         for req_payload in [
             {"goal_id": 17, "start": "2020-11-05 08:45", "final": "2020-11-05 09:15"},
-            {"start": "2020-11-05 08:45", "final": "2020-11-05 09:15",},
+            {
+                "start": "2020-11-05 08:45",
+                "final": "2020-11-05 09:15",
+            },
             {"goal_id": 1, "start": "2020-11-05 08:45"},
-            {"goal_id": 1, "final": "2020-11-05 09:15",},
+            {
+                "goal_id": 1,
+                "final": "2020-11-05 09:15",
+            },
             {"goal_id": 1, "start": "2020-11-05 08:45"},
             {"goal_id": 1, "final": "2020-11-05 09:15"},
             {"goal_id": 1, "start": "-11-05 08:45", "final": "2020-11-05 09:15"},
