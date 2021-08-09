@@ -25,6 +25,8 @@ import {
   mockHandlerForDeleteGoalRequest,
   mockHandlerForCreateIntervalRequest,
   MOCK_INTERVAL_300,
+  mockHandlerForEditIntervalRequest,
+  MOCK_INTERVAL_100,
 } from './testHelpers'
 
 const requestHandlersToMock = [
@@ -65,6 +67,15 @@ const requestHandlersToMock = [
     )
   }),
   rest.delete('/api/v1.0/goals/:id', (req, res, ctx) => {
+    return res(
+      ctx.status(401),
+      ctx.json({
+        error: 'Unauthorized',
+        message: 'mocked-authentication required',
+      })
+    )
+  }),
+  rest.put('/api/v1.0/intervals/:id', (req, res, ctx) => {
     return res(
       ctx.status(401),
       ctx.json({
@@ -769,6 +780,7 @@ describe('<App> + mocking of HTTP requests', () => {
 
       /* Act. */
       const editAnchorTags = await screen.findAllByText('Edit')
+      expect(editAnchorTags.length).toEqual(2)
       const editAnchorTag = editAnchorTags[0]
       fireEvent.click(editAnchorTag)
 
@@ -1476,6 +1488,121 @@ describe('<App> + mocking of HTTP requests', () => {
 
       /* Assert. */
       const element = await screen.findByText('mocked-authentication required')
+      expect(element).toBeInTheDocument()
+    }
+  )
+
+  test(
+    "an authenticated user clicks on 'Intervals Overview'," +
+      " then clicks on the 1st 'Edit' anchor tag," +
+      ' and finally fills out the form and submits it',
+    async () => {
+      /* Arrange. */
+      quasiServer.use(
+        rest.get('/api/v1.0/user', mockHandlerForFetchUserRequest),
+        rest.get('/api/v1.0/goals', mockHandlerForFetchGoalsRequest),
+        rest.get('/api/v1.0/intervals', mockHandlerForFetchIntervalsRequest),
+
+        rest.put('/api/v1.0/intervals/:id', mockHandlerForEditIntervalRequest),
+        rest.get('/api/v1.0/goals', mockHandlerForFetchGoalsRequest)
+      )
+
+      const enhancer = applyMiddleware(thunkMiddleware)
+      const realStore = createStore(rootReducer, enhancer)
+
+      const history = createMemoryHistory()
+
+      render(
+        <Provider store={realStore}>
+          <Router history={history}>
+            <App />
+          </Router>
+        </Provider>
+      )
+
+      const intervalsOverviewAnchor = await screen.findByText(
+        'Intervals Overview'
+      )
+      fireEvent.click(intervalsOverviewAnchor)
+
+      /* Act. */
+      const editAnchorTags = await screen.findAllByText('Edit')
+      expect(editAnchorTags.length).toEqual(2)
+      const editAnchorTag = editAnchorTags[0]
+      fireEvent.click(editAnchorTag)
+
+      const startTimestampInput = screen.getByDisplayValue(
+        MOCK_INTERVAL_100.start
+      )
+      fireEvent.change(startTimestampInput, {
+        target: { value: '2021-08-09 06:57' },
+      })
+
+      const editButton = screen.getByRole('button', { name: 'Edit' })
+      fireEvent.click(editButton)
+
+      /* Assert. */
+      let element
+
+      element = await screen.findByText('INTERVAL SUCCESSFULLY EDITED')
+      expect(element).toBeInTheDocument()
+    }
+  )
+
+  test(
+    "an authenticated user clicks on 'Intervals Overview'," +
+      " then clicks on the 1st 'Edit' anchor tag," +
+      ' fills out the form and submits it' +
+      ' but the JWS token expires before the PUT request is issued',
+    async () => {
+      /* Arrange. */
+      quasiServer.use(
+        rest.get('/api/v1.0/user', mockHandlerForFetchUserRequest),
+        rest.get('/api/v1.0/goals', mockHandlerForFetchGoalsRequest),
+        rest.get('/api/v1.0/intervals', mockHandlerForFetchIntervalsRequest),
+
+        // rest.get('/api/v1.0/goals', mockHandlerForFetchGoalsRequest)
+        rest.get('/api/v1.0/intervals', mockHandlerForFetchIntervalsRequest)
+      )
+
+      const enhancer = applyMiddleware(thunkMiddleware)
+      const realStore = createStore(rootReducer, enhancer)
+
+      const history = createMemoryHistory()
+
+      render(
+        <Provider store={realStore}>
+          <Router history={history}>
+            <App />
+          </Router>
+        </Provider>
+      )
+
+      const intervalsOverviewAnchor = await screen.findByText(
+        'Intervals Overview'
+      )
+      fireEvent.click(intervalsOverviewAnchor)
+
+      /* Act. */
+      const editAnchorTags = await screen.findAllByText('Edit')
+      expect(editAnchorTags.length).toEqual(2)
+      const editAnchorTag = editAnchorTags[0]
+      fireEvent.click(editAnchorTag)
+
+      const startTimestampInput = screen.getByDisplayValue(
+        MOCK_INTERVAL_100.start
+      )
+      fireEvent.change(startTimestampInput, {
+        target: { value: '2021-08-09 06:57' },
+      })
+
+      const editButton = screen.getByRole('button', { name: 'Edit' })
+      fireEvent.click(editButton)
+
+      /* Assert. */
+      let element
+
+      element = await screen.findByText('mocked-authentication required')
       expect(element).toBeInTheDocument()
     }
   )
