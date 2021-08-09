@@ -22,11 +22,7 @@ import { rest } from 'msw'
 import { setupServer } from 'msw/node'
 import {
   createStoreMock,
-  mockHandlerForCreateGoalRequest,
-  mockHandlerForFetchGoalsRequest,
-  mockHandlerForEditGoalRequest,
-  mockHandlerForDeleteGoalRequest,
-  mockHandlerForMultipleFailures,
+  requestHandlers,
   MOCK_GOAL_10,
   MOCK_GOAL_20,
 } from '../../testHelpers'
@@ -476,10 +472,10 @@ describe('slice reducer', () => {
 })
 
 const requestHandlersToMock = [
-  rest.post('/api/v1.0/goals', mockHandlerForCreateGoalRequest),
-  rest.get('/api/v1.0/goals', mockHandlerForFetchGoalsRequest),
-  rest.put('/api/v1.0/goals/:id', mockHandlerForEditGoalRequest),
-  rest.delete('/api/v1.0/goals/:id', mockHandlerForDeleteGoalRequest),
+  rest.post('/api/v1.0/goals', requestHandlers.mockCreateGoal),
+  rest.get('/api/v1.0/goals', requestHandlers.mockFetchGoals),
+  rest.put('/api/v1.0/goals/:id', requestHandlers.mockEditGoal),
+  rest.delete('/api/v1.0/goals/:id', requestHandlers.mockDeleteGoal),
 ]
 
 /* Create an MSW "request-interception layer". */
@@ -530,7 +526,7 @@ describe('thunk-action creators', () => {
 
   test('createGoal + its HTTP request is mocked to fail', async () => {
     quasiServer.use(
-      rest.post('/api/v1.0/goals', mockHandlerForMultipleFailures)
+      rest.post('/api/v1.0/goals', requestHandlers.mockMultipleFailures)
     )
 
     const createGoalPromise = storeMock.dispatch(
@@ -572,7 +568,9 @@ describe('thunk-action creators', () => {
   })
 
   test('fetchGoals + its HTTP request is mocked to fail', async () => {
-    quasiServer.use(rest.get('/api/v1.0/goals', mockHandlerForMultipleFailures))
+    quasiServer.use(
+      rest.get('/api/v1.0/goals', requestHandlers.mockMultipleFailures)
+    )
 
     const fetchGoalsPromise = storeMock.dispatch(fetchGoals())
 
@@ -609,7 +607,7 @@ describe('thunk-action creators', () => {
 
   test('editGoal + its HTTP request is mocked to fail', async () => {
     quasiServer.use(
-      rest.put('/api/v1.0/goals/:id', mockHandlerForMultipleFailures)
+      rest.put('/api/v1.0/goals/:id', requestHandlers.mockMultipleFailures)
     )
 
     const editGoalPromise = storeMock.dispatch(
@@ -643,7 +641,7 @@ describe('thunk-action creators', () => {
 
   test('deleteGoal + its HTTP request is mocked to fail', async () => {
     quasiServer.use(
-      rest.delete('/api/v1.0/goals/:id', mockHandlerForMultipleFailures)
+      rest.delete('/api/v1.0/goals/:id', requestHandlers.mockMultipleFailures)
     )
 
     const deleteGoalPromise = storeMock.dispatch(deleteGoal(17))

@@ -20,10 +20,7 @@ import { rest } from 'msw'
 import { setupServer } from 'msw/node'
 import {
   createStoreMock,
-  mockHandlerForCreateUserRequest,
-  mockHandlerForIssueJWSTokenRequest,
-  mockHandlerForFetchUserRequest,
-  mockHandlerForMultipleFailures,
+  requestHandlers,
   MOCK_USER_1,
 } from '../../testHelpers'
 import { createUser, issueJWSToken, fetchUser } from './authSlice'
@@ -325,9 +322,9 @@ describe('slice reducer', () => {
 })
 
 const requestHandlersToMock = [
-  rest.post('/api/v1.0/users', mockHandlerForCreateUserRequest),
-  rest.post('/api/v1.0/tokens', mockHandlerForIssueJWSTokenRequest),
-  rest.get('/api/v1.0/user', mockHandlerForFetchUserRequest),
+  rest.post('/api/v1.0/users', requestHandlers.mockCreateUser),
+  rest.post('/api/v1.0/tokens', requestHandlers.mockIssueJWSToken),
+  rest.get('/api/v1.0/user', requestHandlers.mockFetchUser),
 ]
 
 /* Create an MSW "request-interception layer". */
@@ -416,7 +413,7 @@ describe('thunk-action creators', () => {
 
   test('issueJWSToken + its HTTP request is mocked to fail', async () => {
     quasiServer.use(
-      rest.post('/api/v1.0/tokens', mockHandlerForMultipleFailures)
+      rest.post('/api/v1.0/tokens', requestHandlers.mockMultipleFailures)
     )
 
     const issueJWSTokenPromise = storeMock.dispatch(
@@ -450,7 +447,9 @@ describe('thunk-action creators', () => {
   })
 
   test('fetchUser + its HTTP request is mocked to fail', async () => {
-    quasiServer.use(rest.get('/api/v1.0/user', mockHandlerForMultipleFailures))
+    quasiServer.use(
+      rest.get('/api/v1.0/user', requestHandlers.mockMultipleFailures)
+    )
     const fetchUserPromise = storeMock.dispatch(fetchUser())
 
     await expect(fetchUserPromise).rejects.toEqual('mocked-Unauthorized')

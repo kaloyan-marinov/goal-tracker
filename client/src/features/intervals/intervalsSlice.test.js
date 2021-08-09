@@ -1,8 +1,4 @@
-import {
-  mockHandlerForMultipleFailures,
-  MOCK_INTERVAL_100,
-  MOCK_INTERVAL_200,
-} from '../../testHelpers'
+import { MOCK_INTERVAL_100, MOCK_INTERVAL_200 } from '../../testHelpers'
 
 import {
   initialStateIntervals,
@@ -26,13 +22,7 @@ import intervalsReducer from './intervalsSlice'
 
 import { rest } from 'msw'
 import { setupServer } from 'msw/node'
-import {
-  createStoreMock,
-  mockHandlerForCreateIntervalRequest,
-  mockHandlerForFetchIntervalsRequest,
-  mockHandlerForEditIntervalRequest,
-  mockHandlerForDeleteIntervalRequest,
-} from '../../testHelpers'
+import { createStoreMock, requestHandlers } from '../../testHelpers'
 import {
   createInterval,
   fetchIntervals,
@@ -461,10 +451,10 @@ describe('slice reducer', () => {
 })
 
 const requestHandlersToMock = [
-  rest.post('/api/v1.0/intervals', mockHandlerForCreateIntervalRequest),
-  rest.get('/api/v1.0/intervals', mockHandlerForFetchIntervalsRequest),
-  rest.put('/api/v1.0/intervals/:id', mockHandlerForEditIntervalRequest),
-  rest.delete('/api/v1.0/intervals/:id', mockHandlerForDeleteIntervalRequest),
+  rest.post('/api/v1.0/intervals', requestHandlers.mockCreateInterval),
+  rest.get('/api/v1.0/intervals', requestHandlers.mockFetchIntervals),
+  rest.put('/api/v1.0/intervals/:id', requestHandlers.mockEditInterval),
+  rest.delete('/api/v1.0/intervals/:id', requestHandlers.mockDeleteInterval),
 ]
 
 /* Create an MSW "request-interception layer". */
@@ -512,7 +502,7 @@ describe('thunk-action creators', () => {
 
   test('createInterval + its HTTP request is mocked to fail', async () => {
     quasiServer.use(
-      rest.post('/api/v1.0/intervals', mockHandlerForMultipleFailures)
+      rest.post('/api/v1.0/intervals', requestHandlers.mockMultipleFailures)
     )
 
     const createIntervalPromise = storeMock.dispatch(
@@ -546,7 +536,7 @@ describe('thunk-action creators', () => {
 
   test('fetchIntervals + its HTTP request is mocked to fail', async () => {
     quasiServer.use(
-      rest.get('/api/v1.0/intervals', mockHandlerForMultipleFailures)
+      rest.get('/api/v1.0/intervals', requestHandlers.mockMultipleFailures)
     )
 
     const fetchIntervalsPromise = storeMock.dispatch(fetchIntervals())
@@ -583,7 +573,7 @@ describe('thunk-action creators', () => {
 
   test('editInterval + its HTTP request is mocked to fail', async () => {
     quasiServer.use(
-      rest.put('/api/v1.0/intervals/:id', mockHandlerForMultipleFailures)
+      rest.put('/api/v1.0/intervals/:id', requestHandlers.mockMultipleFailures)
     )
 
     const editIntervalPromise = storeMock.dispatch(
@@ -617,7 +607,10 @@ describe('thunk-action creators', () => {
 
   test('deleteInterval + its HTTP request is mocked to fail', async () => {
     quasiServer.use(
-      rest.delete('/api/v1.0/intervals/:id', mockHandlerForMultipleFailures)
+      rest.delete(
+        '/api/v1.0/intervals/:id',
+        requestHandlers.mockMultipleFailures
+      )
     )
 
     const deleteIntervalPromise = storeMock.dispatch(deleteInterval(171717))

@@ -14,38 +14,26 @@ import App from './App'
 import { rest } from 'msw'
 import { setupServer } from 'msw/node'
 import {
-  mockHandlerForFetchUserRequest,
-  mockHandlerForCreateUserRequest,
-  mockHandlerForIssueJWSTokenRequest,
-  mockHandlerForFetchGoalsRequest,
-  mockHandlerForFetchIntervalsRequest,
-  mockHandlerForCreateGoalRequest,
+  requestHandlers,
   MOCK_GOAL_10,
-  mockHandlerForEditGoalRequest,
-  mockHandlerForDeleteGoalRequest,
-  mockHandlerForCreateIntervalRequest,
   MOCK_INTERVAL_300,
-  mockHandlerForEditIntervalRequest,
   MOCK_INTERVAL_100,
-  mockHandlerForDeleteIntervalRequest,
   MOCK_INTERVAL_200,
   MOCK_GOAL_20,
-  mockHandlerForMultipleFailures,
-  mockHandlerForSingleFailure,
 } from './testHelpers'
 
 const requestHandlersToMock = [
-  rest.get('/api/v1.0/user', mockHandlerForMultipleFailures),
+  rest.get('/api/v1.0/user', requestHandlers.mockMultipleFailures),
 
-  rest.post('/api/v1.0/tokens', mockHandlerForMultipleFailures),
+  rest.post('/api/v1.0/tokens', requestHandlers.mockMultipleFailures),
 
-  rest.post('/api/v1.0/goals', mockHandlerForMultipleFailures),
+  rest.post('/api/v1.0/goals', requestHandlers.mockMultipleFailures),
 
-  rest.put('/api/v1.0/goals/:id', mockHandlerForMultipleFailures),
-  rest.delete('/api/v1.0/goals/:id', mockHandlerForMultipleFailures),
+  rest.put('/api/v1.0/goals/:id', requestHandlers.mockMultipleFailures),
+  rest.delete('/api/v1.0/goals/:id', requestHandlers.mockMultipleFailures),
 
-  rest.put('/api/v1.0/intervals/:id', mockHandlerForMultipleFailures),
-  rest.delete('/api/v1.0/intervals/:id', mockHandlerForMultipleFailures),
+  rest.put('/api/v1.0/intervals/:id', requestHandlers.mockMultipleFailures),
+  rest.delete('/api/v1.0/intervals/:id', requestHandlers.mockMultipleFailures),
 ]
 
 /* Create an MSW "request-interception layer". */
@@ -150,10 +138,10 @@ describe('<App> + mocking of HTTP requests', () => {
     async () => {
       /* Arrange. */
       quasiServer.use(
-        rest.get('/api/v1.0/user', mockHandlerForSingleFailure),
-        rest.post('/api/v1.0/users', mockHandlerForCreateUserRequest),
-        rest.post('/api/v1.0/tokens', mockHandlerForIssueJWSTokenRequest),
-        rest.get('/api/v1.0/user', mockHandlerForFetchUserRequest)
+        rest.get('/api/v1.0/user', requestHandlers.mockSingleFailure),
+        rest.post('/api/v1.0/users', requestHandlers.mockCreateUser),
+        rest.post('/api/v1.0/tokens', requestHandlers.mockIssueJWSToken),
+        rest.get('/api/v1.0/user', requestHandlers.mockFetchUser)
       )
 
       const enhancer = applyMiddleware(thunkMiddleware)
@@ -210,7 +198,7 @@ describe('<App> + mocking of HTTP requests', () => {
     async () => {
       /* Arrange. */
       quasiServer.use(
-        rest.get('/api/v1.0/user', mockHandlerForSingleFailure),
+        rest.get('/api/v1.0/user', requestHandlers.mockSingleFailure),
         rest.post('/api/v1.0/users', (req, res, ctx) => {
           return res.once(
             ctx.status(400),
@@ -344,9 +332,9 @@ describe('<App> + mocking of HTTP requests', () => {
     async () => {
       /* Arrange. */
       quasiServer.use(
-        rest.get('/api/v1.0/user', mockHandlerForSingleFailure),
-        rest.post('/api/v1.0/tokens', mockHandlerForIssueJWSTokenRequest),
-        rest.get('/api/v1.0/user', mockHandlerForFetchUserRequest)
+        rest.get('/api/v1.0/user', requestHandlers.mockSingleFailure),
+        rest.post('/api/v1.0/tokens', requestHandlers.mockIssueJWSToken),
+        rest.get('/api/v1.0/user', requestHandlers.mockFetchUser)
       )
 
       const enhancer = applyMiddleware(thunkMiddleware)
@@ -391,7 +379,7 @@ describe('<App> + mocking of HTTP requests', () => {
 
   test("an authenticated user clicks the 'Logout' link", async () => {
     /* Arrange. */
-    quasiServer.use(rest.get('/api/v1.0/user', mockHandlerForFetchUserRequest))
+    quasiServer.use(rest.get('/api/v1.0/user', requestHandlers.mockFetchUser))
 
     const enhancer = applyMiddleware(thunkMiddleware)
     const realStore = createStore(rootReducer, enhancer)
@@ -423,9 +411,9 @@ describe('<App> + mocking of HTTP requests', () => {
   test("an authenticated user clicks on 'Goals Overview'", async () => {
     /* Arrange. */
     quasiServer.use(
-      rest.get('/api/v1.0/user', mockHandlerForFetchUserRequest),
-      rest.get('/api/v1.0/goals', mockHandlerForFetchGoalsRequest),
-      rest.get('/api/v1.0/intervals', mockHandlerForFetchIntervalsRequest)
+      rest.get('/api/v1.0/user', requestHandlers.mockFetchUser),
+      rest.get('/api/v1.0/goals', requestHandlers.mockFetchGoals),
+      rest.get('/api/v1.0/intervals', requestHandlers.mockFetchIntervals)
     )
 
     const enhancer = applyMiddleware(thunkMiddleware)
@@ -461,8 +449,8 @@ describe('<App> + mocking of HTTP requests', () => {
     async () => {
       /* Arrange. */
       quasiServer.use(
-        rest.get('/api/v1.0/user', mockHandlerForFetchUserRequest),
-        rest.get('/api/v1.0/goals', mockHandlerForMultipleFailures)
+        rest.get('/api/v1.0/user', requestHandlers.mockFetchUser),
+        rest.get('/api/v1.0/goals', requestHandlers.mockMultipleFailures)
       )
       /*
       Because the previous statement doesn't add a request handler for
@@ -508,9 +496,9 @@ describe('<App> + mocking of HTTP requests', () => {
     async () => {
       /* Arrange. */
       quasiServer.use(
-        rest.get('/api/v1.0/user', mockHandlerForFetchUserRequest),
-        rest.get('/api/v1.0/goals', mockHandlerForFetchGoalsRequest),
-        rest.get('/api/v1.0/intervals', mockHandlerForMultipleFailures)
+        rest.get('/api/v1.0/user', requestHandlers.mockFetchUser),
+        rest.get('/api/v1.0/goals', requestHandlers.mockFetchGoals),
+        rest.get('/api/v1.0/intervals', requestHandlers.mockMultipleFailures)
       )
 
       const enhancer = applyMiddleware(thunkMiddleware)
@@ -545,18 +533,18 @@ describe('<App> + mocking of HTTP requests', () => {
     async () => {
       /* Arrange. */
       quasiServer.use(
-        rest.get('/api/v1.0/user', mockHandlerForFetchUserRequest),
-        rest.get('/api/v1.0/goals', mockHandlerForFetchGoalsRequest),
-        rest.get('/api/v1.0/intervals', mockHandlerForFetchIntervalsRequest),
+        rest.get('/api/v1.0/user', requestHandlers.mockFetchUser),
+        rest.get('/api/v1.0/goals', requestHandlers.mockFetchGoals),
+        rest.get('/api/v1.0/intervals', requestHandlers.mockFetchIntervals),
 
-        rest.post('/api/v1.0/goals', mockHandlerForCreateGoalRequest),
-        rest.get('/api/v1.0/goals', mockHandlerForFetchGoalsRequest),
-        rest.get('/api/v1.0/intervals', mockHandlerForFetchIntervalsRequest)
+        rest.post('/api/v1.0/goals', requestHandlers.mockCreateGoal),
+        rest.get('/api/v1.0/goals', requestHandlers.mockFetchGoals),
+        rest.get('/api/v1.0/intervals', requestHandlers.mockFetchIntervals)
       )
       /*
       The previous statement uses the following request-handlers:
-        mockHandlerForCreateGoalRequest
-        mockHandlerForFetchGoalsRequest
+        requestHandlers.mockCreateGoal
+        requestHandlers.mockFetchGoals
       whose current implementation causes this test to generate the following:
 
         console.error
@@ -620,9 +608,9 @@ describe('<App> + mocking of HTTP requests', () => {
     async () => {
       /* Arrange. */
       quasiServer.use(
-        rest.get('/api/v1.0/user', mockHandlerForFetchUserRequest),
-        rest.get('/api/v1.0/goals', mockHandlerForFetchGoalsRequest),
-        rest.get('/api/v1.0/intervals', mockHandlerForFetchIntervalsRequest)
+        rest.get('/api/v1.0/user', requestHandlers.mockFetchUser),
+        rest.get('/api/v1.0/goals', requestHandlers.mockFetchGoals),
+        rest.get('/api/v1.0/intervals', requestHandlers.mockFetchIntervals)
       )
 
       const enhancer = applyMiddleware(thunkMiddleware)
@@ -661,11 +649,11 @@ describe('<App> + mocking of HTTP requests', () => {
     async () => {
       /* Arrange. */
       quasiServer.use(
-        rest.get('/api/v1.0/user', mockHandlerForFetchUserRequest),
-        rest.get('/api/v1.0/goals', mockHandlerForFetchGoalsRequest),
-        rest.get('/api/v1.0/intervals', mockHandlerForFetchIntervalsRequest),
+        rest.get('/api/v1.0/user', requestHandlers.mockFetchUser),
+        rest.get('/api/v1.0/goals', requestHandlers.mockFetchGoals),
+        rest.get('/api/v1.0/intervals', requestHandlers.mockFetchIntervals),
 
-        rest.put('/api/v1.0/goals/:id', mockHandlerForEditGoalRequest)
+        rest.put('/api/v1.0/goals/:id', requestHandlers.mockEditGoal)
       )
       /*
       Because the previous statement doesn't add a request handler for
@@ -739,12 +727,12 @@ describe('<App> + mocking of HTTP requests', () => {
     async () => {
       /* Arrange. */
       quasiServer.use(
-        rest.get('/api/v1.0/user', mockHandlerForFetchUserRequest),
-        rest.get('/api/v1.0/goals', mockHandlerForFetchGoalsRequest),
-        rest.get('/api/v1.0/intervals', mockHandlerForFetchIntervalsRequest),
+        rest.get('/api/v1.0/user', requestHandlers.mockFetchUser),
+        rest.get('/api/v1.0/goals', requestHandlers.mockFetchGoals),
+        rest.get('/api/v1.0/intervals', requestHandlers.mockFetchIntervals),
 
-        rest.get('/api/v1.0/goals', mockHandlerForFetchGoalsRequest),
-        rest.get('/api/v1.0/intervals', mockHandlerForFetchIntervalsRequest)
+        rest.get('/api/v1.0/goals', requestHandlers.mockFetchGoals),
+        rest.get('/api/v1.0/intervals', requestHandlers.mockFetchIntervals)
       )
 
       const enhancer = applyMiddleware(thunkMiddleware)
@@ -802,11 +790,11 @@ describe('<App> + mocking of HTTP requests', () => {
     async () => {
       /* Arrange. */
       quasiServer.use(
-        rest.get('/api/v1.0/user', mockHandlerForFetchUserRequest),
-        rest.get('/api/v1.0/goals', mockHandlerForFetchGoalsRequest),
-        rest.get('/api/v1.0/intervals', mockHandlerForFetchIntervalsRequest),
+        rest.get('/api/v1.0/user', requestHandlers.mockFetchUser),
+        rest.get('/api/v1.0/goals', requestHandlers.mockFetchGoals),
+        rest.get('/api/v1.0/intervals', requestHandlers.mockFetchIntervals),
 
-        rest.delete('/api/v1.0/goals/:id', mockHandlerForDeleteGoalRequest)
+        rest.delete('/api/v1.0/goals/:id', requestHandlers.mockDeleteGoal)
       )
       /*
       Because the previous statement doesn't add a request handler for
@@ -879,12 +867,12 @@ describe('<App> + mocking of HTTP requests', () => {
     async () => {
       /* Arrange. */
       quasiServer.use(
-        rest.get('/api/v1.0/user', mockHandlerForFetchUserRequest),
-        rest.get('/api/v1.0/goals', mockHandlerForFetchGoalsRequest),
-        rest.get('/api/v1.0/intervals', mockHandlerForFetchIntervalsRequest),
+        rest.get('/api/v1.0/user', requestHandlers.mockFetchUser),
+        rest.get('/api/v1.0/goals', requestHandlers.mockFetchGoals),
+        rest.get('/api/v1.0/intervals', requestHandlers.mockFetchIntervals),
 
-        rest.get('/api/v1.0/goals', mockHandlerForFetchGoalsRequest),
-        rest.get('/api/v1.0/intervals', mockHandlerForFetchIntervalsRequest)
+        rest.get('/api/v1.0/goals', requestHandlers.mockFetchGoals),
+        rest.get('/api/v1.0/intervals', requestHandlers.mockFetchIntervals)
       )
 
       const enhancer = applyMiddleware(thunkMiddleware)
@@ -944,9 +932,9 @@ describe('<App> + mocking of HTTP requests', () => {
     async () => {
       /* Arrange. */
       quasiServer.use(
-        rest.get('/api/v1.0/user', mockHandlerForFetchUserRequest),
-        rest.get('/api/v1.0/goals', mockHandlerForFetchGoalsRequest),
-        rest.get('/api/v1.0/intervals', mockHandlerForFetchIntervalsRequest)
+        rest.get('/api/v1.0/user', requestHandlers.mockFetchUser),
+        rest.get('/api/v1.0/goals', requestHandlers.mockFetchGoals),
+        rest.get('/api/v1.0/intervals', requestHandlers.mockFetchIntervals)
       )
       /*
       Because the previous statement doesn't add a request handler for
@@ -1009,12 +997,12 @@ describe('<App> + mocking of HTTP requests', () => {
   test("an authenticated user clicks on 'Intervals Overview'", async () => {
     /* Arrange. */
     quasiServer.use(
-      rest.get('/api/v1.0/user', mockHandlerForFetchUserRequest),
-      rest.get('/api/v1.0/goals', mockHandlerForFetchGoalsRequest),
-      rest.get('/api/v1.0/intervals', mockHandlerForFetchIntervalsRequest),
+      rest.get('/api/v1.0/user', requestHandlers.mockFetchUser),
+      rest.get('/api/v1.0/goals', requestHandlers.mockFetchGoals),
+      rest.get('/api/v1.0/intervals', requestHandlers.mockFetchIntervals),
 
-      rest.get('/api/v1.0/goals', mockHandlerForFetchGoalsRequest),
-      rest.get('/api/v1.0/intervals', mockHandlerForFetchIntervalsRequest)
+      rest.get('/api/v1.0/goals', requestHandlers.mockFetchGoals),
+      rest.get('/api/v1.0/intervals', requestHandlers.mockFetchIntervals)
     )
 
     const enhancer = applyMiddleware(thunkMiddleware)
@@ -1060,8 +1048,8 @@ describe('<App> + mocking of HTTP requests', () => {
     async () => {
       /* Arrange. */
       quasiServer.use(
-        rest.get('/api/v1.0/user', mockHandlerForFetchUserRequest),
-        rest.get('/api/v1.0/goals', mockHandlerForMultipleFailures)
+        rest.get('/api/v1.0/user', requestHandlers.mockFetchUser),
+        rest.get('/api/v1.0/goals', requestHandlers.mockMultipleFailures)
       )
       /*
       Because the previous statement doesn't add a request handler for
@@ -1107,9 +1095,9 @@ describe('<App> + mocking of HTTP requests', () => {
     async () => {
       /* Arrange. */
       quasiServer.use(
-        rest.get('/api/v1.0/user', mockHandlerForFetchUserRequest),
-        rest.get('/api/v1.0/goals', mockHandlerForFetchGoalsRequest),
-        rest.get('/api/v1.0/intervals', mockHandlerForMultipleFailures)
+        rest.get('/api/v1.0/user', requestHandlers.mockFetchUser),
+        rest.get('/api/v1.0/goals', requestHandlers.mockFetchGoals),
+        rest.get('/api/v1.0/intervals', requestHandlers.mockMultipleFailures)
       )
 
       const enhancer = applyMiddleware(thunkMiddleware)
@@ -1144,20 +1132,20 @@ describe('<App> + mocking of HTTP requests', () => {
     async () => {
       /* Arrange. */
       quasiServer.use(
-        rest.get('/api/v1.0/user', mockHandlerForFetchUserRequest),
-        rest.get('/api/v1.0/goals', mockHandlerForFetchGoalsRequest),
-        rest.get('/api/v1.0/intervals', mockHandlerForFetchIntervalsRequest),
+        rest.get('/api/v1.0/user', requestHandlers.mockFetchUser),
+        rest.get('/api/v1.0/goals', requestHandlers.mockFetchGoals),
+        rest.get('/api/v1.0/intervals', requestHandlers.mockFetchIntervals),
 
-        rest.get('/api/v1.0/goals', mockHandlerForFetchGoalsRequest), // consumed by <AddNewInterval>'s effect function
+        rest.get('/api/v1.0/goals', requestHandlers.mockFetchGoals), // consumed by <AddNewInterval>'s effect function
 
-        rest.post('/api/v1.0/intervals', mockHandlerForCreateIntervalRequest),
-        rest.get('/api/v1.0/goals', mockHandlerForFetchGoalsRequest)
-        // rest.get('/api/v1.0/intervals', mockHandlerForFetchIntervalsRequest)
+        rest.post('/api/v1.0/intervals', requestHandlers.mockCreateInterval),
+        rest.get('/api/v1.0/goals', requestHandlers.mockFetchGoals)
+        // rest.get('/api/v1.0/intervals', requestHandlers.mockFetchIntervals)
       )
       /*
       The previous statement uses the following request-handlers:
-        mockHandlerForCreateGoalRequest
-        mockHandlerForFetchGoalsRequest
+        requestHandlers.mockCreateGoal
+        requestHandlers.mockFetchGoals
       whose current implementation causes this test to generate the following:
 
       console.error
@@ -1243,13 +1231,13 @@ describe('<App> + mocking of HTTP requests', () => {
     async () => {
       /* Arrange. */
       quasiServer.use(
-        rest.get('/api/v1.0/user', mockHandlerForFetchUserRequest),
-        rest.get('/api/v1.0/goals', mockHandlerForFetchGoalsRequest),
-        rest.get('/api/v1.0/intervals', mockHandlerForFetchIntervalsRequest),
+        rest.get('/api/v1.0/user', requestHandlers.mockFetchUser),
+        rest.get('/api/v1.0/goals', requestHandlers.mockFetchGoals),
+        rest.get('/api/v1.0/intervals', requestHandlers.mockFetchIntervals),
 
-        rest.get('/api/v1.0/goals', mockHandlerForMultipleFailures),
+        rest.get('/api/v1.0/goals', requestHandlers.mockMultipleFailures),
 
-        rest.get('/api/v1.0/intervals', mockHandlerForFetchIntervalsRequest)
+        rest.get('/api/v1.0/intervals', requestHandlers.mockFetchIntervals)
       )
       /*
       Because the previous statement doesn't add a request handler for
@@ -1305,13 +1293,13 @@ describe('<App> + mocking of HTTP requests', () => {
     async () => {
       /* Arrange. */
       quasiServer.use(
-        rest.get('/api/v1.0/user', mockHandlerForFetchUserRequest),
-        rest.get('/api/v1.0/goals', mockHandlerForFetchGoalsRequest),
-        rest.get('/api/v1.0/intervals', mockHandlerForFetchIntervalsRequest),
+        rest.get('/api/v1.0/user', requestHandlers.mockFetchUser),
+        rest.get('/api/v1.0/goals', requestHandlers.mockFetchGoals),
+        rest.get('/api/v1.0/intervals', requestHandlers.mockFetchIntervals),
 
-        rest.get('/api/v1.0/goals', mockHandlerForFetchGoalsRequest), // consumed by <AddNewInterval>'s effect function
+        rest.get('/api/v1.0/goals', requestHandlers.mockFetchGoals), // consumed by <AddNewInterval>'s effect function
 
-        rest.post('/api/v1.0/intervals', mockHandlerForMultipleFailures)
+        rest.post('/api/v1.0/intervals', requestHandlers.mockMultipleFailures)
       )
 
       const enhancer = applyMiddleware(thunkMiddleware)
@@ -1381,12 +1369,12 @@ describe('<App> + mocking of HTTP requests', () => {
     async () => {
       /* Arrange. */
       quasiServer.use(
-        rest.get('/api/v1.0/user', mockHandlerForFetchUserRequest),
-        rest.get('/api/v1.0/goals', mockHandlerForFetchGoalsRequest),
-        rest.get('/api/v1.0/intervals', mockHandlerForFetchIntervalsRequest),
+        rest.get('/api/v1.0/user', requestHandlers.mockFetchUser),
+        rest.get('/api/v1.0/goals', requestHandlers.mockFetchGoals),
+        rest.get('/api/v1.0/intervals', requestHandlers.mockFetchIntervals),
 
-        rest.put('/api/v1.0/intervals/:id', mockHandlerForEditIntervalRequest),
-        rest.get('/api/v1.0/goals', mockHandlerForFetchGoalsRequest)
+        rest.put('/api/v1.0/intervals/:id', requestHandlers.mockEditInterval),
+        rest.get('/api/v1.0/goals', requestHandlers.mockFetchGoals)
       )
 
       const enhancer = applyMiddleware(thunkMiddleware)
@@ -1439,12 +1427,12 @@ describe('<App> + mocking of HTTP requests', () => {
     async () => {
       /* Arrange. */
       quasiServer.use(
-        rest.get('/api/v1.0/user', mockHandlerForFetchUserRequest),
-        rest.get('/api/v1.0/goals', mockHandlerForFetchGoalsRequest),
-        rest.get('/api/v1.0/intervals', mockHandlerForFetchIntervalsRequest),
+        rest.get('/api/v1.0/user', requestHandlers.mockFetchUser),
+        rest.get('/api/v1.0/goals', requestHandlers.mockFetchGoals),
+        rest.get('/api/v1.0/intervals', requestHandlers.mockFetchIntervals),
 
-        // rest.get('/api/v1.0/goals', mockHandlerForFetchGoalsRequest)
-        rest.get('/api/v1.0/intervals', mockHandlerForFetchIntervalsRequest)
+        // rest.get('/api/v1.0/goals', requestHandlers.mockFetchGoals)
+        rest.get('/api/v1.0/intervals', requestHandlers.mockFetchIntervals)
       )
 
       const enhancer = applyMiddleware(thunkMiddleware)
@@ -1496,13 +1484,13 @@ describe('<App> + mocking of HTTP requests', () => {
     async () => {
       /* Arrange. */
       quasiServer.use(
-        rest.get('/api/v1.0/user', mockHandlerForFetchUserRequest),
-        rest.get('/api/v1.0/goals', mockHandlerForFetchGoalsRequest),
-        rest.get('/api/v1.0/intervals', mockHandlerForFetchIntervalsRequest),
+        rest.get('/api/v1.0/user', requestHandlers.mockFetchUser),
+        rest.get('/api/v1.0/goals', requestHandlers.mockFetchGoals),
+        rest.get('/api/v1.0/intervals', requestHandlers.mockFetchIntervals),
 
         rest.delete(
           '/api/v1.0/intervals/:id',
-          mockHandlerForDeleteIntervalRequest
+          requestHandlers.mockDeleteInterval
         ),
 
         rest.get('/api/v1.0/goals', (req, res, ctx) => {
@@ -1583,9 +1571,9 @@ describe('<App> + mocking of HTTP requests', () => {
     async () => {
       /* Arrange. */
       quasiServer.use(
-        rest.get('/api/v1.0/user', mockHandlerForFetchUserRequest),
-        rest.get('/api/v1.0/goals', mockHandlerForFetchGoalsRequest),
-        rest.get('/api/v1.0/intervals', mockHandlerForFetchIntervalsRequest)
+        rest.get('/api/v1.0/user', requestHandlers.mockFetchUser),
+        rest.get('/api/v1.0/goals', requestHandlers.mockFetchGoals),
+        rest.get('/api/v1.0/intervals', requestHandlers.mockFetchIntervals)
       )
 
       const enhancer = applyMiddleware(thunkMiddleware)
@@ -1642,12 +1630,12 @@ describe('<App> + mocking of HTTP requests', () => {
     async () => {
       /* Arrange. */
       quasiServer.use(
-        rest.get('/api/v1.0/user', mockHandlerForFetchUserRequest),
-        rest.get('/api/v1.0/goals', mockHandlerForFetchGoalsRequest),
-        rest.get('/api/v1.0/intervals', mockHandlerForFetchIntervalsRequest),
+        rest.get('/api/v1.0/user', requestHandlers.mockFetchUser),
+        rest.get('/api/v1.0/goals', requestHandlers.mockFetchGoals),
+        rest.get('/api/v1.0/intervals', requestHandlers.mockFetchIntervals),
 
-        rest.get('/api/v1.0/goals', mockHandlerForFetchGoalsRequest),
-        rest.get('/api/v1.0/intervals', mockHandlerForFetchIntervalsRequest)
+        rest.get('/api/v1.0/goals', requestHandlers.mockFetchGoals),
+        rest.get('/api/v1.0/intervals', requestHandlers.mockFetchIntervals)
       )
 
       const enhancer = applyMiddleware(thunkMiddleware)
