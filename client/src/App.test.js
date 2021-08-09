@@ -30,76 +30,22 @@ import {
   mockHandlerForDeleteIntervalRequest,
   MOCK_INTERVAL_200,
   MOCK_GOAL_20,
+  mockHandlerForMultipleFailures,
+  mockHandlerForSingleFailure,
 } from './testHelpers'
 
 const requestHandlersToMock = [
-  rest.get('/api/v1.0/user', (req, res, ctx) => {
-    return res(
-      ctx.status(401),
-      ctx.json({
-        error: 'Unauthorized',
-        message: 'mocked-authentication required',
-      })
-    )
-  }),
+  rest.get('/api/v1.0/user', mockHandlerForMultipleFailures),
 
-  rest.post('/api/v1.0/tokens', (req, res, ctx) => {
-    return res(
-      ctx.status(401),
-      ctx.json({
-        error: 'Unauthorized',
-        message: 'mocked-authentication required',
-      })
-    )
-  }),
+  rest.post('/api/v1.0/tokens', mockHandlerForMultipleFailures),
 
-  rest.post('/api/v1.0/goals', (req, res, ctx) => {
-    return res(
-      ctx.status(401),
-      ctx.json({
-        error: 'Unauthorized',
-        message: 'mocked-authentication required',
-      })
-    )
-  }),
+  rest.post('/api/v1.0/goals', mockHandlerForMultipleFailures),
 
-  rest.put('/api/v1.0/goals/:id', (req, res, ctx) => {
-    return res(
-      ctx.status(401),
-      ctx.json({
-        error: 'Unauthorized',
-        message: 'mocked-authentication required',
-      })
-    )
-  }),
-  rest.delete('/api/v1.0/goals/:id', (req, res, ctx) => {
-    return res(
-      ctx.status(401),
-      ctx.json({
-        error: 'Unauthorized',
-        message: 'mocked-authentication required',
-      })
-    )
-  }),
+  rest.put('/api/v1.0/goals/:id', mockHandlerForMultipleFailures),
+  rest.delete('/api/v1.0/goals/:id', mockHandlerForMultipleFailures),
 
-  rest.put('/api/v1.0/intervals/:id', (req, res, ctx) => {
-    return res(
-      ctx.status(401),
-      ctx.json({
-        error: 'Unauthorized',
-        message: 'mocked-authentication required',
-      })
-    )
-  }),
-  rest.delete('/api/v1.0/intervals/:id', (req, res, ctx) => {
-    return res(
-      ctx.status(401),
-      ctx.json({
-        error: 'Unauthorized',
-        message: 'mocked-authentication required',
-      })
-    )
-  }),
+  rest.put('/api/v1.0/intervals/:id', mockHandlerForMultipleFailures),
+  rest.delete('/api/v1.0/intervals/:id', mockHandlerForMultipleFailures),
 ]
 
 /* Create an MSW "request-interception layer". */
@@ -199,15 +145,7 @@ describe('<App> + mocking of HTTP requests', () => {
     async () => {
       /* Arrange. */
       quasiServer.use(
-        rest.get('/api/v1.0/user', (req, res, ctx) => {
-          return res.once(
-            ctx.status(401),
-            ctx.json({
-              error: 'Unauthorized',
-              message: 'mocked-authentication required',
-            })
-          )
-        }),
+        rest.get('/api/v1.0/user', mockHandlerForSingleFailure),
         rest.post('/api/v1.0/tokens', mockHandlerForIssueJWSTokenRequest),
         rest.get('/api/v1.0/user', mockHandlerForFetchUserRequest)
       )
@@ -336,15 +274,7 @@ describe('<App> + mocking of HTTP requests', () => {
     async () => {
       /* Arrange. */
       quasiServer.use(
-        rest.get('/api/v1.0/user', (req, res, ctx) => {
-          return res.once(
-            ctx.status(401),
-            ctx.json({
-              error: 'Unauthorized',
-              message: 'mocked-authentication required',
-            })
-          )
-        }),
+        rest.get('/api/v1.0/user', mockHandlerForSingleFailure),
         rest.post('/api/v1.0/users', mockHandlerForCreateUserRequest),
         rest.post('/api/v1.0/tokens', mockHandlerForIssueJWSTokenRequest),
         rest.get('/api/v1.0/user', mockHandlerForFetchUserRequest)
@@ -404,15 +334,7 @@ describe('<App> + mocking of HTTP requests', () => {
     async () => {
       /* Arrange. */
       quasiServer.use(
-        rest.get('/api/v1.0/user', (req, res, ctx) => {
-          return res.once(
-            ctx.status(401),
-            ctx.json({
-              error: 'Unauthorized',
-              message: 'mocked-authentication required?',
-            })
-          )
-        }),
+        rest.get('/api/v1.0/user', mockHandlerForSingleFailure),
         rest.post('/api/v1.0/users', (req, res, ctx) => {
           return res.once(
             ctx.status(400),
@@ -542,15 +464,7 @@ describe('<App> + mocking of HTTP requests', () => {
       /* Arrange. */
       quasiServer.use(
         rest.get('/api/v1.0/user', mockHandlerForFetchUserRequest),
-        rest.get('/api/v1.0/goals', (req, res, ctx) => {
-          return res(
-            ctx.status(401),
-            ctx.json({
-              error: 'Unauthorized',
-              message: 'mocked-authentication required',
-            })
-          )
-        })
+        rest.get('/api/v1.0/goals', mockHandlerForMultipleFailures)
       )
       /*
       Because the previous statement doesn't add a request handler for
@@ -598,15 +512,7 @@ describe('<App> + mocking of HTTP requests', () => {
       quasiServer.use(
         rest.get('/api/v1.0/user', mockHandlerForFetchUserRequest),
         rest.get('/api/v1.0/goals', mockHandlerForFetchGoalsRequest),
-        rest.get('/api/v1.0/intervals', (req, res, ctx) => {
-          return res(
-            ctx.status(401),
-            ctx.json({
-              error: 'Unauthorized',
-              message: 'mocked-authentication required',
-            })
-          )
-        })
+        rest.get('/api/v1.0/intervals', mockHandlerForMultipleFailures)
       )
 
       const enhancer = applyMiddleware(thunkMiddleware)
@@ -1163,15 +1069,7 @@ describe('<App> + mocking of HTTP requests', () => {
       /* Arrange. */
       quasiServer.use(
         rest.get('/api/v1.0/user', mockHandlerForFetchUserRequest),
-        rest.get('/api/v1.0/goals', (req, res, ctx) => {
-          return res(
-            ctx.status(401),
-            ctx.json({
-              error: 'Unauthorized',
-              message: 'mocked-authentication required',
-            })
-          )
-        })
+        rest.get('/api/v1.0/goals', mockHandlerForMultipleFailures)
       )
       /*
       Because the previous statement doesn't add a request handler for
@@ -1219,15 +1117,7 @@ describe('<App> + mocking of HTTP requests', () => {
       quasiServer.use(
         rest.get('/api/v1.0/user', mockHandlerForFetchUserRequest),
         rest.get('/api/v1.0/goals', mockHandlerForFetchGoalsRequest),
-        rest.get('/api/v1.0/intervals', (req, res, ctx) => {
-          return res(
-            ctx.status(401),
-            ctx.json({
-              error: 'Unauthorized',
-              message: 'mocked-authentication required',
-            })
-          )
-        })
+        rest.get('/api/v1.0/intervals', mockHandlerForMultipleFailures)
       )
 
       const enhancer = applyMiddleware(thunkMiddleware)
@@ -1365,15 +1255,7 @@ describe('<App> + mocking of HTTP requests', () => {
         rest.get('/api/v1.0/goals', mockHandlerForFetchGoalsRequest),
         rest.get('/api/v1.0/intervals', mockHandlerForFetchIntervalsRequest),
 
-        rest.get('/api/v1.0/goals', (req, res, ctx) => {
-          return res(
-            ctx.status(401),
-            ctx.json({
-              error: 'Unauthorized',
-              message: 'mocked-authentication required',
-            })
-          )
-        }),
+        rest.get('/api/v1.0/goals', mockHandlerForMultipleFailures),
 
         rest.get('/api/v1.0/intervals', mockHandlerForFetchIntervalsRequest)
       )
@@ -1437,15 +1319,7 @@ describe('<App> + mocking of HTTP requests', () => {
 
         rest.get('/api/v1.0/goals', mockHandlerForFetchGoalsRequest), // consumed by <AddNewInterval>'s effect function
 
-        rest.post('/api/v1.0/intervals', (req, res, ctx) => {
-          return res(
-            ctx.status(401),
-            ctx.json({
-              error: 'Unauthorized',
-              message: 'mocked-authentication required',
-            })
-          )
-        })
+        rest.post('/api/v1.0/intervals', mockHandlerForMultipleFailures)
       )
 
       const enhancer = applyMiddleware(thunkMiddleware)

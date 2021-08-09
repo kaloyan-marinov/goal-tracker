@@ -23,6 +23,7 @@ import {
   mockHandlerForCreateUserRequest,
   mockHandlerForIssueJWSTokenRequest,
   mockHandlerForFetchUserRequest,
+  mockHandlerForMultipleFailures,
 } from '../../testHelpers'
 import { createUser, issueJWSToken, fetchUser } from './authSlice'
 
@@ -419,28 +420,19 @@ describe('thunk-action creators', () => {
 
   test('issueJWSToken + its HTTP request is mocked to fail', async () => {
     quasiServer.use(
-      rest.post('/api/v1.0/tokens', (req, res, ctx) => {
-        return res(
-          ctx.status(401),
-          ctx.json({
-            error: 'mocked-authentication required',
-          })
-        )
-      })
+      rest.post('/api/v1.0/tokens', mockHandlerForMultipleFailures)
     )
 
     const issueJWSTokenPromise = storeMock.dispatch(
       issueJWSToken('mary.smith@protonmail.com', '456')
     )
 
-    await expect(issueJWSTokenPromise).rejects.toEqual(
-      'mocked-authentication required'
-    )
+    await expect(issueJWSTokenPromise).rejects.toEqual('mocked-Unauthorized')
     expect(storeMock.getActions()).toEqual([
       { type: 'auth/issueJWSToken/pending' },
       {
         type: 'auth/issueJWSToken/rejected',
-        error: 'mocked-authentication required',
+        error: 'mocked-Unauthorized',
       },
     ])
   })
@@ -462,26 +454,15 @@ describe('thunk-action creators', () => {
   })
 
   test('fetchUser + its HTTP request is mocked to fail', async () => {
-    quasiServer.use(
-      rest.get('/api/v1.0/user', (req, res, ctx) => {
-        return res(
-          ctx.status(401),
-          ctx.json({
-            error: 'mocked-authentication required',
-          })
-        )
-      })
-    )
+    quasiServer.use(rest.get('/api/v1.0/user', mockHandlerForMultipleFailures))
     const fetchUserPromise = storeMock.dispatch(fetchUser())
 
-    await expect(fetchUserPromise).rejects.toEqual(
-      'mocked-authentication required'
-    )
+    await expect(fetchUserPromise).rejects.toEqual('mocked-Unauthorized')
     expect(storeMock.getActions()).toEqual([
       { type: 'auth/fetchUser/pending' },
       {
         type: 'auth/fetchUser/rejected',
-        error: 'mocked-authentication required',
+        error: 'mocked-Unauthorized',
       },
     ])
   })

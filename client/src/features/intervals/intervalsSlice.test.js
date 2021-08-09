@@ -1,4 +1,8 @@
-import { MOCK_INTERVAL_100, MOCK_INTERVAL_200 } from '../../testHelpers'
+import {
+  mockHandlerForMultipleFailures,
+  MOCK_INTERVAL_100,
+  MOCK_INTERVAL_200,
+} from '../../testHelpers'
 
 import {
   initialStateIntervals,
@@ -508,15 +512,7 @@ describe('thunk-action creators', () => {
 
   test('createInterval + its HTTP request is mocked to fail', async () => {
     quasiServer.use(
-      rest.post('/api/v1.0/intervals', (req, res, ctx) => {
-        return res(
-          ctx.status(401),
-          ctx.json({
-            error: 'Unauthorized',
-            message: 'mocked-authentication required',
-          })
-        )
-      })
+      rest.post('/api/v1.0/intervals', mockHandlerForMultipleFailures)
     )
 
     const createIntervalPromise = storeMock.dispatch(
@@ -550,15 +546,7 @@ describe('thunk-action creators', () => {
 
   test('fetchIntervals + its HTTP request is mocked to fail', async () => {
     quasiServer.use(
-      rest.get('/api/v1.0/intervals', (req, res, ctx) => {
-        return res(
-          ctx.status(401),
-          ctx.json({
-            error: 'Unauthorized',
-            message: 'mocked-authentication required',
-          })
-        )
-      })
+      rest.get('/api/v1.0/intervals', mockHandlerForMultipleFailures)
     )
 
     const fetchIntervalsPromise = storeMock.dispatch(fetchIntervals())
@@ -595,15 +583,7 @@ describe('thunk-action creators', () => {
 
   test('editInterval + its HTTP request is mocked to fail', async () => {
     quasiServer.use(
-      rest.put('/api/v1.0/intervals/:id', (req, res, ctx) => {
-        return res(
-          ctx.status(401),
-          ctx.json({
-            error: 'Unauthorized',
-            message: 'mocked-authentication required',
-          })
-        )
-      })
+      rest.put('/api/v1.0/intervals/:id', mockHandlerForMultipleFailures)
     )
 
     const editIntervalPromise = storeMock.dispatch(
@@ -637,15 +617,7 @@ describe('thunk-action creators', () => {
 
   test('deleteInterval + its HTTP request is mocked to fail', async () => {
     quasiServer.use(
-      rest.delete('/api/v1.0/intervals/:id', (req, res, ctx) => {
-        return res(
-          ctx.status(401),
-          ctx.json({
-            error: 'Unauthorized',
-            message: 'mocked-authentication required',
-          })
-        )
-      })
+      rest.delete('/api/v1.0/intervals/:id', mockHandlerForMultipleFailures)
     )
 
     const deleteIntervalPromise = storeMock.dispatch(deleteInterval(171717))

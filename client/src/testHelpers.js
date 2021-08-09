@@ -3,6 +3,26 @@ import configureMockStore from 'redux-mock-store'
 
 export const createStoreMock = configureMockStore([thunkMiddleware])
 
+export const mockHandlerForSingleFailure = (req, res, ctx) => {
+  return res.once(
+    ctx.status(401),
+    ctx.json({
+      error: 'mocked-Unauthorized',
+      message: 'mocked-authentication required',
+    })
+  )
+}
+
+export const mockHandlerForMultipleFailures = (req, res, ctx) => {
+  return res(
+    ctx.status(401),
+    ctx.json({
+      error: 'mocked-Unauthorized',
+      message: 'mocked-authentication required',
+    })
+  )
+}
+
 /* Mock handlers for HTTP requests. */
 const MOCK_USER_1 = {
   id: 1,

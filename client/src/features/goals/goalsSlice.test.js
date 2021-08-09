@@ -26,6 +26,7 @@ import {
   mockHandlerForFetchGoalsRequest,
   mockHandlerForEditGoalRequest,
   mockHandlerForDeleteGoalRequest,
+  mockHandlerForMultipleFailures,
 } from '../../testHelpers'
 import { createGoal, fetchGoals, editGoal, deleteGoal } from './goalsSlice'
 
@@ -537,15 +538,7 @@ describe('thunk-action creators', () => {
 
   test('createGoal + its HTTP request is mocked to fail', async () => {
     quasiServer.use(
-      rest.post('/api/v1.0/goals', (req, res, ctx) => {
-        return res(
-          ctx.status(401),
-          ctx.json({
-            error: 'Unauthorized',
-            message: 'mocked-authentication required',
-          })
-        )
-      })
+      rest.post('/api/v1.0/goals', mockHandlerForMultipleFailures)
     )
 
     const createGoalPromise = storeMock.dispatch(
@@ -587,17 +580,7 @@ describe('thunk-action creators', () => {
   })
 
   test('fetchGoals + its HTTP request is mocked to fail', async () => {
-    quasiServer.use(
-      rest.get('/api/v1.0/goals', (req, res, ctx) => {
-        return res(
-          ctx.status(401),
-          ctx.json({
-            error: 'Unauthorized',
-            message: 'mocked-authentication required',
-          })
-        )
-      })
-    )
+    quasiServer.use(rest.get('/api/v1.0/goals', mockHandlerForMultipleFailures))
 
     const fetchGoalsPromise = storeMock.dispatch(fetchGoals())
 
@@ -633,15 +616,7 @@ describe('thunk-action creators', () => {
 
   test('editGoal + its HTTP request is mocked to fail', async () => {
     quasiServer.use(
-      rest.put('/api/v1.0/goals/:id', (req, res, ctx) => {
-        return res(
-          ctx.status(401),
-          ctx.json({
-            error: 'Unauthorized',
-            message: 'mocked-authentication required',
-          })
-        )
-      })
+      rest.put('/api/v1.0/goals/:id', mockHandlerForMultipleFailures)
     )
 
     const editGoalPromise = storeMock.dispatch(
@@ -675,27 +650,19 @@ describe('thunk-action creators', () => {
 
   test('deleteGoal + its HTTP request is mocked to fail', async () => {
     quasiServer.use(
-      rest.delete('/api/v1.0/goals/:id', (req, res, ctx) => {
-        return res(
-          ctx.status(401),
-          ctx.json({
-            error: 'Unauthorized',
-            message: 'mocked-authorization required',
-          })
-        )
-      })
+      rest.delete('/api/v1.0/goals/:id', mockHandlerForMultipleFailures)
     )
 
     const deleteGoalPromise = storeMock.dispatch(deleteGoal(17))
 
     await expect(deleteGoalPromise).rejects.toEqual(
-      'mocked-authorization required'
+      'mocked-authentication required'
     )
     expect(storeMock.getActions()).toEqual([
       { type: 'goals/deleteGoal/pending' },
       {
         type: 'goals/deleteGoal/rejected',
-        error: 'mocked-authorization required',
+        error: 'mocked-authentication required',
       },
     ])
   })
