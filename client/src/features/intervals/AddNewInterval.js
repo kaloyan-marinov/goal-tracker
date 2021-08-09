@@ -34,7 +34,7 @@ const AddNewInterval = () => {
   }, [])
 
   const [formData, setFormData] = useState({
-    goalId: '',
+    goalId: '0',
     startTimestamp: '',
     finalTimestamp: '',
   })
@@ -66,7 +66,7 @@ const AddNewInterval = () => {
   }
 
   const goalOptions = goalIds.map((gId) => (
-    <option key={gId} value={gId}>
+    <option key={gId} value={gId.toString()}>
       {goalEntities[gId].description}
     </option>
   ))
@@ -76,8 +76,8 @@ const AddNewInterval = () => {
       [AddNewInterval]
       <form onSubmit={(e) => onSubmit(e)}>
         <h3>Select the goal that you have worked on</h3>
-        <select name="goalId" onChange={onChange}>
-          <option value=""></option>
+        <select name="goalId" value={goalId} onChange={onChange}>
+          <option value="0"></option>
           {goalOptions}
         </select>
         <h3>Enter the start timestamp (in GMT)</h3>
