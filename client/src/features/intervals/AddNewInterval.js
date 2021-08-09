@@ -41,7 +41,10 @@ const AddNewInterval = () => {
   const [toIntervalsOverview, setToIntervalsOverview] = useState(false)
 
   if (toIntervalsOverview) {
-    return <Redirect to="/intervals-overview" />
+    const nextUrl = '/intervals-overview'
+    console.log(`    toIntervalsOverview: ${toIntervalsOverview}`)
+    console.log(`    >> re-directing to ${nextUrl}`)
+    return <Redirect to={nextUrl} />
   }
 
   const { goalId, startTimestamp, finalTimestamp } = formData

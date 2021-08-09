@@ -20,7 +20,10 @@ const EditGoal = (props) => {
   const [toGoalsOverview, setToGoalsOverview] = useState(false)
 
   if (toGoalsOverview) {
-    return <Redirect to="/goals-overview" />
+    const nextUrl = '/goals-overview'
+    console.log(`    toGoalsOverview: ${toGoalsOverview}`)
+    console.log(`    >> re-directing to ${nextUrl}`)
+    return <Redirect to={nextUrl} />
   }
 
   const onChange = (e) => {

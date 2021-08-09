@@ -35,7 +35,7 @@ export const MOCK_GOAL_10 = {
   description: 'mocked-write tests for thunk-action creators',
 }
 
-const MOCK_GOAL_20 = {
+export const MOCK_GOAL_20 = {
   id: 20,
   description: 'mocked-cook dinner',
 }

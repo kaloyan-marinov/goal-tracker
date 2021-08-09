@@ -27,6 +27,9 @@ import {
   MOCK_INTERVAL_300,
   mockHandlerForEditIntervalRequest,
   MOCK_INTERVAL_100,
+  mockHandlerForDeleteIntervalRequest,
+  MOCK_INTERVAL_200,
+  MOCK_GOAL_20,
 } from './testHelpers'
 
 const requestHandlersToMock = [
@@ -39,6 +42,7 @@ const requestHandlersToMock = [
       })
     )
   }),
+
   rest.post('/api/v1.0/tokens', (req, res, ctx) => {
     return res(
       ctx.status(401),
@@ -48,6 +52,7 @@ const requestHandlersToMock = [
       })
     )
   }),
+
   rest.post('/api/v1.0/goals', (req, res, ctx) => {
     return res(
       ctx.status(401),
@@ -57,6 +62,7 @@ const requestHandlersToMock = [
       })
     )
   }),
+
   rest.put('/api/v1.0/goals/:id', (req, res, ctx) => {
     return res(
       ctx.status(401),
@@ -75,7 +81,17 @@ const requestHandlersToMock = [
       })
     )
   }),
+
   rest.put('/api/v1.0/intervals/:id', (req, res, ctx) => {
+    return res(
+      ctx.status(401),
+      ctx.json({
+        error: 'Unauthorized',
+        message: 'mocked-authentication required',
+      })
+    )
+  }),
+  rest.delete('/api/v1.0/intervals/:id', (req, res, ctx) => {
     return res(
       ctx.status(401),
       ctx.json({
@@ -1603,6 +1619,218 @@ describe('<App> + mocking of HTTP requests', () => {
       let element
 
       element = await screen.findByText('mocked-authentication required')
+      expect(element).toBeInTheDocument()
+    }
+  )
+
+  test(
+    "an authenticated user clicks on 'Intervals Overview'," +
+      " then clicks on the 1st 'Delete' anchor tag," +
+      " and finally clicks on the 'Yes' button",
+    async () => {
+      /* Arrange. */
+      quasiServer.use(
+        rest.get('/api/v1.0/user', mockHandlerForFetchUserRequest),
+        rest.get('/api/v1.0/goals', mockHandlerForFetchGoalsRequest),
+        rest.get('/api/v1.0/intervals', mockHandlerForFetchIntervalsRequest),
+
+        rest.delete(
+          '/api/v1.0/intervals/:id',
+          mockHandlerForDeleteIntervalRequest
+        ),
+
+        rest.get('/api/v1.0/goals', (req, res, ctx) => {
+          return res.once(
+            ctx.status(200),
+            ctx.json({
+              goals: [MOCK_GOAL_20],
+            })
+          )
+        }),
+        rest.get('/api/v1.0/intervals', (req, res, ctx) => {
+          return res.once(
+            ctx.status(200),
+            ctx.json({
+              intervals: [MOCK_INTERVAL_200],
+            })
+          )
+        })
+      )
+
+      const enhancer = applyMiddleware(thunkMiddleware)
+      const realStore = createStore(rootReducer, enhancer)
+
+      const history = createMemoryHistory()
+
+      render(
+        <Provider store={realStore}>
+          <Router history={history}>
+            <App />
+          </Router>
+        </Provider>
+      )
+
+      const intervalsOverviewAnchor = await screen.findByText(
+        'Intervals Overview'
+      )
+      fireEvent.click(intervalsOverviewAnchor)
+
+      /* Act. */
+      const deleteAnchors = await screen.findAllByText('Delete')
+      expect(deleteAnchors.length).toEqual(2)
+
+      const deleteAnchor = deleteAnchors[0]
+      fireEvent.click(deleteAnchor)
+
+      let element
+
+      element = screen.getByText('The selected interval:')
+      expect(element).toBeInTheDocument()
+
+      element = screen.getByText('Do you want to delete the selected interval?')
+      expect(element).toBeInTheDocument()
+
+      const descriptionInput = screen.getByText(MOCK_GOAL_10.description)
+      expect(descriptionInput).toBeInTheDocument()
+
+      const yesButton = screen.getByText('Yes')
+      fireEvent.click(yesButton)
+
+      /* Assert. */
+      element = await screen.findByText('INTERVAL SUCCESSFULLY DELETED')
+      expect(element).toBeInTheDocument()
+
+      await waitFor(() => {
+        const descriptionOfDeletedGoal = screen.queryByText(
+          MOCK_GOAL_10.description
+        )
+        expect(descriptionOfDeletedGoal).not.toBeInTheDocument()
+      })
+    }
+  )
+
+  test(
+    "an authenticated user clicks on 'Intervals Overview'," +
+      " then clicks on the 1st 'Delete' anchor tag," +
+      " and finally clicks on the 'Yes' button" +
+      ' but the JWS token expires before the DELETE request is issued',
+    async () => {
+      /* Arrange. */
+      quasiServer.use(
+        rest.get('/api/v1.0/user', mockHandlerForFetchUserRequest),
+        rest.get('/api/v1.0/goals', mockHandlerForFetchGoalsRequest),
+        rest.get('/api/v1.0/intervals', mockHandlerForFetchIntervalsRequest)
+      )
+
+      const enhancer = applyMiddleware(thunkMiddleware)
+      const realStore = createStore(rootReducer, enhancer)
+
+      const history = createMemoryHistory()
+
+      render(
+        <Provider store={realStore}>
+          <Router history={history}>
+            <App />
+          </Router>
+        </Provider>
+      )
+
+      const intervalsOverviewAnchor = await screen.findByText(
+        'Intervals Overview'
+      )
+      fireEvent.click(intervalsOverviewAnchor)
+
+      /* Act. */
+      const deleteAnchors = await screen.findAllByText('Delete')
+      expect(deleteAnchors.length).toEqual(2)
+
+      const deleteAnchor = deleteAnchors[0]
+      fireEvent.click(deleteAnchor)
+
+      let element
+
+      element = screen.getByText('The selected interval:')
+      expect(element).toBeInTheDocument()
+
+      element = screen.getByText('Do you want to delete the selected interval?')
+      expect(element).toBeInTheDocument()
+
+      const descriptionInput = screen.getByText(MOCK_GOAL_10.description)
+      expect(descriptionInput).toBeInTheDocument()
+
+      const yesButton = screen.getByText('Yes')
+      fireEvent.click(yesButton)
+
+      /* Assert. */
+      element = await screen.findByText(
+        'FAILED TO DELETE THE SELECTED INTERVAL'
+      )
+      expect(element).toBeInTheDocument()
+    }
+  )
+
+  test(
+    "an authenticated user clicks on 'Intervals Overview'," +
+      " then clicks on the 1st 'Delete' anchor tag," +
+      " and finally clicks on the 'No' button",
+    async () => {
+      /* Arrange. */
+      quasiServer.use(
+        rest.get('/api/v1.0/user', mockHandlerForFetchUserRequest),
+        rest.get('/api/v1.0/goals', mockHandlerForFetchGoalsRequest),
+        rest.get('/api/v1.0/intervals', mockHandlerForFetchIntervalsRequest),
+
+        rest.get('/api/v1.0/goals', mockHandlerForFetchGoalsRequest),
+        rest.get('/api/v1.0/intervals', mockHandlerForFetchIntervalsRequest)
+      )
+
+      const enhancer = applyMiddleware(thunkMiddleware)
+      const realStore = createStore(rootReducer, enhancer)
+
+      const history = createMemoryHistory()
+
+      render(
+        <Provider store={realStore}>
+          <Router history={history}>
+            <App />
+          </Router>
+        </Provider>
+      )
+
+      const intervalsOverviewAnchor = await screen.findByText(
+        'Intervals Overview'
+      )
+      fireEvent.click(intervalsOverviewAnchor)
+
+      /* Act. */
+      const deleteAnchors = await screen.findAllByText('Delete')
+      expect(deleteAnchors.length).toEqual(2)
+
+      const deleteAnchor = deleteAnchors[0]
+      fireEvent.click(deleteAnchor)
+
+      let element
+
+      element = screen.getByText('The selected interval:')
+      expect(element).toBeInTheDocument()
+
+      element = screen.getByText('Do you want to delete the selected interval?')
+      expect(element).toBeInTheDocument()
+
+      const descriptionInput = screen.getByText(MOCK_GOAL_10.description)
+      expect(descriptionInput).toBeInTheDocument()
+
+      const noButton = screen.getByText('No')
+      fireEvent.click(noButton)
+
+      /* Assert. */
+      const deleteAnchorElements = await screen.findAllByText('Delete')
+      expect(deleteAnchorElements.length).toEqual(2)
+
+      element = await screen.findByText(MOCK_GOAL_10.description)
+      expect(element).toBeInTheDocument()
+
+      element = await screen.findByText(MOCK_GOAL_20.description)
       expect(element).toBeInTheDocument()
     }
   )
