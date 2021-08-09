@@ -66,130 +66,6 @@ describe('<App> + mocking of HTTP requests', () => {
     quasiServer.close()
   })
 
-  test('renders <Login> for an unauthenticated user', async () => {
-    /* Arrange. */
-    const enhancer = applyMiddleware(thunkMiddleware)
-    const realStore = createStore(rootReducer, enhancer)
-
-    const history = createMemoryHistory()
-
-    render(
-      <Provider store={realStore}>
-        <Router history={history}>
-          <App />
-        </Router>
-      </Provider>
-    )
-
-    /* Act. */
-    const loginAnchor = await screen.findByText('Login')
-    fireEvent.click(loginAnchor)
-
-    /* Assert. */
-    let element
-
-    element = screen.getByPlaceholderText('Enter email')
-    expect(element).toBeInTheDocument()
-
-    element = screen.getByPlaceholderText('Enter password')
-    expect(element).toBeInTheDocument()
-  })
-
-  test(
-    'renders <Login> for an unauthenticated user,' +
-      ' and then renders an <Alert>' +
-      ' if the login form is submitted with incorrect credentials',
-    async () => {
-      /* Arrange. */
-      const enhancer = applyMiddleware(thunkMiddleware)
-      const realStore = createStore(rootReducer, enhancer)
-
-      const history = createMemoryHistory()
-
-      render(
-        <Provider store={realStore}>
-          <Router history={history}>
-            <App />
-          </Router>
-        </Provider>
-      )
-
-      const loginAnchor = await screen.findByText('Login')
-      fireEvent.click(loginAnchor)
-
-      /* Act. */
-      const emailInput = screen.getByPlaceholderText('Enter email')
-      fireEvent.change(emailInput, {
-        target: { value: 'mary.smith@protonmail.com' },
-      })
-
-      const passwordInput = screen.getByPlaceholderText('Enter password')
-      fireEvent.change(passwordInput, {
-        target: { value: '456' },
-      })
-
-      const loginButton = screen.getByRole('button', {
-        name: 'Login',
-      })
-      fireEvent.click(loginButton)
-
-      /* Assert. */
-      const element = await screen.findByText('AUTHENTICATION FAILED')
-      expect(element).toBeInTheDocument()
-    }
-  )
-
-  test(
-    'renders <Login> for an unauthenticated user,' +
-      ' from where the user can log in',
-    async () => {
-      /* Arrange. */
-      quasiServer.use(
-        rest.get('/api/v1.0/user', mockHandlerForSingleFailure),
-        rest.post('/api/v1.0/tokens', mockHandlerForIssueJWSTokenRequest),
-        rest.get('/api/v1.0/user', mockHandlerForFetchUserRequest)
-      )
-
-      const enhancer = applyMiddleware(thunkMiddleware)
-      const realStore = createStore(rootReducer, enhancer)
-
-      const history = createMemoryHistory()
-
-      /* Act. */
-      render(
-        <Provider store={realStore}>
-          <Router history={history}>
-            <App />
-          </Router>
-        </Provider>
-      )
-
-      const loginAnchor = await screen.findByText('Login')
-      fireEvent.click(loginAnchor)
-
-      const emailInput = screen.getByPlaceholderText('Enter email')
-      fireEvent.change(emailInput, {
-        target: { value: 'mary.smith@protonmail.com' },
-      })
-
-      const passwordInput = screen.getByPlaceholderText('Enter password')
-      fireEvent.change(passwordInput, {
-        target: { value: '456' },
-      })
-
-      const loginButton = screen.getByRole('button', {
-        name: 'Login',
-      })
-      fireEvent.click(loginButton)
-
-      /* Assert. */
-      const personalizedGreeting = await screen.findByText(
-        'Welcome, mocked-mary.smith@protonmail.com !'
-      )
-      expect(personalizedGreeting).toBeInTheDocument()
-    }
-  )
-
   test('renders <Register> for an unauthenticated user', async () => {
     /* Arrange. */
     const enhancer = applyMiddleware(thunkMiddleware)
@@ -386,6 +262,130 @@ describe('<App> + mocking of HTTP requests', () => {
         'mocked-There already exists a user with the provided email.'
       )
       expect(element).toBeInTheDocument()
+    }
+  )
+
+  test('renders <Login> for an unauthenticated user', async () => {
+    /* Arrange. */
+    const enhancer = applyMiddleware(thunkMiddleware)
+    const realStore = createStore(rootReducer, enhancer)
+
+    const history = createMemoryHistory()
+
+    render(
+      <Provider store={realStore}>
+        <Router history={history}>
+          <App />
+        </Router>
+      </Provider>
+    )
+
+    /* Act. */
+    const loginAnchor = await screen.findByText('Login')
+    fireEvent.click(loginAnchor)
+
+    /* Assert. */
+    let element
+
+    element = screen.getByPlaceholderText('Enter email')
+    expect(element).toBeInTheDocument()
+
+    element = screen.getByPlaceholderText('Enter password')
+    expect(element).toBeInTheDocument()
+  })
+
+  test(
+    'renders <Login> for an unauthenticated user,' +
+      ' and then renders an <Alert>' +
+      ' if the login form is submitted with incorrect credentials',
+    async () => {
+      /* Arrange. */
+      const enhancer = applyMiddleware(thunkMiddleware)
+      const realStore = createStore(rootReducer, enhancer)
+
+      const history = createMemoryHistory()
+
+      render(
+        <Provider store={realStore}>
+          <Router history={history}>
+            <App />
+          </Router>
+        </Provider>
+      )
+
+      const loginAnchor = await screen.findByText('Login')
+      fireEvent.click(loginAnchor)
+
+      /* Act. */
+      const emailInput = screen.getByPlaceholderText('Enter email')
+      fireEvent.change(emailInput, {
+        target: { value: 'mary.smith@protonmail.com' },
+      })
+
+      const passwordInput = screen.getByPlaceholderText('Enter password')
+      fireEvent.change(passwordInput, {
+        target: { value: '456' },
+      })
+
+      const loginButton = screen.getByRole('button', {
+        name: 'Login',
+      })
+      fireEvent.click(loginButton)
+
+      /* Assert. */
+      const element = await screen.findByText('AUTHENTICATION FAILED')
+      expect(element).toBeInTheDocument()
+    }
+  )
+
+  test(
+    'renders <Login> for an unauthenticated user,' +
+      ' from where the user can log in',
+    async () => {
+      /* Arrange. */
+      quasiServer.use(
+        rest.get('/api/v1.0/user', mockHandlerForSingleFailure),
+        rest.post('/api/v1.0/tokens', mockHandlerForIssueJWSTokenRequest),
+        rest.get('/api/v1.0/user', mockHandlerForFetchUserRequest)
+      )
+
+      const enhancer = applyMiddleware(thunkMiddleware)
+      const realStore = createStore(rootReducer, enhancer)
+
+      const history = createMemoryHistory()
+
+      /* Act. */
+      render(
+        <Provider store={realStore}>
+          <Router history={history}>
+            <App />
+          </Router>
+        </Provider>
+      )
+
+      const loginAnchor = await screen.findByText('Login')
+      fireEvent.click(loginAnchor)
+
+      const emailInput = screen.getByPlaceholderText('Enter email')
+      fireEvent.change(emailInput, {
+        target: { value: 'mary.smith@protonmail.com' },
+      })
+
+      const passwordInput = screen.getByPlaceholderText('Enter password')
+      fireEvent.change(passwordInput, {
+        target: { value: '456' },
+      })
+
+      const loginButton = screen.getByRole('button', {
+        name: 'Login',
+      })
+      fireEvent.click(loginButton)
+
+      /* Assert. */
+      const personalizedGreeting = await screen.findByText(
+        'Welcome, mocked-mary.smith@protonmail.com !'
+      )
+      expect(personalizedGreeting).toBeInTheDocument()
     }
   )
 
