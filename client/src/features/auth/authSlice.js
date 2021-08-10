@@ -1,5 +1,4 @@
 import axios from 'axios'
-import { displayAlertTemporarily } from '../alerts/alertsSlice'
 
 export const initialStateAuth = {
   requestStatus: 'idle', // or: 'loading', 'succeeded', 'failed',
@@ -211,11 +210,6 @@ export const issueJWSToken = (email, password) => async (dispatch) => {
 }
 
 export const fetchUser = () => async (dispatch) => {
-  const body = {}
-  /* TODO: remove the previous instruction altogether,
-           because no body is to be sent when making an axios.get() request
-  */
-
   const token = localStorage.getItem('goal-tracker-token')
 
   const config = {
