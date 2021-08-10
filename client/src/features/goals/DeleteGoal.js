@@ -29,14 +29,13 @@ const DeleteGoal = (props) => {
     return <Redirect to={nextUrl} />
   }
 
-  const onClickYes = () => {
-    dispatch(deleteGoal(goal.id))
-      .then(() =>
-        dispatch(displayAlertTemporarily('GOAL SUCCESSFULLY DELETED'))
-      )
-      .catch(() =>
-        dispatch(displayAlertTemporarily('FAILED TO DELETE THE SELECTED GOAL'))
-      )
+  const onClickYes = async () => {
+    try {
+      await dispatch(deleteGoal(goal.id))
+      dispatch(displayAlertTemporarily('GOAL SUCCESSFULLY DELETED'))
+    } catch (err) {
+      dispatch(displayAlertTemporarily('FAILED TO DELETE THE SELECTED GOAL'))
+    }
   }
 
   const onClickNo = () => setToGoalsOverview(true)

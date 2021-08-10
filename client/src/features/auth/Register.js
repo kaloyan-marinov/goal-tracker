@@ -30,22 +30,21 @@ const Register = () => {
   }
 
   const onSubmit = async (e) => {
-    // TODO: identify the commit where the `async` should have _first_ been added to the previous line, and add it there
     e.preventDefault()
 
     if (password !== confirmPassword) {
       dispatch(displayAlertTemporarily('PASSWORDS DO NOT MATCH'))
     } else {
-      dispatch(createUser(email, password))
-        .then(() => {
-          dispatch(displayAlertTemporarily('YOU HAVE SUCCESSFULLY REGISTERED'))
-          const promise = dispatch(issueJWSToken(email, password))
-          return promise
-        })
-        .then(() => dispatch(fetchUser()))
-        .catch((actionError) => {
-          dispatch(displayAlertTemporarily(actionError))
-        })
+      try {
+        await dispatch(createUser(email, password))
+        dispatch(displayAlertTemporarily('YOU HAVE SUCCESSFULLY REGISTERED'))
+
+        await dispatch(issueJWSToken(email, password))
+
+        await dispatch(fetchUser())
+      } catch (actionError) {
+        dispatch(displayAlertTemporarily(actionError))
+      }
     }
   }
 

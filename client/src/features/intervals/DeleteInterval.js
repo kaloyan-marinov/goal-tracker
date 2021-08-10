@@ -32,17 +32,16 @@ const DeleteInterval = (props) => {
     return <Redirect to={nextUrl} />
   }
 
-  const onClickYes = () => {
-    dispatch(deleteInterval(interval.id))
-      .then(() =>
-        dispatch(displayAlertTemporarily('INTERVAL SUCCESSFULLY DELETED'))
+  const onClickYes = async () => {
+    try {
+      await dispatch(deleteInterval(interval.id))
+      dispatch(displayAlertTemporarily('INTERVAL SUCCESSFULLY DELETED'))
+      setToIntervalsOverview(true)
+    } catch (err) {
+      dispatch(
+        displayAlertTemporarily('FAILED TO DELETE THE SELECTED INTERVAL')
       )
-      .then(() => setToIntervalsOverview(true))
-      .catch(() =>
-        dispatch(
-          displayAlertTemporarily('FAILED TO DELETE THE SELECTED INTERVAL')
-        )
-      )
+    }
   }
 
   const onClickNo = () => setToIntervalsOverview(true)

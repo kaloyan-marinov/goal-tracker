@@ -35,7 +35,9 @@ const AddNewInterval = () => {
     console.log('    <AddNewInterval> is running its effect function')
 
     const effectFn = async () => {
-      console.log("    <AddNewInterval>'s useEffect hook is dispatching fetchGoals()")
+      console.log(
+        "    <AddNewInterval>'s useEffect hook is dispatching fetchGoals()"
+      )
       try {
         await dispatch(fetchGoals())
       } catch (err) {
@@ -72,10 +74,13 @@ const AddNewInterval = () => {
   const onSubmit = async (e) => {
     e.preventDefault()
 
-    dispatch(createInterval(goalId, startTimestamp, finalTimestamp))
-      .then(() => dispatch(displayAlertTemporarily('NEW INTERVAL ADDED')))
-      .then(() => setToIntervalsOverview(true))
-      .catch((actionError) => dispatch(displayAlertTemporarily(actionError)))
+    try {
+      await dispatch(createInterval(goalId, startTimestamp, finalTimestamp))
+      dispatch(displayAlertTemporarily('NEW INTERVAL ADDED'))
+      setToIntervalsOverview(true)
+    } catch (actionError) {
+      dispatch(displayAlertTemporarily(actionError))
+    }
   }
 
   const goalOptions = goalIds.map((gId) => (

@@ -48,19 +48,18 @@ const EditInterval = (props) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
   }
 
-  const onSubmit = (e) => {
+  const onSubmit = async (e) => {
     e.preventDefault()
 
-    dispatch(editInterval(interval.id, goalId, startTimestamp, finalTimestamp))
-      .then(() =>
-        dispatch(displayAlertTemporarily('INTERVAL SUCCESSFULLY EDITED'))
+    try {
+      await dispatch(
+        editInterval(interval.id, goalId, startTimestamp, finalTimestamp)
       )
-      .then(() => {
-        setToIntervalsOverview(true)
-      })
-      .catch((actionError) => {
-        dispatch(displayAlertTemporarily(actionError))
-      })
+      dispatch(displayAlertTemporarily('INTERVAL SUCCESSFULLY EDITED'))
+      setToIntervalsOverview(true)
+    } catch (actionError) {
+      dispatch(displayAlertTemporarily(actionError))
+    }
   }
 
   return (

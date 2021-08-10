@@ -29,12 +29,14 @@ const Login = () => {
   }
 
   const onSubmit = async (e) => {
-    // TODO: identify the commit where the `async` should have _first_ been added to the previous line, and add it there
     e.preventDefault()
 
-    dispatch(issueJWSToken(email, password))
-      .then(() => dispatch(fetchUser()))
-      .catch(() => dispatch(displayAlertTemporarily('AUTHENTICATION FAILED')))
+    try {
+      await dispatch(issueJWSToken(email, password))
+      await dispatch(fetchUser())
+    } catch (err) {
+      dispatch(displayAlertTemporarily('AUTHENTICATION FAILED'))
+    }
   }
 
   if (isAuthenticated) {

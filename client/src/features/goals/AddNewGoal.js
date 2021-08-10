@@ -39,14 +39,13 @@ const AddNewGoal = () => {
   const onSubmit = async (e) => {
     e.preventDefault()
 
-    dispatch(createGoal(description))
-      .then(() => dispatch(displayAlertTemporarily('NEW GOAL ADDED')))
-      .then(() => {
-        setToGoalsOverview(true)
-      })
-      .catch(() =>
-        dispatch(displayAlertTemporarily('FAILED TO ADD A NEW GOAL'))
-      )
+    try {
+      await dispatch(createGoal(description))
+      dispatch(displayAlertTemporarily('NEW GOAL ADDED'))
+      setToGoalsOverview(true)
+    } catch (err) {
+      dispatch(displayAlertTemporarily('FAILED TO ADD A NEW GOAL'))
+    }
   }
 
   return (

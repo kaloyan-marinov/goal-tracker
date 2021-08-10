@@ -33,14 +33,13 @@ const EditGoal = (props) => {
   const onSubmit = async (e) => {
     e.preventDefault()
 
-    dispatch(editGoal(goalId, description))
-      .then(() => dispatch(displayAlertTemporarily('GOAL SUCCESSFULLY EDITED')))
-      .then(() => {
-        setToGoalsOverview(true)
-      })
-      .catch(() => {
-        dispatch(displayAlertTemporarily('FAILED TO EDIT THE SELECTED GOAL'))
-      })
+    try {
+      await dispatch(editGoal(goalId, description))
+      dispatch(displayAlertTemporarily('GOAL SUCCESSFULLY EDITED'))
+      setToGoalsOverview(true)
+    } catch (err) {
+      dispatch(displayAlertTemporarily('FAILED TO EDIT THE SELECTED GOAL'))
+    }
   }
 
   return (
