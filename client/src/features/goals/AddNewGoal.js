@@ -32,11 +32,11 @@ const AddNewGoal = () => {
     return <Redirect to={nextUrl} />
   }
 
-  const onChange = (e) => {
+  const handleChange = (e) => {
     setDescription(e.target.value)
   }
 
-  const onSubmit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
 
     try {
@@ -51,14 +51,14 @@ const AddNewGoal = () => {
   return (
     <Fragment>
       [AddNewGoal]
-      <form onSubmit={(e) => onSubmit(e)}>
+      <form onSubmit={(e) => handleSubmit(e)}>
         <div>
           <input
             type="text"
             placeholder="Enter description of goal"
             name="description"
             value={description}
-            onChange={(e) => onChange(e)}
+            onChange={(e) => handleChange(e)}
             // required // disabled temporarily, to test the server side
           />
         </div>

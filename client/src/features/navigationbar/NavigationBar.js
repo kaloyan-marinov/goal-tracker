@@ -22,7 +22,7 @@ const NavigationBar = () => {
   console.log(`    requestStatus: ${requestStatus}`)
   console.log(`    isAuthenticated: ${isAuthenticated}`)
 
-  const onClick = () => {
+  const handleClick = () => {
     dispatch(logout())
     dispatch(reinitializeGoalsSlice())
     dispatch(reinitializeIntervalsSlice())
@@ -52,7 +52,7 @@ const NavigationBar = () => {
         <Link to="/dashboard">Dashboard</Link>
       </li>
       <li>
-        <a href="#!" onClick={onClick}>
+        <a href="#!" onClick={handleClick}>
           Logout
         </a>
       </li>

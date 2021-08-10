@@ -44,11 +44,11 @@ const EditInterval = (props) => {
     </option>
   ))
 
-  const onChange = (e) => {
+  const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
   }
 
-  const onSubmit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
 
     try {
@@ -83,9 +83,9 @@ const EditInterval = (props) => {
           </tr>
         </table>
         <hr />
-        <form onSubmit={(e) => onSubmit(e)}>
+        <form onSubmit={(e) => handleSubmit(e)}>
           <h3>Select the goal that you have worked on</h3>
-          <select name="goalId" value={goalId} onChange={onChange}>
+          <select name="goalId" value={goalId} onChange={handleChange}>
             {goalOptions}
           </select>
           <h3>Enter the start timestamp (in GMT)</h3>
@@ -94,7 +94,7 @@ const EditInterval = (props) => {
             placeholder="YYYY-MM-DD HH:MM"
             name="startTimestamp"
             value={startTimestamp}
-            onChange={onChange}
+            onChange={handleChange}
           />
           <h3>Enter the final timestamp (in GMT)</h3>
           <input
@@ -102,7 +102,7 @@ const EditInterval = (props) => {
             placeholder="YYYY-MM-DD HH:MM"
             name="finalTimestamp"
             value={finalTimestamp}
-            onChange={onChange}
+            onChange={handleChange}
           />
           <hr />
           <input type="submit" value="Edit" />

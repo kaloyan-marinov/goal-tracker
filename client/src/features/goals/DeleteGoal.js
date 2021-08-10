@@ -29,7 +29,7 @@ const DeleteGoal = (props) => {
     return <Redirect to={nextUrl} />
   }
 
-  const onClickYes = async () => {
+  const handleClickYes = async () => {
     try {
       await dispatch(deleteGoal(goal.id))
       dispatch(displayAlertTemporarily('GOAL SUCCESSFULLY DELETED'))
@@ -38,7 +38,7 @@ const DeleteGoal = (props) => {
     }
   }
 
-  const onClickNo = () => setToGoalsOverview(true)
+  const handleClickNo = () => setToGoalsOverview(true)
 
   return (
     <Fragment>
@@ -51,10 +51,10 @@ const DeleteGoal = (props) => {
       <div>Do you want to delete the selected goal?</div>
       <ul>
         <li>
-          <button onClick={onClickYes}>Yes</button>
+          <button onClick={handleClickYes}>Yes</button>
         </li>
         <li>
-          <button onClick={onClickNo}>No</button>
+          <button onClick={handleClickNo}>No</button>
         </li>
       </ul>
     </Fragment>

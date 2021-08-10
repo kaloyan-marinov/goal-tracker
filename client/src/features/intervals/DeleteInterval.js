@@ -32,7 +32,7 @@ const DeleteInterval = (props) => {
     return <Redirect to={nextUrl} />
   }
 
-  const onClickYes = async () => {
+  const handleClickYes = async () => {
     try {
       await dispatch(deleteInterval(interval.id))
       dispatch(displayAlertTemporarily('INTERVAL SUCCESSFULLY DELETED'))
@@ -44,7 +44,7 @@ const DeleteInterval = (props) => {
     }
   }
 
-  const onClickNo = () => setToIntervalsOverview(true)
+  const handleClickNo = () => setToIntervalsOverview(true)
 
   return (
     <Fragment>
@@ -70,10 +70,10 @@ const DeleteInterval = (props) => {
       <div>Do you want to delete the selected interval?</div>
       <ul>
         <li>
-          <button onClick={onClickYes}>Yes</button>
+          <button onClick={handleClickYes}>Yes</button>
         </li>
         <li>
-          <button onClick={onClickNo}>No</button>
+          <button onClick={handleClickNo}>No</button>
         </li>
       </ul>
     </Fragment>

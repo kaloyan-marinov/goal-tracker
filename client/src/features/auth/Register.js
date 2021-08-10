@@ -22,14 +22,14 @@ const Register = () => {
 
   const { email, password, confirmPassword } = formData
 
-  const onChange = (e) => {
+  const handleChange = (e) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
     })
   }
 
-  const onSubmit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
 
     if (password !== confirmPassword) {
@@ -55,14 +55,14 @@ const Register = () => {
   return (
     <Fragment>
       <h1>Register</h1>
-      <form onSubmit={(e) => onSubmit(e)}>
+      <form onSubmit={(e) => handleSubmit(e)}>
         <div>
           <input
             type="email"
             placeholder="Enter email"
             name="email"
             value={email}
-            onChange={(e) => onChange(e)}
+            onChange={(e) => handleChange(e)}
             // required // disabled temporarily, to test the server side
           />
         </div>
@@ -72,7 +72,7 @@ const Register = () => {
             placeholder="Enter password"
             name="password"
             value={password}
-            onChange={(e) => onChange(e)}
+            onChange={(e) => handleChange(e)}
           />
         </div>
         <div>
@@ -81,7 +81,7 @@ const Register = () => {
             placeholder="Confirm password"
             name="confirmPassword"
             value={confirmPassword}
-            onChange={(e) => onChange(e)}
+            onChange={(e) => handleChange(e)}
           />
         </div>
         <input type="submit" value="Register" />

@@ -21,14 +21,14 @@ const Login = () => {
 
   const { email, password } = formData
 
-  const onChange = (e) => {
+  const handleChange = (e) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
     })
   }
 
-  const onSubmit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
 
     try {
@@ -49,14 +49,14 @@ const Login = () => {
   return (
     <Fragment>
       <h1>Login</h1>
-      <form onSubmit={(e) => onSubmit(e)}>
+      <form onSubmit={(e) => handleSubmit(e)}>
         <div>
           <input
             type="email"
             placeholder="Enter email"
             name="email"
             value={email}
-            onChange={(e) => onChange(e)}
+            onChange={(e) => handleChange(e)}
             // required // disabled temporarily, to test the server side
           />
         </div>
@@ -66,7 +66,7 @@ const Login = () => {
             placeholder="Enter password"
             name="password"
             value={password}
-            onChange={(e) => onChange(e)}
+            onChange={(e) => handleChange(e)}
           />
         </div>
         <input type="submit" value="Login" />
