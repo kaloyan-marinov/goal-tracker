@@ -23,14 +23,27 @@ const AddNewInterval = () => {
   /* TODO: look into whether the "make <IntervalsOverview> display the Goal Description
            (instead of the Goal ID)" commit made it possible to altogether remove the
            following call of useEffect
+
+           restatement on 2021/08/10, 07:05
+              this component should only be rendered
+              when the user clicks 'Add a new interval' on <IntervalsOverview>
+
+              in view of that and in view of <IntervalsOverview>'s own effect function,
+              it should be possible to altogether remove the following useEffect hook
   */
   useEffect(() => {
     console.log('    <AddNewInterval> is running its effect function')
 
-    const promise = dispatch(fetchGoals())
-    return promise
-      .then(() => {})
-      .catch(() => dispatch(displayAlertTemporarily('FAILED TO FETCH GOALS')))
+    const effectFn = async () => {
+      console.log("    <AddNewInterval>'s useEffect hook is dispatching fetchGoals()")
+      try {
+        await dispatch(fetchGoals())
+      } catch (err) {
+        dispatch(displayAlertTemporarily('FAILED TO FETCH GOALS'))
+      }
+    }
+
+    effectFn()
   }, [dispatch])
 
   const [formData, setFormData] = useState({
