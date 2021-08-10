@@ -31,7 +31,7 @@ const AddNewInterval = () => {
     return promise
       .then(() => {})
       .catch(() => dispatch(displayAlertTemporarily('FAILED TO FETCH GOALS')))
-  }, [])
+  }, [dispatch])
 
   const [formData, setFormData] = useState({
     goalId: '0',
