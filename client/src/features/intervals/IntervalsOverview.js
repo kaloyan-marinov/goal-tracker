@@ -35,7 +35,7 @@ const IntervalsOverview = () => {
       .catch(() =>
         dispatch(displayAlertTemporarily('FAILED TO FETCH INTERVALS'))
       )
-  }, [])
+  }, [dispatch])
 
   const goalEntities = useSelector(selectGoalEntities)
   const intervalIds = useSelector(selectIntervalIds)

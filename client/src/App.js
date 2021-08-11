@@ -41,7 +41,7 @@ const App = () => {
       .catch(() => {
         console.log('    the promise has rejected')
       })
-  }, [])
+  }, [dispatch])
 
   return (
     <Fragment>

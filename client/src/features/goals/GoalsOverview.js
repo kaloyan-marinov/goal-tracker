@@ -57,7 +57,7 @@ const GoalsOverview = () => {
       .catch(() =>
         dispatch(displayAlertTemporarily('FAILED TO FETCH INTERVALS'))
       )
-  }, [])
+  }, [dispatch])
 
   const goalIds = useSelector(selectGoalIds)
   const goalEntities = useSelector(selectGoalEntities)
