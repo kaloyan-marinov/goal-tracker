@@ -87,20 +87,20 @@ export default function authReducer(state = initialStateAuth, action) {
       }
     } /* end: auth/fetchUser/rejected */
 
-    case 'auth/logout': {
-      /* TODO: rectify this as part of g-t-i-34 */
-      localStorage.removeItem('goal-tracker-token')
+    case 'auth/removeJWSToken': {
+      /*
+      TODO: find out
+            why the auth reducer in the devconnector repo does not set `user: null`
+            when reducing/handling the LOGOUT action type
+      */
 
-      /* TODO: find out
-               why the auth reducer in the devconnector repo does not set `user: null`
-               when reducing/handling the LOGOUT action type */
       return {
         ...state,
         token: null,
         isAuthenticated: false,
         currentUser: null,
       }
-    } /* end: auth/logout */
+    } /* end: auth/removeJWSToken */
 
     default:
       return state
@@ -149,8 +149,8 @@ export const fetchUserRejected = (error) => ({
   error,
 })
 
-export const logout = () => ({
-  type: 'auth/logout',
+export const removeJWSToken = () => ({
+  type: 'auth/removeJWSToken',
 })
 
 /* Thunk-action creator functions */
@@ -229,6 +229,13 @@ export const fetchUser = () => async (dispatch) => {
     const actionError = errorPayload.error || 'ERROR NOT FROM BACKEND'
     dispatch(fetchUserRejected(actionError))
     return Promise.reject(actionError)
+  }
+}
+
+export const logout = () => {
+  return (dispatch) => {
+    localStorage.removeItem('goal-tracker-token')
+    dispatch(removeJWSToken())
   }
 }
 
