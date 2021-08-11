@@ -20,21 +20,27 @@ const IntervalsOverview = () => {
   useEffect(() => {
     console.log('    <IntervalsOverview> is running its effect function')
 
-    /* TODO: [identical to the TODO, which is within the useEffect() call in
-             <GoalsOverview>]
-    
-             find out if the next instruction is an acceptable way of dispatching the
-             fetchGoals() and fetchIntervals() "thunk" actions:
-             (a) one after another, and
-             (b) in such a way that allows us to handle the potential failure of each
-                 individual "thunk" action separately
-    */
-    dispatch(fetchGoals())
-      .catch(() => dispatch(displayAlertTemporarily('FAILED TO FETCH GOALS')))
-      .then(() => dispatch(fetchIntervals()))
-      .catch(() =>
-        dispatch(displayAlertTemporarily('FAILED TO FETCH INTERVALS'))
+    const effectFn = async () => {
+      console.log(
+        "    <IntervalsOverview>'s useEffect hook is dispatching fetchGoals()"
       )
+      try {
+        await dispatch(fetchGoals())
+      } catch (err) {
+        dispatch(displayAlertTemporarily('FAILED TO FETCH GOALS'))
+      }
+
+      console.log(
+        "    <IntervalsOverview>'s useEffect hook is dispatching fetchIntervals()"
+      )
+      try {
+        await dispatch(fetchIntervals())
+      } catch (err) {
+        dispatch(displayAlertTemporarily('FAILED TO FETCH INTERVALS'))
+      }
+    }
+
+    effectFn()
   }, [dispatch])
 
   const goalEntities = useSelector(selectGoalEntities)

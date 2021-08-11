@@ -29,18 +29,18 @@ const App = () => {
   useEffect(() => {
     console.log('    <App> is running its effect function')
 
-    const promise = dispatch(fetchUser())
-    /* TODO: find out if the next instruction is an acceptable way of dealing with the
-             fetchUser() "thunk" action, whose latest version is introduced in the same
-             commit as this comment.
-    */
-    return promise
-      .then(() => {
+    const effectFn = async () => {
+      console.log("    <App>'s useEffect hook is dispatching fetchUser()")
+
+      try {
+        await dispatch(fetchUser())
         console.log('    the promise has resolved')
-      })
-      .catch(() => {
+      } catch (err) {
         console.log('    the promise has rejected')
-      })
+      }
+    }
+
+    effectFn()
   }, [dispatch])
 
   return (
