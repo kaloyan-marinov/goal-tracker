@@ -3,17 +3,37 @@ import configureMockStore from 'redux-mock-store'
 
 export const createStoreMock = configureMockStore([thunkMiddleware])
 
+export const mockSingleFailure = (req, res, ctx) => {
+  return res.once(
+    ctx.status(401),
+    ctx.json({
+      error: 'mocked-Unauthorized',
+      message: 'mocked-authentication required',
+    })
+  )
+}
+
+export const mockMultipleFailures = (req, res, ctx) => {
+  return res(
+    ctx.status(401),
+    ctx.json({
+      error: 'mocked-Unauthorized',
+      message: 'mocked-authentication required',
+    })
+  )
+}
+
 /* Mock handlers for HTTP requests. */
-const MOCK_USER_1 = {
+export const MOCK_USER_1 = {
   id: 1,
   email: 'mocked-mary.smith@protonmail.com',
 }
 
-export const mockHandlerForCreateUserRequest = (req, res, ctx) => {
+export const mockCreateUser = (req, res, ctx) => {
   return res.once(ctx.status(201), ctx.json(MOCK_USER_1))
 }
 
-export const mockHandlerForIssueJWSTokenRequest = (req, res, ctx) => {
+export const mockIssueJWSToken = (req, res, ctx) => {
   return res.once(
     ctx.status(200),
     ctx.json({
@@ -22,29 +42,29 @@ export const mockHandlerForIssueJWSTokenRequest = (req, res, ctx) => {
   )
 }
 
-export const mockHandlerForFetchUserRequest = (req, res, ctx) => {
+export const mockFetchUser = (req, res, ctx) => {
   return res.once(ctx.status(200), ctx.json(MOCK_USER_1))
 }
 
-export const mockHandlerForMultipleFetchUserRequests = (req, res, ctx) => {
+export const mockMultipleFetchUser = (req, res, ctx) => {
   return res(ctx.status(200), ctx.json(MOCK_USER_1))
 }
 
 export const MOCK_GOAL_10 = {
   id: 10,
-  description: 'mocked-write tests for thunk-action creators',
+  description: '[mocked] build a backend application',
 }
 
 export const MOCK_GOAL_20 = {
   id: 20,
-  description: 'mocked-cook dinner',
+  description: '[mocked] build a frontend application',
 }
 
-export const mockHandlerForCreateGoalRequest = (req, res, ctx) => {
+export const mockCreateGoal = (req, res, ctx) => {
   return res.once(ctx.status(201), ctx.json(MOCK_GOAL_10))
 }
 
-export const mockHandlerForFetchGoalsRequest = (req, res, ctx) => {
+export const mockFetchGoals = (req, res, ctx) => {
   return res.once(
     ctx.status(200),
     ctx.json({
@@ -53,7 +73,7 @@ export const mockHandlerForFetchGoalsRequest = (req, res, ctx) => {
   )
 }
 
-export const mockHandlerForEditGoalRequest = (req, res, ctx) => {
+export const mockEditGoal = (req, res, ctx) => {
   const { id: goalId } = req.params
 
   return res.once(
@@ -65,7 +85,7 @@ export const mockHandlerForEditGoalRequest = (req, res, ctx) => {
   )
 }
 
-export const mockHandlerForDeleteGoalRequest = (req, res, ctx) => {
+export const mockDeleteGoal = (req, res, ctx) => {
   return res.once(ctx.status(204))
 }
 
@@ -90,11 +110,11 @@ export const MOCK_INTERVAL_300 = {
   final: '1999-08-05 19:46',
 }
 
-export const mockHandlerForCreateIntervalRequest = (req, res, ctx) => {
+export const mockCreateInterval = (req, res, ctx) => {
   return res.once(ctx.status(201), ctx.json(MOCK_INTERVAL_100))
 }
 
-export const mockHandlerForFetchIntervalsRequest = (req, res, ctx) => {
+export const mockFetchIntervals = (req, res, ctx) => {
   return res.once(
     ctx.status(200),
     ctx.json({
@@ -103,7 +123,7 @@ export const mockHandlerForFetchIntervalsRequest = (req, res, ctx) => {
   )
 }
 
-export const mockHandlerForEditIntervalRequest = (req, res, ctx) => {
+export const mockEditInterval = (req, res, ctx) => {
   const { id: intervalIdStr } = req.params
   const intervalId = parseInt(intervalIdStr)
 
@@ -119,6 +139,26 @@ export const mockHandlerForEditIntervalRequest = (req, res, ctx) => {
   )
 }
 
-export const mockHandlerForDeleteIntervalRequest = (req, res, ctx) => {
+export const mockDeleteInterval = (req, res, ctx) => {
   return res.once(ctx.status(204))
+}
+
+export const requestHandlers = {
+  mockSingleFailure,
+  mockMultipleFailures,
+
+  mockCreateUser,
+  mockIssueJWSToken,
+  mockFetchUser,
+  mockMultipleFetchUser,
+
+  mockCreateGoal,
+  mockFetchGoals,
+  mockEditGoal,
+  mockDeleteGoal,
+
+  mockCreateInterval,
+  mockFetchIntervals,
+  mockEditInterval,
+  mockDeleteInterval,
 }

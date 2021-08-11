@@ -22,7 +22,7 @@ const EditInterval = (props) => {
   const goal = goalEntities[interval.goal_id]
 
   const [formData, setFormData] = useState({
-    goalId: interval.goal_id,
+    goalId: interval.goal_id.toString(),
     startTimestamp: interval.start,
     finalTimestamp: interval.final,
   })
@@ -38,17 +38,11 @@ const EditInterval = (props) => {
 
   const { goalId, startTimestamp, finalTimestamp } = formData
 
-  const goalOptions = goalIds.map((gId) =>
-    gId === goalId ? (
-      <option selected="selected" key={gId} value={gId}>
-        {goalEntities[gId].description}
-      </option>
-    ) : (
-      <option key={gId} value={gId}>
-        {goalEntities[gId].description}
-      </option>
-    )
-  )
+  const goalOptions = goalIds.map((gId) => (
+    <option key={gId} value={gId.toString()}>
+      {goalEntities[gId].description}
+    </option>
+  ))
 
   const onChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
@@ -92,8 +86,7 @@ const EditInterval = (props) => {
         <hr />
         <form onSubmit={(e) => onSubmit(e)}>
           <h3>Select the goal that you have worked on</h3>
-          <select name="goalId" onChange={onChange}>
-            <option value=""></option>
+          <select name="goalId" value={goalId} onChange={onChange}>
             {goalOptions}
           </select>
           <h3>Enter the start timestamp (in GMT)</h3>

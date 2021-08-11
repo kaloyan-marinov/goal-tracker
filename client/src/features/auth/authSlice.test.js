@@ -20,16 +20,10 @@ import { rest } from 'msw'
 import { setupServer } from 'msw/node'
 import {
   createStoreMock,
-  mockHandlerForCreateUserRequest,
-  mockHandlerForIssueJWSTokenRequest,
-  mockHandlerForFetchUserRequest,
+  requestHandlers,
+  MOCK_USER_1,
 } from '../../testHelpers'
 import { createUser, issueJWSToken, fetchUser } from './authSlice'
-
-const USER = {
-  id: 17,
-  email: 'mary.smith@protonmail.com',
-}
 
 describe('selectors', () => {
   test('selectIsAuthenticated', () => {
@@ -62,13 +56,13 @@ describe('selectors', () => {
     const initSt = {
       auth: {
         ...initialStateAuth,
-        currentUser: USER,
+        currentUser: MOCK_USER_1,
       },
     }
 
     const currentUser = selectCurrentUser(initSt)
 
-    expect(currentUser).toEqual(USER)
+    expect(currentUser).toEqual(MOCK_USER_1)
   })
 })
 
@@ -142,11 +136,11 @@ describe('action creators', () => {
   })
 
   test('fetchUserFulfilled', () => {
-    const action = fetchUserFulfilled(USER)
+    const action = fetchUserFulfilled(MOCK_USER_1)
 
     expect(action).toEqual({
       type: 'auth/fetchUser/fulfilled',
-      payload: USER,
+      payload: MOCK_USER_1,
     })
   })
 
@@ -290,7 +284,7 @@ describe('slice reducer', () => {
     }
     const action = {
       type: 'auth/fetchUser/fulfilled',
-      payload: USER,
+      payload: MOCK_USER_1,
     }
 
     const newStAuth = authReducer(initStAuth, action)
@@ -300,7 +294,7 @@ describe('slice reducer', () => {
       requestError: null,
       token: null,
       isAuthenticated: true,
-      currentUser: USER,
+      currentUser: MOCK_USER_1,
     })
   })
 
@@ -328,9 +322,9 @@ describe('slice reducer', () => {
 })
 
 const requestHandlersToMock = [
-  rest.post('/api/v1.0/users', mockHandlerForCreateUserRequest),
-  rest.post('/api/v1.0/tokens', mockHandlerForIssueJWSTokenRequest),
-  rest.get('/api/v1.0/user', mockHandlerForFetchUserRequest),
+  rest.post('/api/v1.0/users', requestHandlers.mockCreateUser),
+  rest.post('/api/v1.0/tokens', requestHandlers.mockIssueJWSToken),
+  rest.get('/api/v1.0/user', requestHandlers.mockFetchUser),
 ]
 
 /* Create an MSW "request-interception layer". */
@@ -419,28 +413,19 @@ describe('thunk-action creators', () => {
 
   test('issueJWSToken + its HTTP request is mocked to fail', async () => {
     quasiServer.use(
-      rest.post('/api/v1.0/tokens', (req, res, ctx) => {
-        return res(
-          ctx.status(401),
-          ctx.json({
-            error: 'mocked-authentication required',
-          })
-        )
-      })
+      rest.post('/api/v1.0/tokens', requestHandlers.mockMultipleFailures)
     )
 
     const issueJWSTokenPromise = storeMock.dispatch(
       issueJWSToken('mary.smith@protonmail.com', '456')
     )
 
-    await expect(issueJWSTokenPromise).rejects.toEqual(
-      'mocked-authentication required'
-    )
+    await expect(issueJWSTokenPromise).rejects.toEqual('mocked-Unauthorized')
     expect(storeMock.getActions()).toEqual([
       { type: 'auth/issueJWSToken/pending' },
       {
         type: 'auth/issueJWSToken/rejected',
-        error: 'mocked-authentication required',
+        error: 'mocked-Unauthorized',
       },
     ])
   })
@@ -463,25 +448,16 @@ describe('thunk-action creators', () => {
 
   test('fetchUser + its HTTP request is mocked to fail', async () => {
     quasiServer.use(
-      rest.get('/api/v1.0/user', (req, res, ctx) => {
-        return res(
-          ctx.status(401),
-          ctx.json({
-            error: 'mocked-authentication required',
-          })
-        )
-      })
+      rest.get('/api/v1.0/user', requestHandlers.mockMultipleFailures)
     )
     const fetchUserPromise = storeMock.dispatch(fetchUser())
 
-    await expect(fetchUserPromise).rejects.toEqual(
-      'mocked-authentication required'
-    )
+    await expect(fetchUserPromise).rejects.toEqual('mocked-Unauthorized')
     expect(storeMock.getActions()).toEqual([
       { type: 'auth/fetchUser/pending' },
       {
         type: 'auth/fetchUser/rejected',
-        error: 'mocked-authentication required',
+        error: 'mocked-Unauthorized',
       },
     ])
   })
