@@ -26,21 +26,20 @@ const EditGoal = (props) => {
     return <Redirect to={nextUrl} />
   }
 
-  const onChange = (e) => {
+  const handleChange = (e) => {
     setDescription(e.target.value)
   }
 
-  const onSubmit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
 
-    dispatch(editGoal(goalId, description))
-      .then(() => dispatch(displayAlertTemporarily('GOAL SUCCESSFULLY EDITED')))
-      .then(() => {
-        setToGoalsOverview(true)
-      })
-      .catch(() => {
-        dispatch(displayAlertTemporarily('FAILED TO EDIT THE SELECTED GOAL'))
-      })
+    try {
+      await dispatch(editGoal(goalId, description))
+      dispatch(displayAlertTemporarily('GOAL SUCCESSFULLY EDITED'))
+      setToGoalsOverview(true)
+    } catch (err) {
+      dispatch(displayAlertTemporarily('FAILED TO EDIT THE SELECTED GOAL'))
+    }
   }
 
   return (
@@ -49,7 +48,7 @@ const EditGoal = (props) => {
       <div>
         <Link to="/goals-overview">Return to Goals Overview</Link>
       </div>
-      <form onSubmit={(e) => onSubmit(e)}>
+      <form onSubmit={(e) => handleSubmit(e)}>
         <div>
           <h3>Description of the selected goal:</h3>
           <input type="text" value={goal.description} disabled />
@@ -60,7 +59,7 @@ const EditGoal = (props) => {
             type="text"
             name="description"
             value={description}
-            onChange={(e) => onChange(e)}
+            onChange={(e) => handleChange(e)}
             // required // disabled temporarily, to test the server side
           />
         </div>

@@ -22,30 +22,29 @@ const Register = () => {
 
   const { email, password, confirmPassword } = formData
 
-  const onChange = (e) => {
+  const handleChange = (e) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
     })
   }
 
-  const onSubmit = async (e) => {
-    // TODO: identify the commit where the `async` should have _first_ been added to the previous line, and add it there
+  const handleSubmit = async (e) => {
     e.preventDefault()
 
     if (password !== confirmPassword) {
       dispatch(displayAlertTemporarily('PASSWORDS DO NOT MATCH'))
     } else {
-      dispatch(createUser(email, password))
-        .then(() => {
-          dispatch(displayAlertTemporarily('YOU HAVE SUCCESSFULLY REGISTERED'))
-          const promise = dispatch(issueJWSToken(email, password))
-          return promise
-        })
-        .then(() => dispatch(fetchUser()))
-        .catch((actionError) => {
-          dispatch(displayAlertTemporarily(actionError))
-        })
+      try {
+        await dispatch(createUser(email, password))
+        dispatch(displayAlertTemporarily('YOU HAVE SUCCESSFULLY REGISTERED'))
+
+        await dispatch(issueJWSToken(email, password))
+
+        await dispatch(fetchUser())
+      } catch (actionError) {
+        dispatch(displayAlertTemporarily(actionError))
+      }
     }
   }
 
@@ -56,14 +55,14 @@ const Register = () => {
   return (
     <Fragment>
       <h1>Register</h1>
-      <form onSubmit={(e) => onSubmit(e)}>
+      <form onSubmit={(e) => handleSubmit(e)}>
         <div>
           <input
             type="email"
             placeholder="Enter email"
             name="email"
             value={email}
-            onChange={(e) => onChange(e)}
+            onChange={(e) => handleChange(e)}
             // required // disabled temporarily, to test the server side
           />
         </div>
@@ -73,7 +72,7 @@ const Register = () => {
             placeholder="Enter password"
             name="password"
             value={password}
-            onChange={(e) => onChange(e)}
+            onChange={(e) => handleChange(e)}
           />
         </div>
         <div>
@@ -82,7 +81,7 @@ const Register = () => {
             placeholder="Confirm password"
             name="confirmPassword"
             value={confirmPassword}
-            onChange={(e) => onChange(e)}
+            onChange={(e) => handleChange(e)}
           />
         </div>
         <input type="submit" value="Register" />

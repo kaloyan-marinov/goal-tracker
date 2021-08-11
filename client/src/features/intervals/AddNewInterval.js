@@ -35,7 +35,9 @@ const AddNewInterval = () => {
     console.log('    <AddNewInterval> is running its effect function')
 
     const effectFn = async () => {
-      console.log("    <AddNewInterval>'s useEffect hook is dispatching fetchGoals()")
+      console.log(
+        "    <AddNewInterval>'s useEffect hook is dispatching fetchGoals()"
+      )
       try {
         await dispatch(fetchGoals())
       } catch (err) {
@@ -65,17 +67,20 @@ const AddNewInterval = () => {
            similarly to how this component's other state variables are used
   */
 
-  const onChange = (e) => {
+  const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
   }
 
-  const onSubmit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
 
-    dispatch(createInterval(goalId, startTimestamp, finalTimestamp))
-      .then(() => dispatch(displayAlertTemporarily('NEW INTERVAL ADDED')))
-      .then(() => setToIntervalsOverview(true))
-      .catch((actionError) => dispatch(displayAlertTemporarily(actionError)))
+    try {
+      await dispatch(createInterval(goalId, startTimestamp, finalTimestamp))
+      dispatch(displayAlertTemporarily('NEW INTERVAL ADDED'))
+      setToIntervalsOverview(true)
+    } catch (actionError) {
+      dispatch(displayAlertTemporarily(actionError))
+    }
   }
 
   const goalOptions = goalIds.map((gId) => (
@@ -87,9 +92,9 @@ const AddNewInterval = () => {
   return (
     <Fragment>
       [AddNewInterval]
-      <form onSubmit={(e) => onSubmit(e)}>
+      <form onSubmit={(e) => handleSubmit(e)}>
         <h3>Select the goal that you have worked on</h3>
-        <select name="goalId" value={goalId} onChange={onChange}>
+        <select name="goalId" value={goalId} onChange={handleChange}>
           <option value="0"></option>
           {goalOptions}
         </select>
@@ -99,7 +104,7 @@ const AddNewInterval = () => {
           placeholder="YYYY-MM-DD HH:MM"
           name="startTimestamp"
           value={startTimestamp}
-          onChange={onChange}
+          onChange={handleChange}
         />
         <h3>Enter the final timestamp (in GMT)</h3>
         <input
@@ -107,7 +112,7 @@ const AddNewInterval = () => {
           placeholder="YYYY-MM-DD HH:MM"
           name="finalTimestamp"
           value={finalTimestamp}
-          onChange={onChange}
+          onChange={handleChange}
         />
         <hr />
         <input type="submit" value="Add interval" />

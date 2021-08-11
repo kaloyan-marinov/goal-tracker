@@ -21,20 +21,22 @@ const Login = () => {
 
   const { email, password } = formData
 
-  const onChange = (e) => {
+  const handleChange = (e) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
     })
   }
 
-  const onSubmit = async (e) => {
-    // TODO: identify the commit where the `async` should have _first_ been added to the previous line, and add it there
+  const handleSubmit = async (e) => {
     e.preventDefault()
 
-    dispatch(issueJWSToken(email, password))
-      .then(() => dispatch(fetchUser()))
-      .catch(() => dispatch(displayAlertTemporarily('AUTHENTICATION FAILED')))
+    try {
+      await dispatch(issueJWSToken(email, password))
+      await dispatch(fetchUser())
+    } catch (err) {
+      dispatch(displayAlertTemporarily('AUTHENTICATION FAILED'))
+    }
   }
 
   if (isAuthenticated) {
@@ -47,14 +49,14 @@ const Login = () => {
   return (
     <Fragment>
       <h1>Login</h1>
-      <form onSubmit={(e) => onSubmit(e)}>
+      <form onSubmit={(e) => handleSubmit(e)}>
         <div>
           <input
             type="email"
             placeholder="Enter email"
             name="email"
             value={email}
-            onChange={(e) => onChange(e)}
+            onChange={(e) => handleChange(e)}
             // required // disabled temporarily, to test the server side
           />
         </div>
@@ -64,7 +66,7 @@ const Login = () => {
             placeholder="Enter password"
             name="password"
             value={password}
-            onChange={(e) => onChange(e)}
+            onChange={(e) => handleChange(e)}
           />
         </div>
         <input type="submit" value="Login" />
