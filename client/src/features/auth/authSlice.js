@@ -43,9 +43,6 @@ export default function authReducer(state = initialStateAuth, action) {
     case 'auth/issueJWSToken/fulfilled': {
       const token = action.payload
 
-      /* TODO: rectify this as part of g-t-i-34 */
-      localStorage.setItem('goal-tracker-token', token)
-
       return {
         ...state,
         requestStatus: 'succeeded',
@@ -199,6 +196,7 @@ export const issueJWSToken = (email, password) => async (dispatch) => {
     console.log('issuing the following request: POST /api/v1.0/tokens')
 
     const response = await axios.post('/api/v1.0/tokens', body, config)
+    localStorage.setItem('goal-tracker-token', response.data.token)
     dispatch(issueJWSTokenFulfilled(response.data.token))
     return Promise.resolve()
   } catch (err) {
