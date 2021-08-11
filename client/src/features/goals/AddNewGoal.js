@@ -6,6 +6,8 @@ import { displayAlertTemporarily } from '../alerts/alertsSlice'
 import { Redirect } from 'react-router-dom'
 
 const AddNewGoal = () => {
+  console.log(`${new Date().toISOString()} - React is rendering <AddNewGoal>`)
+
   const dispatch = useDispatch()
   const [description, setDescription] = useState('')
   const [toGoalsOverview, setToGoalsOverview] = useState(false)
@@ -24,7 +26,10 @@ const AddNewGoal = () => {
 
     figure out how to avoid sending that request
     */
-    return <Redirect to="/goals-overview" />
+    const nextUrl = '/goals-overview'
+    console.log(`    toGoalsOverview: ${toGoalsOverview}`)
+    console.log(`    >> re-directing to ${nextUrl}`)
+    return <Redirect to={nextUrl} />
   }
 
   const onChange = (e) => {

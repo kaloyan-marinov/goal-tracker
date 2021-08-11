@@ -11,9 +11,15 @@ import { Fragment } from 'react'
 import { Link } from 'react-router-dom'
 
 const IntervalsOverview = () => {
+  console.log(
+    `${new Date().toISOString()} - React is rendering <IntervalsOverview>`
+  )
+
   const dispatch = useDispatch()
 
   useEffect(() => {
+    console.log('    <IntervalsOverview> is running its effect function')
+
     /* TODO: [identical to the TODO, which is within the useEffect() call in
              <GoalsOverview>]
     
@@ -65,14 +71,16 @@ const IntervalsOverview = () => {
         </div>
         <br />
         <table border="1">
-          <tr>
-            <th>[Column-1]</th>
-            <th>[Column-2]</th>
-            <th>Start</th>
-            <th>End</th>
-            <th>Goal Description</th>
-          </tr>
-          {intervalTableRows}
+          <thead>
+            <tr>
+              <th>[Column-1]</th>
+              <th>[Column-2]</th>
+              <th>Start</th>
+              <th>End</th>
+              <th>Goal Description</th>
+            </tr>
+          </thead>
+          <tbody>{intervalTableRows}</tbody>
         </table>
       </div>
     </Fragment>

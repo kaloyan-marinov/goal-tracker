@@ -10,9 +10,15 @@ import { selectGoalIds, selectGoalEntities } from './goalsSlice'
 import { displayAlertTemporarily } from '../alerts/alertsSlice'
 
 const GoalsOverview = () => {
+  console.log(
+    `${new Date().toISOString()} - React is rendering <GoalsOverview>`
+  )
+
   const dispatch = useDispatch()
 
   useEffect(() => {
+    console.log('    <GoalsOverview> is running its effect function')
+
     /* TODO: consider the commit immediately before this function was implemented in its
              present form; there was an issue with that commit; the issue could be
              demonstrated by using the UI in the following way:
@@ -82,12 +88,14 @@ const GoalsOverview = () => {
         </div>
         <br />
         <table border="1">
-          <tr>
-            <th>[Column-1]</th>
-            <th>[Column-2]</th>
-            <th>Description</th>
-          </tr>
-          {goalTableRows}
+          <thead>
+            <tr>
+              <th>[Column-1]</th>
+              <th>[Column-2]</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>{goalTableRows}</tbody>
         </table>
       </div>
     </Fragment>

@@ -1,14 +1,18 @@
 import axios from 'axios'
 
-const initialState = {
+export const initialStateIntervals = {
   requestStatus: 'idle', // or: 'loading', 'succeeded', 'failed'
   requestError: null,
   ids: [],
   entities: {},
 }
 
-export default function intervalsReducer(state = initialState, action) {
+export default function intervalsReducer(
+  state = initialStateIntervals,
+  action
+) {
   switch (action.type) {
+    /* TODO: rectify this as part of g-t-i-37 */
     case 'intervals/createInterval/pending': {
       return {
         ...state,
@@ -42,6 +46,7 @@ export default function intervalsReducer(state = initialState, action) {
       }
     } /* end: intervals/createInterval/rejected */
 
+    /* TODO: rectify this as part of g-t-i-37 */
     case 'intervals/fetchIntervals/pending': {
       return {
         ...state,
@@ -58,6 +63,7 @@ export default function intervalsReducer(state = initialState, action) {
         return intervalsObj
       }, {})
 
+      /* TODO: rectify this as part of g-t-i-37 */
       return {
         ...state,
         requestStatus: 'fulfilled',
@@ -76,10 +82,11 @@ export default function intervalsReducer(state = initialState, action) {
     }
 
     case 'intervals/reinitializeIntervalsSlice': {
-      return initialState
+      return initialStateIntervals
     } /* end: intervals/reinitializeIntervalsSlice */
 
     case 'intervals/editInterval/pending': {
+      /* TODO: rectify this as part of g-t-i-37 */
       return {
         ...state,
         requestStatus: 'pending',
@@ -87,6 +94,7 @@ export default function intervalsReducer(state = initialState, action) {
     } /* end: intervals/editInterval/pending */
 
     case 'intervals/editInterval/fulfilled': {
+      /* TODO: rectify this as part of g-t-i-38 */
       return {
         ...state,
         requestStatus: 'succeeded',
@@ -103,6 +111,7 @@ export default function intervalsReducer(state = initialState, action) {
     } /* end: intervals/editInterval/rejected */
 
     case 'intervals/deleteInterval/pending': {
+      /* TODO: rectify this as part of g-t-i-37 */
       return {
         ...state,
         requestStatus: 'pending',
@@ -110,6 +119,7 @@ export default function intervalsReducer(state = initialState, action) {
     } /* end: intervals/deleteInterval/pending */
 
     case 'intervals/deleteInterval/fulfilled': {
+      /* TODO: rectify this as part of g-t-i-38 */
       return {
         ...state,
         requestStatus: 'succeeded',
@@ -131,30 +141,30 @@ export default function intervalsReducer(state = initialState, action) {
 }
 
 /* Action creator functions */
-const createIntervalPending = () => ({
+export const createIntervalPending = () => ({
   type: 'intervals/createInterval/pending',
 })
 
-const createIntervalFulfilled = (interval) => ({
+export const createIntervalFulfilled = (interval) => ({
   type: 'intervals/createInterval/fulfilled',
   payload: interval,
 })
 
-const createIntervalRejected = (error) => ({
+export const createIntervalRejected = (error) => ({
   type: 'intervals/createInterval/rejected',
   error,
 })
 
-const fetchIntervalsPending = () => ({
+export const fetchIntervalsPending = () => ({
   type: 'intervals/fetchIntervals/pending',
 })
 
-const fetchIntervalsFulfilled = (intervals) => ({
+export const fetchIntervalsFulfilled = (intervals) => ({
   type: 'intervals/fetchIntervals/fulfilled',
   payload: intervals,
 })
 
-const fetchIntervalsRejected = (error) => ({
+export const fetchIntervalsRejected = (error) => ({
   type: 'intervals/fetchIntervals/rejected',
   error,
 })
@@ -163,35 +173,35 @@ export const reinitializeIntervalsSlice = () => ({
   type: 'intervals/reinitializeIntervalsSlice',
 })
 
-const editIntervalPending = () => ({
+export const editIntervalPending = () => ({
   type: 'intervals/editInterval/pending',
 })
 
-const editIntervalFulfilled = (interval) => ({
+export const editIntervalFulfilled = (interval) => ({
   type: 'intervals/editInterval/fulfilled',
   payload: interval,
 })
 
-const editIntervalRejected = (error) => ({
+export const editIntervalRejected = (error) => ({
   type: 'intervals/editInterval/rejected',
   error,
 })
 
-const deleteIntervalPending = () => ({
+export const deleteIntervalPending = () => ({
   type: 'intervals/deleteInterval/pending',
 })
 
-const deleteIntervalFulfilled = (intervalId) => ({
+export const deleteIntervalFulfilled = (intervalId) => ({
   type: 'intervals/deleteInterval/fulfilled',
   payload: intervalId,
 })
 
-const deleteIntervalRejected = (error) => ({
+export const deleteIntervalRejected = (error) => ({
   type: 'intervals/deleteInterval/rejected',
   error,
 })
 
-/* "Thunk action creator" functions */
+/* Thunk-action creator functions */
 export const createInterval =
   (goalId, startTimestamp, finalTimestamp) => async (dispatch) => {
     const body = {
@@ -210,6 +220,8 @@ export const createInterval =
 
     dispatch(createIntervalPending())
     try {
+      console.log(`issuing the following request: POST /api/v1.0/intervals`)
+
       const response = await axios.post('/api/v1.0/intervals', body, config)
       dispatch(createIntervalFulfilled(response.data))
       return Promise.resolve()
@@ -232,6 +244,8 @@ export const fetchIntervals = () => async (dispatch) => {
 
   dispatch(fetchIntervalsPending())
   try {
+    console.log(`issuing the following request: GET /api/v1.0/intervals`)
+
     const response = await axios.get('/api/v1.0/intervals', config)
     dispatch(fetchIntervalsFulfilled(response.data.intervals))
     return Promise.resolve()
@@ -261,6 +275,10 @@ export const editInterval =
 
     dispatch(editIntervalPending())
     try {
+      console.log(
+        `issuing the following request: PUT /api/v1.0/intervals/${intervalId}`
+      )
+
       const response = await axios.put(
         `/api/v1.0/intervals/${intervalId}`,
         body,
@@ -287,6 +305,10 @@ export const deleteInterval = (intervalId) => async (dispatch) => {
 
   dispatch(deleteIntervalPending())
   try {
+    console.log(
+      `issuing the following request: DELETE /api/v1.0/intervals/${intervalId}`
+    )
+
     const response = await axios.delete(
       `/api/v1.0/intervals/${intervalId}`,
       config

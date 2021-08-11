@@ -2,6 +2,8 @@
 import { useSelector } from 'react-redux'
 
 const Alert = () => {
+  console.log(`${new Date().toISOString()} - React is rendering <Alert>`)
+
   const alerts = useSelector((state) => state.alerts.entities)
   /*
   TODO: find the commit that added the previous instruction,

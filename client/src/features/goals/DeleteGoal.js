@@ -9,6 +9,8 @@ import { deleteGoal } from './goalsSlice'
 import { displayAlertTemporarily } from '../alerts/alertsSlice'
 
 const DeleteGoal = (props) => {
+  console.log(`${new Date().toISOString()} - React is rendering <DeleteGoal>`)
+
   const dispatch = useDispatch()
 
   const goalId = props.match.params.id
@@ -17,7 +19,14 @@ const DeleteGoal = (props) => {
   const [toGoalsOverview, setToGoalsOverview] = useState(false)
 
   if (toGoalsOverview || goal === undefined) {
-    return <Redirect to="/goals-overview" />
+    const nextUrl = '/goals-overview'
+    console.log(
+      `    toGoalsOverview || goal === undefined: ${
+        toGoalsOverview || goal === undefined
+      }`
+    )
+    console.log(`    >> re-directing to ${nextUrl}`)
+    return <Redirect to={nextUrl} />
   }
 
   const onClickYes = () => {

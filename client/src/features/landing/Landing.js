@@ -4,10 +4,15 @@ import { selectIsAuthenticated } from '../auth/authSlice'
 import { Redirect } from 'react-router-dom'
 
 const Landing = () => {
+  console.log(`${new Date().toISOString()} - React is rendering <Landing>`)
+
   const isAuthenticated = useSelector(selectIsAuthenticated)
 
   if (isAuthenticated) {
-    return <Redirect to="/dashboard" />
+    const nextUrl = '/dashboard'
+    console.log(`    isAuthenticated: ${isAuthenticated}`)
+    console.log(`    >> re-directing to ${nextUrl}`)
+    return <Redirect to={nextUrl} />
   }
 
   return (

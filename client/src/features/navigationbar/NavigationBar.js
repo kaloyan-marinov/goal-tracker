@@ -11,9 +11,16 @@ import { reinitializeGoalsSlice } from '../goals/goalsSlice'
 import { reinitializeIntervalsSlice } from '../intervals/intervalsSlice'
 
 const NavigationBar = () => {
+  console.log(
+    `${new Date().toISOString()} - React is rendering <NavigationBar>`
+  )
+
   const dispatch = useDispatch()
   const requestStatus = useSelector(selectRequestStatus)
   const isAuthenticated = useSelector(selectIsAuthenticated)
+
+  console.log(`    requestStatus: ${requestStatus}`)
+  console.log(`    isAuthenticated: ${isAuthenticated}`)
 
   const onClick = () => {
     dispatch(logout())

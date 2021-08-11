@@ -1,13 +1,13 @@
 import axios from 'axios'
 
-const initialState = {
+export const initialStateGoals = {
   requestStatus: 'idle', // or: 'loading', 'succeeded', 'failed'
   requestError: null,
   ids: [],
   entities: {},
 }
 
-export default function goalsReducer(state = initialState, action) {
+export default function goalsReducer(state = initialStateGoals, action) {
   switch (action.type) {
     case 'goals/createGoal/pending': {
       return {
@@ -76,7 +76,7 @@ export default function goalsReducer(state = initialState, action) {
     } /* end: goals/fetchGoals/rejected */
 
     case 'goals/reinitializeGoalsSlice': {
-      return initialState
+      return initialStateGoals
     } /* end: goals/reinitializeGoalsSlice */
 
     case 'goals/editGoal/pending': {
@@ -111,6 +111,7 @@ export default function goalsReducer(state = initialState, action) {
     } /* end: goals/editGoal/rejected */
 
     case 'goals/deleteGoal/pending': {
+      /* TODO: rectify this as part of g-t-i-37 */
       return {
         ...state,
         requestStatus: 'pending',
@@ -148,30 +149,30 @@ export default function goalsReducer(state = initialState, action) {
 }
 
 /* Action creator functions */
-const createGoalPending = () => ({
+export const createGoalPending = () => ({
   type: 'goals/createGoal/pending',
 })
 
-const createGoalFulfilled = (goal) => ({
+export const createGoalFulfilled = (goal) => ({
   type: 'goals/createGoal/fulfilled',
   payload: goal,
 })
 
-const createGoalRejected = (error) => ({
+export const createGoalRejected = (error) => ({
   type: 'goals/createGoal/rejected',
   error,
 })
 
-const fetchGoalsPending = () => ({
+export const fetchGoalsPending = () => ({
   type: 'goals/fetchGoals/pending',
 })
 
-const fetchGoalsFulfilled = (goals) => ({
+export const fetchGoalsFulfilled = (goals) => ({
   type: 'goals/fetchGoals/fulfilled',
   payload: goals,
 })
 
-const fetchGoalsRejected = (error) => ({
+export const fetchGoalsRejected = (error) => ({
   type: 'goals/fetchGoals/rejected',
   error,
 })
@@ -180,35 +181,35 @@ export const reinitializeGoalsSlice = () => ({
   type: 'goals/reinitializeGoalsSlice',
 })
 
-const editGoalPending = () => ({
+export const editGoalPending = () => ({
   type: 'goals/editGoal/pending',
 })
 
-const editGoalFulfilled = (editedGoal) => ({
+export const editGoalFulfilled = (editedGoal) => ({
   type: 'goals/editGoal/fulfilled',
   payload: editedGoal,
 })
 
-const editGoalRejected = (error) => ({
+export const editGoalRejected = (error) => ({
   type: 'goals/editGoal/rejected',
   error,
 })
 
-const deleteGoalPending = () => ({
+export const deleteGoalPending = () => ({
   type: 'goals/deleteGoal/pending',
 })
 
-const deleteGoalFulfilled = (goalId) => ({
+export const deleteGoalFulfilled = (goalId) => ({
   type: 'goals/deleteGoal/fulfilled',
   payload: goalId,
 })
 
-const deleteGoalRejected = (error) => ({
+export const deleteGoalRejected = (error) => ({
   type: 'goals/deleteGoal/rejected',
   error,
 })
 
-/* "Thunk action creator" functions */
+/* Thunk-action creator functions */
 export const createGoal = (description) => async (dispatch) => {
   const body = { description }
 
@@ -222,6 +223,8 @@ export const createGoal = (description) => async (dispatch) => {
 
   dispatch(createGoalPending())
   try {
+    console.log('issuing the following request: POST /api/v1.0/goals')
+
     const response = await axios.post('/api/v1.0/goals', body, config)
     dispatch(createGoalFulfilled(response.data))
     return Promise.resolve()
@@ -244,6 +247,8 @@ export const fetchGoals = () => async (dispatch) => {
 
   dispatch(fetchGoalsPending())
   try {
+    console.log('issuing the following request: GET /api/v1.0/goals')
+
     const response = await axios.get('/api/v1.0/goals', config)
     dispatch(fetchGoalsFulfilled(response.data.goals))
     return Promise.resolve()
@@ -268,6 +273,8 @@ export const editGoal = (id, newDescription) => async (dispatch) => {
 
   dispatch(editGoalPending())
   try {
+    console.log(`issuing the following request: PUT /api/v1.0/goals/${id}`)
+
     const response = await axios.put(`/api/v1.0/goals/${id}`, body, config)
     dispatch(editGoalFulfilled(response.data))
     return Promise.resolve()
@@ -290,6 +297,10 @@ export const deleteGoal = (goalId) => async (dispatch) => {
 
   dispatch(deleteGoalPending())
   try {
+    console.log(
+      `issuing the following request: DELETE /api/v1.0/goals/${goalId}`
+    )
+
     const response = await axios.delete(`/api/v1.0/goals/${goalId}`, config)
     dispatch(deleteGoalFulfilled(goalId))
     return Promise.resolve()

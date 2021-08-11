@@ -10,6 +10,10 @@ import { Redirect } from 'react-router-dom'
 import { createInterval } from './intervalsSlice'
 
 const AddNewInterval = () => {
+  console.log(
+    `${new Date().toISOString()} - React is rendering <AddNewInterval>`
+  )
+
   /* TODO: add logic for validating the data entered into the input fields
    */
   const dispatch = useDispatch()
@@ -21,6 +25,8 @@ const AddNewInterval = () => {
            following call of useEffect
   */
   useEffect(() => {
+    console.log('    <AddNewInterval> is running its effect function')
+
     const promise = dispatch(fetchGoals())
     return promise
       .then(() => {})
@@ -35,7 +41,10 @@ const AddNewInterval = () => {
   const [toIntervalsOverview, setToIntervalsOverview] = useState(false)
 
   if (toIntervalsOverview) {
-    return <Redirect to="/intervals-overview" />
+    const nextUrl = '/intervals-overview'
+    console.log(`    toIntervalsOverview: ${toIntervalsOverview}`)
+    console.log(`    >> re-directing to ${nextUrl}`)
+    return <Redirect to={nextUrl} />
   }
 
   const { goalId, startTimestamp, finalTimestamp } = formData
