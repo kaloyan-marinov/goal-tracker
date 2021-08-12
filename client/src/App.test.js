@@ -485,7 +485,9 @@ describe('<App> + mocking of HTTP requests', () => {
       /* Assert. */
       let element
 
-      element = await screen.findByText('FAILED TO FETCH GOALS')
+      element = await screen.findByText(
+        "[FROM <GoalsOverview>'s useEffect HOOK] FAILED TO FETCH GOALS - PLEASE LOG BACK IN"
+      )
       expect(element).toBeInTheDocument()
     }
   )

@@ -225,10 +225,10 @@ export const fetchUser = () => async (dispatch) => {
     dispatch(fetchUserFulfilled(response.data))
     return Promise.resolve()
   } catch (err) {
-    const errorPayload = err.response.data
-    const actionError = errorPayload.error || 'ERROR NOT FROM BACKEND'
-    dispatch(fetchUserRejected(actionError))
-    return Promise.reject(actionError)
+    const responseBodyError =
+      err.response.data.error || 'ERROR NOT FROM BACKEND'
+    dispatch(fetchUserRejected(responseBodyError))
+    return Promise.reject(err)
   }
 }
 

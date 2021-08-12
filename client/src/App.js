@@ -9,7 +9,7 @@ import './App.css'
 import Alert from './features/alerts/Alert'
 import { useDispatch } from 'react-redux'
 import { useEffect } from 'react'
-import { fetchUser } from './features/auth/authSlice'
+import { fetchUser, logout } from './features/auth/authSlice'
 import Dashboard from './features/dashboard/Dashboard'
 import PrivateRoute from './features/auth/PrivateRoute'
 import GoalsOverview from './features/goals/GoalsOverview'
@@ -20,6 +20,7 @@ import IntervalsOverview from './features/intervals/IntervalsOverview'
 import AddNewInterval from './features/intervals/AddNewInterval'
 import EditInterval from './features/intervals/EditInterval'
 import DeleteInterval from './features/intervals/DeleteInterval'
+import { displayAlertTemporarily } from './features/alerts/alertsSlice'
 
 const App = () => {
   console.log(`${new Date().toISOString()} - React is rendering <App>`)
@@ -34,9 +35,23 @@ const App = () => {
 
       try {
         await dispatch(fetchUser())
-        console.log('    the promise has resolved')
       } catch (err) {
-        console.log('    the promise has rejected')
+        let alertMessage
+
+        if (err.response.status === 401) {
+          dispatch(logout())
+          alertMessage = 'PLEASE REGISTER OR LOG IN'
+        } else {
+          alertMessage =
+            err.response.data.message ||
+            'ERROR NOT FROM BACKEND BUT FROM FRONTEND THUNK-ACTION'
+        }
+
+        dispatch(
+          displayAlertTemporarily(
+            "[FROM <App>'s useEffect HOOK] " + alertMessage
+          )
+        )
       }
     }
 
