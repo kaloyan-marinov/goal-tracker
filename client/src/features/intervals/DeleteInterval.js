@@ -18,16 +18,19 @@ const DeleteInterval = (props) => {
 
   const intervalId = props.match.params.id
   const interval = useSelector(selectIntervalEntities)[intervalId]
-  const goal = useSelector(selectGoalEntities)[interval.goal_id]
-
   console.log(`    interval: ${JSON.stringify(interval)}`)
+
+  const isIntervalUndefined = interval === undefined
+  const goalId = isIntervalUndefined === true ? '-1' : interval.goal_id
+  const goal = useSelector(selectGoalEntities)[goalId]
   console.log(`    goal: ${JSON.stringify(goal)}`)
 
-  const [toIntervalsOverview, setToIntervalsOverview] = useState(false)
+  const [toIntervalsOverview, setToIntervalsOverview] =
+    useState(isIntervalUndefined)
 
-  if (toIntervalsOverview) {
+  if (isIntervalUndefined || toIntervalsOverview) {
     const nextUrl = '/intervals-overview'
-    console.log(`    toIntervalsOverview: ${toIntervalsOverview}`)
+    console.log(`    isIntervalUndefined: ${isIntervalUndefined}`)
     console.log(`    >> re-directing to ${nextUrl}`)
     return <Redirect to={nextUrl} />
   }
@@ -36,7 +39,6 @@ const DeleteInterval = (props) => {
     try {
       await dispatch(deleteInterval(interval.id))
       dispatch(displayAlertTemporarily('INTERVAL SUCCESSFULLY DELETED'))
-      setToIntervalsOverview(true)
     } catch (err) {
       dispatch(
         displayAlertTemporarily('FAILED TO DELETE THE SELECTED INTERVAL')
