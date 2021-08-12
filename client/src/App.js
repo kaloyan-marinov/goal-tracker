@@ -21,6 +21,8 @@ import AddNewInterval from './features/intervals/AddNewInterval'
 import EditInterval from './features/intervals/EditInterval'
 import DeleteInterval from './features/intervals/DeleteInterval'
 import { displayAlertTemporarily } from './features/alerts/alertsSlice'
+import { reinitializeGoalsSlice } from './features/goals/goalsSlice'
+import { reinitializeIntervalsSlice } from './features/intervals/intervalsSlice'
 
 const App = () => {
   console.log(`${new Date().toISOString()} - React is rendering <App>`)
@@ -40,6 +42,8 @@ const App = () => {
 
         if (err.response.status === 401) {
           dispatch(logout())
+          dispatch(reinitializeGoalsSlice())
+          dispatch(reinitializeIntervalsSlice())
           alertMessage = 'PLEASE REGISTER OR LOG IN'
         } else {
           alertMessage =

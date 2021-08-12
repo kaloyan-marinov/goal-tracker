@@ -3,8 +3,11 @@ import { Fragment } from 'react'
 import { Link } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
 import { useEffect } from 'react'
-import { fetchGoals } from './goalsSlice'
-import { fetchIntervals } from '../intervals/intervalsSlice'
+import { fetchGoals, reinitializeGoalsSlice } from './goalsSlice'
+import {
+  fetchIntervals,
+  reinitializeIntervalsSlice,
+} from '../intervals/intervalsSlice'
 import { useSelector } from 'react-redux'
 import { selectGoalIds, selectGoalEntities } from './goalsSlice'
 import { displayAlertTemporarily } from '../alerts/alertsSlice'
@@ -36,6 +39,8 @@ const GoalsOverview = () => {
 
         if (err.response.status === 401) {
           dispatch(logout())
+          dispatch(reinitializeGoalsSlice())
+          dispatch(reinitializeIntervalsSlice())
           alertMessage = 'FAILED TO FETCH GOALS - PLEASE LOG BACK IN'
         } else {
           alertMessage =
@@ -60,6 +65,8 @@ const GoalsOverview = () => {
 
         if (err.response.status === 401) {
           dispatch(logout())
+          dispatch(reinitializeGoalsSlice())
+          dispatch(reinitializeIntervalsSlice())
           alertMessage = 'FAILED TO FETCH INTERVALS - PLEASE LOG BACK IN'
         } else {
           alertMessage =
