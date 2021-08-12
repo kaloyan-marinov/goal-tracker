@@ -542,13 +542,13 @@ describe('thunk-action creators', () => {
     const fetchIntervalsPromise = storeMock.dispatch(fetchIntervals())
 
     await expect(fetchIntervalsPromise).rejects.toEqual(
-      'mocked-authentication required'
+      new Error('Request failed with status code 401')
     )
     expect(storeMock.getActions()).toEqual([
       { type: 'intervals/fetchIntervals/pending' },
       {
         type: 'intervals/fetchIntervals/rejected',
-        error: 'mocked-authentication required',
+        error: 'mocked-Unauthorized',
       },
     ])
   })
