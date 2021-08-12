@@ -416,6 +416,7 @@ describe('slice reducer', () => {
     }
     const action = {
       type: 'intervals/deleteInterval/fulfilled',
+      payload: MOCK_INTERVAL_200.id,
     }
 
     const newSt = intervalsReducer(initStIntervals, action)
@@ -423,10 +424,8 @@ describe('slice reducer', () => {
     expect(newSt).toEqual({
       requestStatus: 'succeeded',
       requestError: null,
-      ids: [MOCK_INTERVAL_200.id],
-      entities: {
-        [MOCK_INTERVAL_200.id]: MOCK_INTERVAL_200,
-      },
+      ids: [],
+      entities: {},
     })
   })
 

@@ -30,6 +30,9 @@ const IntervalsOverview = () => {
       } catch (err) {
         let alertMessage
 
+        console.log('inspecting err', err)
+        console.log(err)
+
         if (err.response.status === 401) {
           dispatch(logout())
           dispatch(reinitializeGoalsSlice())

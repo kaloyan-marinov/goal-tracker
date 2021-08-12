@@ -119,11 +119,19 @@ export default function intervalsReducer(
     } /* end: intervals/deleteInterval/pending */
 
     case 'intervals/deleteInterval/fulfilled': {
-      /* TODO: rectify this as part of g-t-i-38 */
+      const idOfDeletedInterval = action.payload
+
+      const remainingIds = state.ids.filter((id) => id !== idOfDeletedInterval)
+
+      const remainingEntities = { ...state.entities }
+      delete remainingEntities[idOfDeletedInterval]
+
       return {
         ...state,
         requestStatus: 'succeeded',
         requestError: null,
+        ids: remainingIds,
+        entities: remainingEntities,
       } /* end: intervals/deleteInterval/fulfilled */
     }
 
