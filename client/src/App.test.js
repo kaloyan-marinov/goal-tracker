@@ -1126,7 +1126,9 @@ describe('<App> + mocking of HTTP requests', () => {
       /* Assert. */
       let element
 
-      element = await screen.findByText('FAILED TO FETCH INTERVALS')
+      element = await screen.findByText(
+        "[FROM <IntervalsOverview>'s useEffect HOOK] FAILED TO FETCH INTERVALS - PLEASE LOG BACK IN"
+      )
       expect(element).toBeInTheDocument()
     }
   )

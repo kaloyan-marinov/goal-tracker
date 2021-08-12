@@ -54,7 +54,24 @@ const IntervalsOverview = () => {
       try {
         await dispatch(fetchIntervals())
       } catch (err) {
-        dispatch(displayAlertTemporarily('FAILED TO FETCH INTERVALS'))
+        let alertMessage
+
+        if (err.response.status === 401) {
+          dispatch(logout())
+          dispatch(reinitializeGoalsSlice())
+          dispatch(reinitializeIntervalsSlice())
+          alertMessage = 'FAILED TO FETCH INTERVALS - PLEASE LOG BACK IN'
+        } else {
+          alertMessage =
+            err.response.data.message ||
+            'ERROR NOT FROM BACKEND BUT FROM FRONTEND THUNK-ACTION'
+        }
+
+        dispatch(
+          displayAlertTemporarily(
+            "[FROM <IntervalsOverview>'s useEffect HOOK] " + alertMessage
+          )
+        )
       }
     }
 
