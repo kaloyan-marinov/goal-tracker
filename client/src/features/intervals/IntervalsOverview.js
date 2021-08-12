@@ -1,14 +1,15 @@
 // import React from 'react'
 import { useDispatch } from 'react-redux'
 import { useEffect } from 'react'
-import { fetchGoals } from '../goals/goalsSlice'
-import { fetchIntervals } from './intervalsSlice'
+import { fetchGoals, reinitializeGoalsSlice } from '../goals/goalsSlice'
+import { fetchIntervals, reinitializeIntervalsSlice } from './intervalsSlice'
 import { displayAlertTemporarily } from '../alerts/alertsSlice'
 import { useSelector } from 'react-redux'
 import { selectGoalEntities } from '../goals/goalsSlice'
 import { selectIntervalIds, selectIntervalEntities } from './intervalsSlice'
 import { Fragment } from 'react'
 import { Link } from 'react-router-dom'
+import { logout } from '../auth/authSlice'
 
 const IntervalsOverview = () => {
   console.log(
@@ -27,7 +28,24 @@ const IntervalsOverview = () => {
       try {
         await dispatch(fetchGoals())
       } catch (err) {
-        dispatch(displayAlertTemporarily('FAILED TO FETCH GOALS'))
+        let alertMessage
+
+        if (err.response.status === 401) {
+          dispatch(logout())
+          dispatch(reinitializeGoalsSlice())
+          dispatch(reinitializeIntervalsSlice())
+          alertMessage = 'FAILED TO FETCH GOALS - PLEASE LOG BACK IN'
+        } else {
+          alertMessage =
+            err.response.data.message ||
+            'ERROR NOT FROM BACKEND BUT FROM FRONTEND THUNK-ACTION'
+        }
+
+        dispatch(
+          displayAlertTemporarily(
+            "[FROM <IntervalsOverview>'s useEffect HOOK] " + alertMessage
+          )
+        )
       }
 
       console.log(

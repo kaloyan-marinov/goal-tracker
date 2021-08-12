@@ -18,13 +18,9 @@ const DeleteGoal = (props) => {
 
   const [toGoalsOverview, setToGoalsOverview] = useState(false)
 
-  if (toGoalsOverview || goal === undefined) {
+  if (goal === undefined || toGoalsOverview) {
     const nextUrl = '/goals-overview'
-    console.log(
-      `    toGoalsOverview || goal === undefined: ${
-        toGoalsOverview || goal === undefined
-      }`
-    )
+    console.log(`    goal === undefined || toGoalsOverview: true`)
     console.log(`    >> re-directing to ${nextUrl}`)
     return <Redirect to={nextUrl} />
   }
