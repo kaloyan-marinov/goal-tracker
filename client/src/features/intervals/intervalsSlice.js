@@ -234,10 +234,11 @@ export const createInterval =
       dispatch(createIntervalFulfilled(response.data))
       return Promise.resolve()
     } catch (err) {
-      const errorPayload = err.response.data
-      const actionError = errorPayload.message || 'ERROR NOT FROM BACKEND'
-      dispatch(createIntervalRejected(actionError))
-      return Promise.reject(actionError)
+      const responseBodyError =
+        err.response.data.error ||
+        'ERROR NOT FROM BACKEND BUT FROM FRONTEND THUNK-ACTION'
+      dispatch(createIntervalRejected(responseBodyError))
+      return Promise.reject(err)
     }
   }
 

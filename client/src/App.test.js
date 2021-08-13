@@ -1362,8 +1362,12 @@ describe('<App> + mocking of HTTP requests', () => {
       fireEvent.click(addIntervalButton)
 
       /* Assert. */
-      const element = await screen.findByText('mocked-authentication required')
+      const element = await screen.findByText(
+        '[FROM <AddNewInterval>] FAILED TO ADD A NEW INTERVAL - PLEASE LOG BACK IN'
+      )
       expect(element).toBeInTheDocument()
+
+      expect(history.location.pathname).toEqual('/login')
     }
   )
 

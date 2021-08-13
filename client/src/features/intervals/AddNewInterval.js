@@ -3,11 +3,16 @@ import { Fragment } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useState } from 'react'
 import { displayAlertTemporarily } from '../alerts/alertsSlice'
-import { selectGoalIds, selectGoalEntities } from '../goals/goalsSlice'
+import {
+  selectGoalIds,
+  selectGoalEntities,
+  reinitializeGoalsSlice,
+} from '../goals/goalsSlice'
 import { useEffect } from 'react'
 import { fetchGoals } from '../goals/goalsSlice'
 import { Redirect } from 'react-router-dom'
-import { createInterval } from './intervalsSlice'
+import { createInterval, reinitializeIntervalsSlice } from './intervalsSlice'
+import { logout } from '../auth/authSlice'
 
 const AddNewInterval = () => {
   console.log(
@@ -78,8 +83,23 @@ const AddNewInterval = () => {
       await dispatch(createInterval(goalId, startTimestamp, finalTimestamp))
       dispatch(displayAlertTemporarily('NEW INTERVAL ADDED'))
       setToIntervalsOverview(true)
-    } catch (actionError) {
-      dispatch(displayAlertTemporarily(actionError))
+    } catch (err) {
+      let alertMessage
+
+      if (err.response.status === 401) {
+        dispatch(logout())
+        dispatch(reinitializeGoalsSlice())
+        dispatch(reinitializeIntervalsSlice())
+        alertMessage = 'FAILED TO ADD A NEW INTERVAL - PLEASE LOG BACK IN'
+      } else {
+        alertMessage =
+          err.response.data.message ||
+          'ERROR NOT FROM BACKEND BUT FROM FRONTEND THUNK-ACTION'
+      }
+
+      dispatch(
+        displayAlertTemporarily('[FROM <AddNewInterval>] ' + alertMessage)
+      )
     }
   }
 
