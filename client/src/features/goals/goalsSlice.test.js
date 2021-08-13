@@ -534,13 +534,13 @@ describe('thunk-action creators', () => {
     )
 
     await expect(createGoalPromise).rejects.toEqual(
-      'mocked-authentication required'
+      new Error('Request failed with status code 401')
     )
     expect(storeMock.getActions()).toEqual([
       { type: 'goals/createGoal/pending' },
       {
         type: 'goals/createGoal/rejected',
-        error: 'mocked-authentication required',
+        error: 'mocked-Unauthorized',
       },
     ])
   })

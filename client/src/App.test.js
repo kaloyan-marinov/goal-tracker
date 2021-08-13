@@ -641,7 +641,9 @@ describe('<App> + mocking of HTTP requests', () => {
       fireEvent.click(addGoalButton)
 
       /* Assert. */
-      const element = await screen.findByText('FAILED TO ADD A NEW GOAL')
+      const element = await screen.findByText(
+        '[FROM <AddNewGoal>] FAILED TO ADD A NEW GOAL - PLEASE LOG BACK IN'
+      )
       expect(element).toBeInTheDocument()
     }
   )

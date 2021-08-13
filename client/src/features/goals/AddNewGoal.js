@@ -1,9 +1,11 @@
 // import React from 'react'
 import { useState, Fragment } from 'react'
 import { useDispatch } from 'react-redux'
-import { createGoal } from './goalsSlice'
+import { createGoal, reinitializeGoalsSlice } from './goalsSlice'
 import { displayAlertTemporarily } from '../alerts/alertsSlice'
 import { Redirect } from 'react-router-dom'
+import { logout } from '../auth/authSlice'
+import { reinitializeIntervalsSlice } from '../intervals/intervalsSlice'
 
 const AddNewGoal = () => {
   console.log(`${new Date().toISOString()} - React is rendering <AddNewGoal>`)
@@ -44,7 +46,20 @@ const AddNewGoal = () => {
       dispatch(displayAlertTemporarily('NEW GOAL ADDED'))
       setToGoalsOverview(true)
     } catch (err) {
-      dispatch(displayAlertTemporarily('FAILED TO ADD A NEW GOAL'))
+      let alertMessage
+
+      if (err.response.status === 401) {
+        dispatch(logout())
+        dispatch(reinitializeGoalsSlice())
+        dispatch(reinitializeIntervalsSlice())
+        alertMessage = 'FAILED TO ADD A NEW GOAL - PLEASE LOG BACK IN'
+      } else {
+        alertMessage =
+          err.response.data.message ||
+          'ERROR NOT FROM BACKEND BUT FROM FRONTEND THUNK-ACTION'
+      }
+
+      dispatch(displayAlertTemporarily('[FROM <AddNewGoal>] ' + alertMessage))
     }
   }
 
