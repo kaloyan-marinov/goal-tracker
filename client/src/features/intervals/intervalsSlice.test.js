@@ -580,13 +580,13 @@ describe('thunk-action creators', () => {
     )
 
     await expect(editIntervalPromise).rejects.toEqual(
-      'mocked-authentication required'
+      new Error('Request failed with status code 401')
     )
     expect(storeMock.getActions()).toEqual([
       { type: 'intervals/editInterval/pending' },
       {
         type: 'intervals/editInterval/rejected',
-        error: 'mocked-authentication required',
+        error: 'mocked-Unauthorized',
       },
     ])
   })

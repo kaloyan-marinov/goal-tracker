@@ -1479,10 +1479,12 @@ describe('<App> + mocking of HTTP requests', () => {
       fireEvent.click(editButton)
 
       /* Assert. */
-      let element
-
-      element = await screen.findByText('mocked-authentication required')
+      const element = await screen.findByText(
+        '[FROM <EditInterval>] FAILED TO EDIT THE SELECTED INTERVAL - PLEASE LOG BACK IN'
+      )
       expect(element).toBeInTheDocument()
+
+      expect(history.location.pathname).toEqual('/login')
     }
   )
 

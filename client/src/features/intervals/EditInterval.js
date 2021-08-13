@@ -1,14 +1,22 @@
 // import React from 'react'
 import { useDispatch } from 'react-redux'
 import { useSelector } from 'react-redux'
-import { selectIntervalEntities } from './intervalsSlice'
-import { selectGoalEntities, selectGoalIds } from '../goals/goalsSlice'
+import {
+  reinitializeIntervalsSlice,
+  selectIntervalEntities,
+} from './intervalsSlice'
+import {
+  reinitializeGoalsSlice,
+  selectGoalEntities,
+  selectGoalIds,
+} from '../goals/goalsSlice'
 import { useState } from 'react'
 import { Redirect } from 'react-router-dom'
 import { editInterval } from './intervalsSlice'
 import { displayAlertTemporarily } from '../alerts/alertsSlice'
 import { Fragment } from 'react'
 import { Link } from 'react-router-dom'
+import { logout } from '../auth/authSlice'
 
 const EditInterval = (props) => {
   console.log(`${new Date().toISOString()} - React is rendering <EditInterval>`)
@@ -57,8 +65,22 @@ const EditInterval = (props) => {
       )
       dispatch(displayAlertTemporarily('INTERVAL SUCCESSFULLY EDITED'))
       setToIntervalsOverview(true)
-    } catch (actionError) {
-      dispatch(displayAlertTemporarily(actionError))
+    } catch (err) {
+      let alertMessage
+
+      if (err.response.status === 401) {
+        dispatch(logout())
+        dispatch(reinitializeGoalsSlice())
+        dispatch(reinitializeIntervalsSlice())
+        alertMessage =
+          'FAILED TO EDIT THE SELECTED INTERVAL - PLEASE LOG BACK IN'
+      } else {
+        alertMessage =
+          err.response.data.message ||
+          'ERROR NOT FROM BACKEND BUT FROM FRONTEND THUNK-ACTION'
+      }
+
+      dispatch(displayAlertTemporarily('[FROM <EditInterval>] ' + alertMessage))
     }
   }
 
