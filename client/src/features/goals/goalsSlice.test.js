@@ -647,13 +647,13 @@ describe('thunk-action creators', () => {
     const deleteGoalPromise = storeMock.dispatch(deleteGoal(17))
 
     await expect(deleteGoalPromise).rejects.toEqual(
-      'mocked-authentication required'
+      new Error('Request failed with status code 401')
     )
     expect(storeMock.getActions()).toEqual([
       { type: 'goals/deleteGoal/pending' },
       {
         type: 'goals/deleteGoal/rejected',
-        error: 'mocked-authentication required',
+        error: 'mocked-Unauthorized',
       },
     ])
   })

@@ -776,9 +776,7 @@ describe('<App> + mocking of HTTP requests', () => {
       fireEvent.click(editButton)
 
       /* Assert. */
-      let element
-
-      element = await screen.findByText(
+      const element = await screen.findByText(
         '[FROM <EditGoal>] FAILED TO EDIT THE SELECTED GOAL - PLEASE LOG BACK IN'
       )
       expect(element).toBeInTheDocument()
@@ -919,13 +917,12 @@ describe('<App> + mocking of HTTP requests', () => {
       fireEvent.click(yesButton)
 
       /* Assert. */
-      element = await screen.findByText('FAILED TO DELETE THE SELECTED GOAL')
+      element = await screen.findByText(
+        '[FROM <DeleteGoal>] FAILED TO DELETE THE SELECTED GOAL - PLEASE LOG BACK IN'
+      )
       expect(element).toBeInTheDocument()
 
-      const descriptionOfDeletedGoal = screen.getByDisplayValue(
-        MOCK_GOAL_10.description
-      )
-      expect(descriptionOfDeletedGoal).toBeInTheDocument()
+      expect(history.location.pathname).toEqual('/login')
     }
   )
 
