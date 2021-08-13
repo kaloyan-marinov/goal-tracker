@@ -1628,9 +1628,11 @@ describe('<App> + mocking of HTTP requests', () => {
 
       /* Assert. */
       element = await screen.findByText(
-        'FAILED TO DELETE THE SELECTED INTERVAL'
+        '[FROM <DeleteInterval>] FAILED TO DELETE THE SELECTED INTERVAL - PLEASE LOG BACK IN'
       )
       expect(element).toBeInTheDocument()
+
+      expect(history.location.pathname).toEqual('/login')
     }
   )
 

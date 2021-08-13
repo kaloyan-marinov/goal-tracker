@@ -615,13 +615,13 @@ describe('thunk-action creators', () => {
     const deleteIntervalPromise = storeMock.dispatch(deleteInterval(171717))
 
     await expect(deleteIntervalPromise).rejects.toEqual(
-      'mocked-authentication required'
+      new Error('Request failed with status code 401')
     )
     expect(storeMock.getActions()).toEqual([
       { type: 'intervals/deleteInterval/pending' },
       {
         type: 'intervals/deleteInterval/rejected',
-        error: 'mocked-authentication required',
+        error: 'mocked-Unauthorized',
       },
     ])
   })

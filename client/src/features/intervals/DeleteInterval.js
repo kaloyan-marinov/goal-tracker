@@ -2,12 +2,16 @@
 import { Fragment } from 'react'
 import { useDispatch } from 'react-redux'
 import { useSelector } from 'react-redux'
-import { selectIntervalEntities } from './intervalsSlice'
-import { selectGoalEntities } from '../goals/goalsSlice'
+import {
+  reinitializeIntervalsSlice,
+  selectIntervalEntities,
+} from './intervalsSlice'
+import { reinitializeGoalsSlice, selectGoalEntities } from '../goals/goalsSlice'
 import { useState } from 'react'
 import { Redirect } from 'react-router-dom'
 import { deleteInterval } from './intervalsSlice'
 import { displayAlertTemporarily } from '../alerts/alertsSlice'
+import { logout } from '../auth/authSlice'
 
 const DeleteInterval = (props) => {
   console.log(
@@ -40,8 +44,22 @@ const DeleteInterval = (props) => {
       await dispatch(deleteInterval(interval.id))
       dispatch(displayAlertTemporarily('INTERVAL SUCCESSFULLY DELETED'))
     } catch (err) {
+      let alertMessage
+
+      if (err.response.status === 401) {
+        dispatch(logout())
+        dispatch(reinitializeGoalsSlice())
+        dispatch(reinitializeIntervalsSlice())
+        alertMessage =
+          'FAILED TO DELETE THE SELECTED INTERVAL - PLEASE LOG BACK IN'
+      } else {
+        alertMessage =
+          err.response.data.message ||
+          'ERROR NOT FROM BACKEND BUT FROM FRONTEND THUNK-ACTION'
+      }
+
       dispatch(
-        displayAlertTemporarily('FAILED TO DELETE THE SELECTED INTERVAL')
+        displayAlertTemporarily('[FROM <DeleteInterval>] ' + alertMessage)
       )
     }
   }

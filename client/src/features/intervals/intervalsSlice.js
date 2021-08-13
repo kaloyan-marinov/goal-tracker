@@ -327,10 +327,11 @@ export const deleteInterval = (intervalId) => async (dispatch) => {
     dispatch(deleteIntervalFulfilled(intervalId))
     return Promise.resolve()
   } catch (err) {
-    const errorPayload = err.response.data
-    const actionError = errorPayload.message || 'ERROR NOT FROM BACKEND'
-    dispatch(deleteIntervalRejected(actionError))
-    return Promise.reject(actionError)
+    const responseBodyError =
+      err.response.data.error ||
+      'ERROR NOT FROM BACKEND BUT FROM FRONTEND THUNK-ACTION'
+    dispatch(deleteIntervalRejected(responseBodyError))
+    return Promise.reject(err)
   }
 }
 
