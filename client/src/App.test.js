@@ -778,14 +778,12 @@ describe('<App> + mocking of HTTP requests', () => {
       /* Assert. */
       let element
 
-      element = await screen.findByText('FAILED TO EDIT THE SELECTED GOAL')
+      element = await screen.findByText(
+        '[FROM <EditGoal>] FAILED TO EDIT THE SELECTED GOAL - PLEASE LOG BACK IN'
+      )
       expect(element).toBeInTheDocument()
 
-      element = screen.getByDisplayValue(MOCK_GOAL_10.description)
-      expect(element).toBeInTheDocument()
-
-      element = screen.getByDisplayValue('[mocked] cook dinner')
-      expect(element).toBeInTheDocument()
+      expect(history.location.pathname).toEqual('/login')
     }
   )
 
