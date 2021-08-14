@@ -90,11 +90,18 @@ export default function intervalsReducer(
     }
 
     case 'intervals/editInterval/fulfilled': {
-      /* TODO: rectify this as part of g-t-i-38 */
+      const editedGoal = action.payload
+
+      const newEntities = {
+        ...state.entities,
+        [editedGoal.id]: editedGoal,
+      }
+
       return {
         ...state,
         requestStatus: 'succeeded',
         requestError: null,
+        entities: newEntities,
       }
     }
 
