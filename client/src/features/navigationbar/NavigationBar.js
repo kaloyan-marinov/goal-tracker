@@ -16,6 +16,7 @@ const NavigationBar = () => {
   )
 
   const dispatch = useDispatch()
+
   const requestStatus = useSelector(selectRequestStatus)
   const isAuthenticated = useSelector(selectIsAuthenticated)
 
@@ -26,24 +27,6 @@ const NavigationBar = () => {
     dispatch(logout())
     dispatch(reinitializeGoalsSlice())
     dispatch(reinitializeIntervalsSlice())
-    /* TODO: consider the commit immediately before this comment was written;
-             there was an issue with that commit; the issue could be
-             demonstrated by using the UI in the following way:
-
-             1. log in with user A
-             2. go to /intervals-overview
-             3. log out
-             4. log in with user B
-             5. go to /intervals-overview
-
-             which would report a crash in the browser
-             due to "TypeError: goal is undefined"
-             as well as to the `goal.description` within <IntervalsOverview>
-
-             so, that commit contained a bug in [that commit's implementation] of the UI
-             - the bug consisted in the fact that logging out didn't use to
-             correctly update the "intervals" slice of the Redux state
-    */
   }
 
   const links = isAuthenticated ? (

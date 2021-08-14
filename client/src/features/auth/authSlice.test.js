@@ -12,7 +12,7 @@ import {
   fetchUserPending,
   fetchUserFulfilled,
   fetchUserRejected,
-  logout,
+  removeJWSToken,
 } from './authSlice'
 import authReducer from './authSlice'
 
@@ -144,11 +144,11 @@ describe('action creators', () => {
     })
   })
 
-  test('logout', () => {
-    const action = logout()
+  test('removeJWSToken', () => {
+    const action = removeJWSToken()
 
     expect(action).toEqual({
-      type: 'auth/logout',
+      type: 'auth/removeJWSToken',
     })
   })
 })
