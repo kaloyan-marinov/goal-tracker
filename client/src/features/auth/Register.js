@@ -44,7 +44,10 @@ const Register = () => {
   }
 
   if (isAuthenticated) {
-    return <Redirect to="/dashboard" />
+    const nextUrl = '/dashboard'
+    console.log(`    isAuthenticated: ${isAuthenticated}`)
+    console.log(`    >> re-directing to ${nextUrl}`)
+    return <Redirect to={nextUrl} />
   }
 
   return (
