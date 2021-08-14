@@ -198,7 +198,7 @@ describe('slice reducer', () => {
     const newSt = intervalsReducer(initStIntervals, action)
 
     expect(newSt).toEqual({
-      requestStatus: 'pending',
+      requestStatus: 'loading',
       requestError: null,
       ids: [],
       entities: {},
@@ -256,7 +256,7 @@ describe('slice reducer', () => {
     const newSt = intervalsReducer(initStIntervals, action)
 
     expect(newSt).toEqual({
-      requestStatus: 'pending',
+      requestStatus: 'loading',
       requestError: null,
       ids: [],
       entities: {},
@@ -275,7 +275,7 @@ describe('slice reducer', () => {
     const newSt = intervalsReducer(initStIntervals, action)
 
     expect(newSt).toEqual({
-      requestStatus: 'fulfilled',
+      requestStatus: 'succeeded',
       requestError: null,
       ids: [MOCK_INTERVAL_100.id, MOCK_INTERVAL_200.id],
       entities: {
@@ -334,7 +334,7 @@ describe('slice reducer', () => {
     const newSt = intervalsReducer(initStIntervals, action)
 
     expect(newSt).toEqual({
-      requestStatus: 'pending',
+      requestStatus: 'loading',
       requestError: null,
       ids: [],
       entities: {},
@@ -397,7 +397,7 @@ describe('slice reducer', () => {
     const newSt = intervalsReducer(initStIntervals, action)
 
     expect(newSt).toEqual({
-      requestStatus: 'pending',
+      requestStatus: 'loading',
       requestError: null,
       ids: [],
       entities: {},

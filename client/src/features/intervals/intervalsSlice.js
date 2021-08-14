@@ -12,13 +12,12 @@ export default function intervalsReducer(
   action
 ) {
   switch (action.type) {
-    /* TODO: rectify this as part of g-t-i-37 */
     case 'intervals/createInterval/pending': {
       return {
         ...state,
-        requestStatus: 'pending',
+        requestStatus: 'loading',
       }
-    } /* end: intervals/createInterval/pending */
+    }
 
     case 'intervals/createInterval/fulfilled': {
       const interval = action.payload
@@ -36,7 +35,7 @@ export default function intervalsReducer(
         ids: newIds,
         entities: newEntities,
       }
-    } /* end: intervals/createInterval/fulfilled */
+    }
 
     case 'intervals/createInterval/rejected': {
       return {
@@ -44,15 +43,14 @@ export default function intervalsReducer(
         requestStatus: 'failed',
         requestError: action.error,
       }
-    } /* end: intervals/createInterval/rejected */
+    }
 
-    /* TODO: rectify this as part of g-t-i-37 */
     case 'intervals/fetchIntervals/pending': {
       return {
         ...state,
-        requestStatus: 'pending',
+        requestStatus: 'loading',
       }
-    } /* end: intervals/fetchIntervals/pending */
+    }
 
     case 'intervals/fetchIntervals/fulfilled': {
       const intervals = action.payload
@@ -63,35 +61,33 @@ export default function intervalsReducer(
         return intervalsObj
       }, {})
 
-      /* TODO: rectify this as part of g-t-i-37 */
       return {
         ...state,
-        requestStatus: 'fulfilled',
+        requestStatus: 'succeeded',
         requestError: null,
         ids: newIds,
         entities: newEntities,
       }
-    } /* end: intervals/fetchIntervals/fulfilled */
+    }
 
     case 'intervals/fetchIntervals/rejected': {
       return {
         ...state,
         requestStatus: 'failed',
         requestError: action.error,
-      } /* end: intervals/fetchIntervals/rejected */
+      }
     }
 
     case 'intervals/reinitializeIntervalsSlice': {
       return initialStateIntervals
-    } /* end: intervals/reinitializeIntervalsSlice */
+    }
 
     case 'intervals/editInterval/pending': {
-      /* TODO: rectify this as part of g-t-i-37 */
       return {
         ...state,
-        requestStatus: 'pending',
+        requestStatus: 'loading',
       }
-    } /* end: intervals/editInterval/pending */
+    }
 
     case 'intervals/editInterval/fulfilled': {
       /* TODO: rectify this as part of g-t-i-38 */
@@ -100,7 +96,7 @@ export default function intervalsReducer(
         requestStatus: 'succeeded',
         requestError: null,
       }
-    } /* end: intervals/editInterval/fulfilled */
+    }
 
     case 'intervals/editInterval/rejected': {
       return {
@@ -108,15 +104,14 @@ export default function intervalsReducer(
         requestStatus: 'failed',
         requestError: action.error,
       }
-    } /* end: intervals/editInterval/rejected */
+    }
 
     case 'intervals/deleteInterval/pending': {
-      /* TODO: rectify this as part of g-t-i-37 */
       return {
         ...state,
-        requestStatus: 'pending',
+        requestStatus: 'loading',
       }
-    } /* end: intervals/deleteInterval/pending */
+    }
 
     case 'intervals/deleteInterval/fulfilled': {
       const idOfDeletedInterval = action.payload
@@ -132,7 +127,7 @@ export default function intervalsReducer(
         requestError: null,
         ids: remainingIds,
         entities: remainingEntities,
-      } /* end: intervals/deleteInterval/fulfilled */
+      }
     }
 
     case 'intervals/deleteInterval/rejected': {
@@ -141,7 +136,7 @@ export default function intervalsReducer(
         requestStatus: 'failed',
         requestError: action.error,
       }
-    } /* end: intervals/deleteInterval/rejected */
+    }
 
     default:
       return state

@@ -15,15 +15,15 @@ export default function authReducer(state = initialStateAuth, action) {
         ...state,
         requestStatus: 'loading',
       }
-    } /* end: auth/createUser/pending */
+    }
 
     case 'auth/createUser/fulfilled': {
       return {
         ...state,
-        requestStatus: 'succeeded', // TODO: find the commit where this was added and replace the "fulfilled" in that commit with "succeeded"
+        requestStatus: 'succeeded',
         requestError: null,
       }
-    } /* end: auth/createUser/fulfilled */
+    }
 
     case 'auth/createUser/rejected': {
       return {
@@ -31,14 +31,14 @@ export default function authReducer(state = initialStateAuth, action) {
         requestStatus: 'failed',
         requestError: action.error,
       }
-    } /* end: auth/createUser/rejected */
+    }
 
     case 'auth/issueJWSToken/pending': {
       return {
         ...state,
         requestStatus: 'loading',
       }
-    } /* end: auth/issueJWSToken/pending */
+    }
 
     case 'auth/issueJWSToken/fulfilled': {
       const token = action.payload
@@ -50,7 +50,7 @@ export default function authReducer(state = initialStateAuth, action) {
         token,
         isAuthenticated: true,
       }
-    } /* end: auth/issueJWSToken/fulfilled */
+    }
 
     case 'auth/issueJWSToken/rejected': {
       return {
@@ -58,14 +58,14 @@ export default function authReducer(state = initialStateAuth, action) {
         requestStatus: 'failed',
         requestError: action.error,
       }
-    } /* end: auth/issueJWSToken/rejected */
+    }
 
     case 'auth/fetchUser/pending': {
       return {
         ...state,
         requestStatus: 'loading',
       }
-    } /* end: auth/fetchUser/pending */
+    }
 
     case 'auth/fetchUser/fulfilled': {
       const user = action.payload
@@ -77,7 +77,7 @@ export default function authReducer(state = initialStateAuth, action) {
         isAuthenticated: true,
         currentUser: user,
       }
-    } /* end: auth/fetchUser/fulfilled */
+    }
 
     case 'auth/fetchUser/rejected': {
       return {
@@ -85,7 +85,7 @@ export default function authReducer(state = initialStateAuth, action) {
         requestStatus: 'failed',
         requestError: action.error,
       }
-    } /* end: auth/fetchUser/rejected */
+    }
 
     case 'auth/removeJWSToken': {
       /*
@@ -100,7 +100,7 @@ export default function authReducer(state = initialStateAuth, action) {
         isAuthenticated: false,
         currentUser: null,
       }
-    } /* end: auth/removeJWSToken */
+    }
 
     default:
       return state
