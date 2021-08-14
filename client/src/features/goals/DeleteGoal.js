@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux'
 import { reinitializeGoalsSlice, selectGoalEntities } from './goalsSlice'
 import { useDispatch } from 'react-redux'
 import { useState } from 'react'
-import { Redirect } from 'react-router-dom'
+import { Redirect, useParams } from 'react-router-dom'
 import { deleteGoal } from './goalsSlice'
 import { displayAlertTemporarily } from '../alerts/alertsSlice'
 import { logout } from '../auth/authSlice'
@@ -15,7 +15,9 @@ const DeleteGoal = (props) => {
 
   const dispatch = useDispatch()
 
-  const goalId = props.match.params.id
+  const params = useParams()
+  const goalId = params.id
+
   const goal = useSelector(selectGoalEntities)[goalId]
 
   const [toGoalsOverview, setToGoalsOverview] = useState(false)

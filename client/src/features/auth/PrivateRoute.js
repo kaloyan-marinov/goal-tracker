@@ -3,10 +3,9 @@ import React from 'react'
 import { useSelector } from 'react-redux'
 import { selectIsAuthenticated, selectRequestStatus } from './authSlice'
 import { Route, Redirect } from 'react-router-dom'
+import { RequestStatus } from '../../constants'
 
 const PrivateRoute = (props) => {
-  const { component: Component, ...rest } = props
-
   console.log(`${new Date().toISOString()} - React is rendering <PrivateRoute>`)
 
   console.log('    its children are as follows:')
@@ -17,27 +16,30 @@ const PrivateRoute = (props) => {
     )
   })
 
-  const isAuthenticated = useSelector(selectIsAuthenticated)
-  console.log(`    isAuthenticated: ${isAuthenticated}`)
+  const { children, ...rest } = props
 
   const requestStatus = useSelector(selectRequestStatus)
   console.log(`    requestStatus: ${requestStatus}`)
 
-  if (!isAuthenticated && requestStatus !== 'loading') {
+  const isAuthenticated = useSelector(selectIsAuthenticated)
+  console.log(`    isAuthenticated: ${isAuthenticated}`)
+
+  if (requestStatus === RequestStatus.LOADING) {
+    console.log(`    requestStatus: ${RequestStatus.LOADING}`)
+    return React.Children.map(props.children, (child) => (
+      <div>{`<${child.type.name}>`} - Loading...</div>
+    ))
+  } else if (!isAuthenticated) {
     const nextURL = '/login'
     console.log(
-      `    <PrR> !isAuthenticated && requestStatus !== 'loading': true` +
-        ` > redirecting to ${nextURL} ...`
+      `    isAuthenticated: ${isAuthenticated} > redirecting to ${nextURL} ...`
     )
-
-    return <Route {...rest} render={(props) => <Redirect to={nextURL} />} />
+    return <Redirect to={nextURL} />
   } else {
     console.log(
-      `    <PrR> !isAuthenticated && requestStatus !== 'loading': false` +
-        ` > rendering the above-listed children`
+      `    isAuthenticated: ${isAuthenticated} > rendering the above-listed children`
     )
-
-    return <Route {...rest} render={(props) => <Component {...props} />} />
+    return <Route {...rest}>{children}</Route>
   }
 }
 

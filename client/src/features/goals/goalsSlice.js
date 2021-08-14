@@ -1,8 +1,9 @@
 import axios from 'axios'
+import { RequestStatus } from '../../constants'
 import { GOAL_TRACKER_TOKEN } from '../auth/authSlice'
 
 export const initialStateGoals = {
-  requestStatus: 'idle', // or: 'loading', 'succeeded', 'failed'
+  requestStatus: RequestStatus.IDLE,
   requestError: null,
   ids: [],
   entities: {},
@@ -13,7 +14,7 @@ export default function goalsReducer(state = initialStateGoals, action) {
     case 'goals/createGoal/pending': {
       return {
         ...state,
-        requestStatus: 'loading',
+        requestStatus: RequestStatus.LOADING,
       }
     }
 
@@ -28,7 +29,7 @@ export default function goalsReducer(state = initialStateGoals, action) {
 
       return {
         ...state,
-        requestStatus: 'succeeded',
+        requestStatus: RequestStatus.SUCCEEDED,
         requestError: null,
         ids: newIds,
         entities: newEntities,
@@ -38,7 +39,7 @@ export default function goalsReducer(state = initialStateGoals, action) {
     case 'goals/createGoal/rejected': {
       return {
         ...state,
-        requestStatus: 'failed',
+        requestStatus: RequestStatus.FAILED,
         requestError: action.error,
       }
     }
@@ -46,7 +47,7 @@ export default function goalsReducer(state = initialStateGoals, action) {
     case 'goals/fetchGoals/pending': {
       return {
         ...state,
-        requestStatus: 'loading',
+        requestStatus: RequestStatus.LOADING,
       }
     }
 
@@ -61,7 +62,7 @@ export default function goalsReducer(state = initialStateGoals, action) {
 
       return {
         ...state,
-        requestStatus: 'succeeded',
+        requestStatus: RequestStatus.SUCCEEDED,
         requestError: null,
         ids: newIds,
         entities: newEntities,
@@ -71,7 +72,7 @@ export default function goalsReducer(state = initialStateGoals, action) {
     case 'goals/fetchGoals/rejected': {
       return {
         ...state,
-        requestStatus: 'failed',
+        requestStatus: RequestStatus.FAILED,
         requestError: action.error,
       }
     }
@@ -83,7 +84,7 @@ export default function goalsReducer(state = initialStateGoals, action) {
     case 'goals/editGoal/pending': {
       return {
         ...state,
-        requestStatus: 'loading',
+        requestStatus: RequestStatus.LOADING,
       }
     }
 
@@ -97,7 +98,7 @@ export default function goalsReducer(state = initialStateGoals, action) {
 
       return {
         ...state,
-        requestStatus: 'succeeded',
+        requestStatus: RequestStatus.SUCCEEDED,
         requestError: null,
         entities: newEntities,
       }
@@ -106,7 +107,7 @@ export default function goalsReducer(state = initialStateGoals, action) {
     case 'goals/editGoal/rejected': {
       return {
         ...state,
-        requestStatus: 'failed',
+        requestStatus: RequestStatus.FAILED,
         requestError: action.error,
       }
     }
@@ -114,7 +115,7 @@ export default function goalsReducer(state = initialStateGoals, action) {
     case 'goals/deleteGoal/pending': {
       return {
         ...state,
-        requestStatus: 'loading',
+        requestStatus: RequestStatus.LOADING,
       }
     }
 
@@ -128,7 +129,7 @@ export default function goalsReducer(state = initialStateGoals, action) {
 
       return {
         ...state,
-        requestStatus: 'succeeded',
+        requestStatus: RequestStatus.SUCCEEDED,
         requestError: null,
         ids: remainingIds,
         entities: remainingEntities,
@@ -138,7 +139,7 @@ export default function goalsReducer(state = initialStateGoals, action) {
     case 'goals/deleteGoal/rejected': {
       return {
         ...state,
-        requestStatus: 'failed',
+        requestStatus: RequestStatus.FAILED,
         requestError: action.error,
       }
     }

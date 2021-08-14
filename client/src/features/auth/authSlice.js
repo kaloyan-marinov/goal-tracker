@@ -1,9 +1,10 @@
 import axios from 'axios'
+import { RequestStatus } from '../../constants'
 
 export const GOAL_TRACKER_TOKEN = 'goal-tracker-token'
 
 export const initialStateAuth = {
-  requestStatus: 'idle', // or: 'loading', 'succeeded', 'failed',
+  requestStatus: RequestStatus.IDLE,
   requestError: null, // or: string
   token: localStorage.getItem(GOAL_TRACKER_TOKEN),
   isAuthenticated: null,
@@ -15,14 +16,14 @@ export default function authReducer(state = initialStateAuth, action) {
     case 'auth/createUser/pending': {
       return {
         ...state,
-        requestStatus: 'loading',
+        requestStatus: RequestStatus.LOADING,
       }
     }
 
     case 'auth/createUser/fulfilled': {
       return {
         ...state,
-        requestStatus: 'succeeded',
+        requestStatus: RequestStatus.SUCCEEDED,
         requestError: null,
       }
     }
@@ -30,7 +31,7 @@ export default function authReducer(state = initialStateAuth, action) {
     case 'auth/createUser/rejected': {
       return {
         ...state,
-        requestStatus: 'failed',
+        requestStatus: RequestStatus.FAILED,
         requestError: action.error,
       }
     }
@@ -38,7 +39,7 @@ export default function authReducer(state = initialStateAuth, action) {
     case 'auth/issueJWSToken/pending': {
       return {
         ...state,
-        requestStatus: 'loading',
+        requestStatus: RequestStatus.LOADING,
       }
     }
 
@@ -47,7 +48,7 @@ export default function authReducer(state = initialStateAuth, action) {
 
       return {
         ...state,
-        requestStatus: 'succeeded',
+        requestStatus: RequestStatus.SUCCEEDED,
         requestError: null,
         token,
         isAuthenticated: true,
@@ -57,7 +58,7 @@ export default function authReducer(state = initialStateAuth, action) {
     case 'auth/issueJWSToken/rejected': {
       return {
         ...state,
-        requestStatus: 'failed',
+        requestStatus: RequestStatus.FAILED,
         requestError: action.error,
       }
     }
@@ -65,7 +66,7 @@ export default function authReducer(state = initialStateAuth, action) {
     case 'auth/fetchUser/pending': {
       return {
         ...state,
-        requestStatus: 'loading',
+        requestStatus: RequestStatus.LOADING,
       }
     }
 
@@ -74,7 +75,7 @@ export default function authReducer(state = initialStateAuth, action) {
 
       return {
         ...state,
-        requestStatus: 'succeeded',
+        requestStatus: RequestStatus.SUCCEEDED,
         requestError: null,
         isAuthenticated: true,
         currentUser: user,
@@ -84,7 +85,7 @@ export default function authReducer(state = initialStateAuth, action) {
     case 'auth/fetchUser/rejected': {
       return {
         ...state,
-        requestStatus: 'failed',
+        requestStatus: RequestStatus.FAILED,
         requestError: action.error,
       }
     }

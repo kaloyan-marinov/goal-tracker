@@ -8,7 +8,7 @@ import {
 } from './intervalsSlice'
 import { reinitializeGoalsSlice, selectGoalEntities } from '../goals/goalsSlice'
 import { useState } from 'react'
-import { Redirect } from 'react-router-dom'
+import { Redirect, useParams } from 'react-router-dom'
 import { deleteInterval } from './intervalsSlice'
 import { displayAlertTemporarily } from '../alerts/alertsSlice'
 import { logout } from '../auth/authSlice'
@@ -20,7 +20,9 @@ const DeleteInterval = (props) => {
 
   const dispatch = useDispatch()
 
-  const intervalId = props.match.params.id
+  const params = useParams()
+  const intervalId = params.id
+
   const interval = useSelector(selectIntervalEntities)[intervalId]
   console.log(`    interval: ${JSON.stringify(interval)}`)
 

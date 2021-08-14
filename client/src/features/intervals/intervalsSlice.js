@@ -1,8 +1,9 @@
 import axios from 'axios'
+import { RequestStatus } from '../../constants'
 import { GOAL_TRACKER_TOKEN } from '../auth/authSlice'
 
 export const initialStateIntervals = {
-  requestStatus: 'idle', // or: 'loading', 'succeeded', 'failed'
+  requestStatus: RequestStatus.IDLE,
   requestError: null,
   ids: [],
   entities: {},
@@ -16,7 +17,7 @@ export default function intervalsReducer(
     case 'intervals/createInterval/pending': {
       return {
         ...state,
-        requestStatus: 'loading',
+        requestStatus: RequestStatus.LOADING,
       }
     }
 
@@ -31,7 +32,7 @@ export default function intervalsReducer(
 
       return {
         ...state,
-        requestStatus: 'succeeded',
+        requestStatus: RequestStatus.SUCCEEDED,
         requestError: null,
         ids: newIds,
         entities: newEntities,
@@ -41,7 +42,7 @@ export default function intervalsReducer(
     case 'intervals/createInterval/rejected': {
       return {
         ...state,
-        requestStatus: 'failed',
+        requestStatus: RequestStatus.FAILED,
         requestError: action.error,
       }
     }
@@ -49,7 +50,7 @@ export default function intervalsReducer(
     case 'intervals/fetchIntervals/pending': {
       return {
         ...state,
-        requestStatus: 'loading',
+        requestStatus: RequestStatus.LOADING,
       }
     }
 
@@ -64,7 +65,7 @@ export default function intervalsReducer(
 
       return {
         ...state,
-        requestStatus: 'succeeded',
+        requestStatus: RequestStatus.SUCCEEDED,
         requestError: null,
         ids: newIds,
         entities: newEntities,
@@ -74,7 +75,7 @@ export default function intervalsReducer(
     case 'intervals/fetchIntervals/rejected': {
       return {
         ...state,
-        requestStatus: 'failed',
+        requestStatus: RequestStatus.FAILED,
         requestError: action.error,
       }
     }
@@ -86,7 +87,7 @@ export default function intervalsReducer(
     case 'intervals/editInterval/pending': {
       return {
         ...state,
-        requestStatus: 'loading',
+        requestStatus: RequestStatus.LOADING,
       }
     }
 
@@ -100,7 +101,7 @@ export default function intervalsReducer(
 
       return {
         ...state,
-        requestStatus: 'succeeded',
+        requestStatus: RequestStatus.SUCCEEDED,
         requestError: null,
         entities: newEntities,
       }
@@ -109,7 +110,7 @@ export default function intervalsReducer(
     case 'intervals/editInterval/rejected': {
       return {
         ...state,
-        requestStatus: 'failed',
+        requestStatus: RequestStatus.FAILED,
         requestError: action.error,
       }
     }
@@ -117,7 +118,7 @@ export default function intervalsReducer(
     case 'intervals/deleteInterval/pending': {
       return {
         ...state,
-        requestStatus: 'loading',
+        requestStatus: RequestStatus.LOADING,
       }
     }
 
@@ -131,7 +132,7 @@ export default function intervalsReducer(
 
       return {
         ...state,
-        requestStatus: 'succeeded',
+        requestStatus: RequestStatus.SUCCEEDED,
         requestError: null,
         ids: remainingIds,
         entities: remainingEntities,
@@ -141,7 +142,7 @@ export default function intervalsReducer(
     case 'intervals/deleteInterval/rejected': {
       return {
         ...state,
-        requestStatus: 'failed',
+        requestStatus: RequestStatus.FAILED,
         requestError: action.error,
       }
     }

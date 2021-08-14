@@ -65,41 +65,45 @@ const App = () => {
   return (
     <Fragment>
       <NavigationBar />
-      <Route exact path="/" component={Landing} />
+      <Route exact path="/">
+        <Landing />
+      </Route>
       <section className="container">
         <Alert />
         <Switch>
-          <Route exact path="/register" component={Register} />
-          <Route exact path="/login" component={Login} />
-          <PrivateRoute exact path="/dashboard" component={Dashboard} />
-          <PrivateRoute
-            exact
-            path="/goals-overview"
-            component={GoalsOverview}
-          />
-          <PrivateRoute exact path="/add-new-goal" component={AddNewGoal} />
-          <PrivateRoute exact path="/edit-goal/:id" component={EditGoal} />
-          <PrivateRoute exact path="/delete-goal/:id" component={DeleteGoal} />
-          <PrivateRoute
-            exact
-            path="/intervals-overview"
-            component={IntervalsOverview}
-          />
-          <PrivateRoute
-            exact
-            path="/add-new-interval"
-            component={AddNewInterval}
-          />
-          <PrivateRoute
-            exact
-            path="/edit-interval/:id"
-            component={EditInterval}
-          />
-          <PrivateRoute
-            exact
-            path="/delete-interval/:id"
-            component={DeleteInterval}
-          />
+          <Route exact path="/register">
+            <Register />
+          </Route>
+          <Route exact path="/login">
+            <Login />
+          </Route>
+          <PrivateRoute exact path="/dashboard">
+            <Dashboard />
+          </PrivateRoute>
+          <PrivateRoute exact path="/goals-overview">
+            <GoalsOverview />
+          </PrivateRoute>
+          <PrivateRoute exact path="/add-new-goal">
+            <AddNewGoal />
+          </PrivateRoute>
+          <PrivateRoute exact path="/edit-goal/:id">
+            <EditGoal />
+          </PrivateRoute>
+          <PrivateRoute exact path="/delete-goal/:id">
+            <DeleteGoal />
+          </PrivateRoute>
+          <PrivateRoute exact path="/intervals-overview">
+            <IntervalsOverview />
+          </PrivateRoute>
+          <PrivateRoute exact path="/add-new-interval">
+            <AddNewInterval />
+          </PrivateRoute>
+          <PrivateRoute exact path="/edit-interval/:id">
+            <EditInterval />
+          </PrivateRoute>
+          <PrivateRoute exact path="/delete-interval/:id">
+            <DeleteInterval />
+          </PrivateRoute>
         </Switch>
       </section>
     </Fragment>

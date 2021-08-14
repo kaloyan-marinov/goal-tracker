@@ -29,12 +29,13 @@ import {
   editInterval,
   deleteInterval,
 } from './intervalsSlice'
+import { RequestStatus } from '../../constants'
 
 describe('selectors', () => {
   const initSt = {
     intervals: {
       ...initialStateIntervals,
-      requestStatus: 'succeeded',
+      requestStatus: RequestStatus.SUCCEEDED,
       ids: [MOCK_INTERVAL_100.id, MOCK_INTERVAL_200.id],
       entities: {
         [MOCK_INTERVAL_100.id]: MOCK_INTERVAL_100,
@@ -198,7 +199,7 @@ describe('slice reducer', () => {
     const newSt = intervalsReducer(initStIntervals, action)
 
     expect(newSt).toEqual({
-      requestStatus: 'loading',
+      requestStatus: RequestStatus.LOADING,
       requestError: null,
       ids: [],
       entities: {},
@@ -217,7 +218,7 @@ describe('slice reducer', () => {
     const newSt = intervalsReducer(initStIntervals, action)
 
     expect(newSt).toEqual({
-      requestStatus: 'succeeded',
+      requestStatus: RequestStatus.SUCCEEDED,
       requestError: null,
       ids: [MOCK_INTERVAL_100.id],
       entities: {
@@ -238,7 +239,7 @@ describe('slice reducer', () => {
     const newSt = intervalsReducer(initStIntervals, action)
 
     expect(newSt).toEqual({
-      requestStatus: 'failed',
+      requestStatus: RequestStatus.FAILED,
       requestError: 'intervals-createInterval-rejected',
       ids: [],
       entities: {},
@@ -256,7 +257,7 @@ describe('slice reducer', () => {
     const newSt = intervalsReducer(initStIntervals, action)
 
     expect(newSt).toEqual({
-      requestStatus: 'loading',
+      requestStatus: RequestStatus.LOADING,
       requestError: null,
       ids: [],
       entities: {},
@@ -275,7 +276,7 @@ describe('slice reducer', () => {
     const newSt = intervalsReducer(initStIntervals, action)
 
     expect(newSt).toEqual({
-      requestStatus: 'succeeded',
+      requestStatus: RequestStatus.SUCCEEDED,
       requestError: null,
       ids: [MOCK_INTERVAL_100.id, MOCK_INTERVAL_200.id],
       entities: {
@@ -297,7 +298,7 @@ describe('slice reducer', () => {
     const newSt = intervalsReducer(initStIntervals, action)
 
     expect(newSt).toEqual({
-      requestStatus: 'failed',
+      requestStatus: RequestStatus.FAILED,
       requestError: 'intervals-fetchIntervals-rejected',
       ids: [],
       entities: {},
@@ -307,7 +308,7 @@ describe('slice reducer', () => {
   test('intervals/reinitializeIntervalsSlice', () => {
     const initStIntervals = {
       ...initialStateIntervals,
-      requestStatus: 'succeeded',
+      requestStatus: RequestStatus.SUCCEEDED,
       requestError: null,
       ids: [MOCK_INTERVAL_200.id],
       entities: {
@@ -334,7 +335,7 @@ describe('slice reducer', () => {
     const newSt = intervalsReducer(initStIntervals, action)
 
     expect(newSt).toEqual({
-      requestStatus: 'loading',
+      requestStatus: RequestStatus.LOADING,
       requestError: null,
       ids: [],
       entities: {},
@@ -362,7 +363,7 @@ describe('slice reducer', () => {
     const newSt = intervalsReducer(initStIntervals, action)
 
     expect(newSt).toEqual({
-      requestStatus: 'succeeded',
+      requestStatus: RequestStatus.SUCCEEDED,
       requestError: null,
       ids: [MOCK_INTERVAL_200.id],
       entities: {
@@ -388,7 +389,7 @@ describe('slice reducer', () => {
     const newSt = intervalsReducer(initStIntervals, action)
 
     expect(newSt).toEqual({
-      requestStatus: 'failed',
+      requestStatus: RequestStatus.FAILED,
       requestError: 'intervals-editInterval-rejected',
       ids: [],
       entities: {},
@@ -406,7 +407,7 @@ describe('slice reducer', () => {
     const newSt = intervalsReducer(initStIntervals, action)
 
     expect(newSt).toEqual({
-      requestStatus: 'loading',
+      requestStatus: RequestStatus.LOADING,
       requestError: null,
       ids: [],
       entities: {},
@@ -431,7 +432,7 @@ describe('slice reducer', () => {
     const newSt = intervalsReducer(initStIntervals, action)
 
     expect(newSt).toEqual({
-      requestStatus: 'succeeded',
+      requestStatus: RequestStatus.SUCCEEDED,
       requestError: null,
       ids: [],
       entities: {},
@@ -450,7 +451,7 @@ describe('slice reducer', () => {
     const newSt = intervalsReducer(initStIntervals, action)
 
     expect(newSt).toEqual({
-      requestStatus: 'failed',
+      requestStatus: RequestStatus.FAILED,
       requestError: 'intervals-deleteInterval-rejected',
       ids: [],
       entities: {},

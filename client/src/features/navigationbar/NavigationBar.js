@@ -9,6 +9,7 @@ import {
 import { Fragment } from 'react'
 import { reinitializeGoalsSlice } from '../goals/goalsSlice'
 import { reinitializeIntervalsSlice } from '../intervals/intervalsSlice'
+import { RequestStatus } from '../../constants'
 
 const NavigationBar = () => {
   console.log(
@@ -58,7 +59,7 @@ const NavigationBar = () => {
       <h1>
         <Link to="/">GoalTracker</Link>
       </h1>
-      {requestStatus !== 'loading' && <Fragment>{links}</Fragment>}
+      {requestStatus !== RequestStatus.LOADING && <Fragment>{links}</Fragment>}
     </nav>
   )
 }
