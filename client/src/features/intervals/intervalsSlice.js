@@ -12,11 +12,10 @@ export default function intervalsReducer(
   action
 ) {
   switch (action.type) {
-    /* TODO: rectify this as part of g-t-i-37 */
     case 'intervals/createInterval/pending': {
       return {
         ...state,
-        requestStatus: 'pending',
+        requestStatus: 'loading',
       }
     } /* end: intervals/createInterval/pending */
 
@@ -46,11 +45,10 @@ export default function intervalsReducer(
       }
     } /* end: intervals/createInterval/rejected */
 
-    /* TODO: rectify this as part of g-t-i-37 */
     case 'intervals/fetchIntervals/pending': {
       return {
         ...state,
-        requestStatus: 'pending',
+        requestStatus: 'loading',
       }
     } /* end: intervals/fetchIntervals/pending */
 
@@ -63,10 +61,9 @@ export default function intervalsReducer(
         return intervalsObj
       }, {})
 
-      /* TODO: rectify this as part of g-t-i-37 */
       return {
         ...state,
-        requestStatus: 'fulfilled',
+        requestStatus: 'succeeded',
         requestError: null,
         ids: newIds,
         entities: newEntities,
@@ -86,10 +83,9 @@ export default function intervalsReducer(
     } /* end: intervals/reinitializeIntervalsSlice */
 
     case 'intervals/editInterval/pending': {
-      /* TODO: rectify this as part of g-t-i-37 */
       return {
         ...state,
-        requestStatus: 'pending',
+        requestStatus: 'loading',
       }
     } /* end: intervals/editInterval/pending */
 
@@ -111,10 +107,9 @@ export default function intervalsReducer(
     } /* end: intervals/editInterval/rejected */
 
     case 'intervals/deleteInterval/pending': {
-      /* TODO: rectify this as part of g-t-i-37 */
       return {
         ...state,
-        requestStatus: 'pending',
+        requestStatus: 'loading',
       }
     } /* end: intervals/deleteInterval/pending */
 
