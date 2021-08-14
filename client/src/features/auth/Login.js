@@ -33,9 +33,10 @@ const Login = () => {
 
     try {
       await dispatch(issueJWSToken(email, password))
+      dispatch(displayAlertTemporarily('YOU HAVE LOGGED IN SUCCESSFULLY'))
       await dispatch(fetchUser())
-    } catch (err) {
-      dispatch(displayAlertTemporarily('AUTHENTICATION FAILED'))
+    } catch (thunkActionErrorOrWholeErrorObject) {
+      dispatch(displayAlertTemporarily(thunkActionErrorOrWholeErrorObject))
     }
   }
 

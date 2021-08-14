@@ -2,11 +2,10 @@
 import { useState, Fragment } from 'react'
 import { useDispatch } from 'react-redux'
 import { displayAlertTemporarily } from '../alerts/alertsSlice'
-import { createUser, issueJWSToken } from './authSlice'
+import { createUser } from './authSlice'
 import { useSelector } from 'react-redux'
 import { selectIsAuthenticated } from './authSlice'
 import { Redirect } from 'react-router-dom'
-import { fetchUser } from './authSlice'
 
 const Register = () => {
   console.log(`${new Date().toISOString()} - React is rendering <Register>`)
@@ -37,19 +36,18 @@ const Register = () => {
     } else {
       try {
         await dispatch(createUser(email, password))
-        dispatch(displayAlertTemporarily('YOU HAVE SUCCESSFULLY REGISTERED'))
-
-        await dispatch(issueJWSToken(email, password))
-
-        await dispatch(fetchUser())
-      } catch (actionError) {
-        dispatch(displayAlertTemporarily(actionError))
+        dispatch(displayAlertTemporarily('YOU HAVE REGISTERED SUCCESSFULLY'))
+      } catch (thunkActionError) {
+        dispatch(displayAlertTemporarily(thunkActionError))
       }
     }
   }
 
   if (isAuthenticated) {
-    return <Redirect to="/dashboard" />
+    const nextUrl = '/dashboard'
+    console.log(`    isAuthenticated: ${isAuthenticated}`)
+    console.log(`    >> re-directing to ${nextUrl}`)
+    return <Redirect to={nextUrl} />
   }
 
   return (

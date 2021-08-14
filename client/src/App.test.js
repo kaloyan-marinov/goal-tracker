@@ -180,14 +180,11 @@ describe('<App> + mocking of HTTP requests', () => {
 
       /* Assert. */
       const element = await screen.findByText(
-        'YOU HAVE SUCCESSFULLY REGISTERED'
+        'YOU HAVE REGISTERED SUCCESSFULLY'
       )
       expect(element).toBeInTheDocument()
 
-      const personalizedGreeting = await screen.findByText(
-        'Welcome, mocked-mary.smith@protonmail.com !'
-      )
-      expect(personalizedGreeting).toBeInTheDocument()
+      expect(history.location.pathname).toEqual('/register')
     }
   )
 
@@ -321,7 +318,7 @@ describe('<App> + mocking of HTTP requests', () => {
       fireEvent.click(loginButton)
 
       /* Assert. */
-      const element = await screen.findByText('AUTHENTICATION FAILED')
+      const element = await screen.findByText('mocked-Unauthorized')
       expect(element).toBeInTheDocument()
     }
   )
@@ -407,6 +404,42 @@ describe('<App> + mocking of HTTP requests', () => {
     element = screen.getByPlaceholderText('Enter password')
     expect(element).toBeInTheDocument()
   })
+
+  test(
+    "an authenticated user manually enters '/register'" +
+      " into her web browser's address bar",
+    async () => {
+      /* Arrange. */
+      quasiServer.use(rest.get('/api/v1.0/user', requestHandlers.mockFetchUser))
+
+      const enhancer = applyMiddleware(thunkMiddleware)
+      const realStore = createStore(rootReducer, enhancer)
+
+      const history = createMemoryHistory()
+
+      render(
+        <Provider store={realStore}>
+          <Router history={history}>
+            <App />
+          </Router>
+        </Provider>
+      )
+
+      const personalizedGreeting = await screen.findByText(
+        'Welcome, mocked-mary.smith@protonmail.com !'
+      )
+      expect(personalizedGreeting).toBeInTheDocument()
+
+      const logoutAnchor = await screen.findByText('Logout')
+      expect(logoutAnchor).toBeInTheDocument()
+
+      /* Act. */
+      history.push('/register')
+
+      /* Assert. */
+      expect(history.location.pathname).toEqual('/dashboard')
+    }
+  )
 
   test("an authenticated user clicks on 'Goals Overview'", async () => {
     /* Arrange. */

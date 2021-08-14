@@ -171,10 +171,12 @@ export const createUser = (email, password) => async (dispatch) => {
     dispatch(createUserFulfilled())
     return Promise.resolve()
   } catch (err) {
-    const errorPayload = err.response.data
-    const actionError = errorPayload.message || 'ERROR NOT FROM BACKEND'
-    dispatch(createUserRejected(actionError))
-    return Promise.reject(actionError)
+    const responseBody = err.response.data
+    const responseBodyMessage =
+      responseBody.message ||
+      'ERROR NOT FROM BACKEND BUT FROM FRONTEND THUNK-ACTION'
+    dispatch(createUserRejected(responseBodyMessage))
+    return Promise.reject(responseBodyMessage)
   }
 }
 
@@ -200,10 +202,12 @@ export const issueJWSToken = (email, password) => async (dispatch) => {
     dispatch(issueJWSTokenFulfilled(response.data.token))
     return Promise.resolve()
   } catch (err) {
-    const errorPayload = err.response.data
-    const actionError = errorPayload.error || 'ERROR NOT FROM BACKEND'
-    dispatch(issueJWSTokenRejected(actionError))
-    return Promise.reject(actionError)
+    const responseBody = err.response.data
+    const responseBodyError =
+      responseBody.error ||
+      'ERROR NOT FROM BACKEND BUT FROM FRONTEND THUNK-ACTION'
+    dispatch(issueJWSTokenRejected(responseBodyError))
+    return Promise.reject(responseBodyError)
   }
 }
 
@@ -225,8 +229,10 @@ export const fetchUser = () => async (dispatch) => {
     dispatch(fetchUserFulfilled(response.data))
     return Promise.resolve()
   } catch (err) {
+    const responseBody = err.response.data
     const responseBodyError =
-      err.response.data.error || 'ERROR NOT FROM BACKEND'
+      responseBody.error ||
+      'ERROR NOT FROM BACKEND BUT FROM FRONTEND THUNK-ACTION'
     dispatch(fetchUserRejected(responseBodyError))
     return Promise.reject(err)
   }
