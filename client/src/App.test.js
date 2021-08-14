@@ -184,10 +184,7 @@ describe('<App> + mocking of HTTP requests', () => {
       )
       expect(element).toBeInTheDocument()
 
-      const personalizedGreeting = await screen.findByText(
-        'Welcome, mocked-mary.smith@protonmail.com !'
-      )
-      expect(personalizedGreeting).toBeInTheDocument()
+      expect(history.location.pathname).toEqual('/register')
     }
   )
 
