@@ -485,7 +485,9 @@ describe('<App> + mocking of HTTP requests', () => {
       /* Assert. */
       let element
 
-      element = await screen.findByText('FAILED TO FETCH GOALS')
+      element = await screen.findByText(
+        "[FROM <GoalsOverview>'s useEffect HOOK] FAILED TO FETCH GOALS - PLEASE LOG BACK IN"
+      )
       expect(element).toBeInTheDocument()
     }
   )
@@ -521,7 +523,9 @@ describe('<App> + mocking of HTTP requests', () => {
       /* Assert. */
       let element
 
-      element = await screen.findByText('FAILED TO FETCH INTERVALS')
+      element = await screen.findByText(
+        "[FROM <GoalsOverview>'s useEffect HOOK] FAILED TO FETCH INTERVALS - PLEASE LOG BACK IN"
+      )
       expect(element).toBeInTheDocument()
     }
   )
@@ -637,7 +641,9 @@ describe('<App> + mocking of HTTP requests', () => {
       fireEvent.click(addGoalButton)
 
       /* Assert. */
-      const element = await screen.findByText('FAILED TO ADD A NEW GOAL')
+      const element = await screen.findByText(
+        '[FROM <AddNewGoal>] FAILED TO ADD A NEW GOAL - PLEASE LOG BACK IN'
+      )
       expect(element).toBeInTheDocument()
     }
   )
@@ -770,16 +776,12 @@ describe('<App> + mocking of HTTP requests', () => {
       fireEvent.click(editButton)
 
       /* Assert. */
-      let element
-
-      element = await screen.findByText('FAILED TO EDIT THE SELECTED GOAL')
+      const element = await screen.findByText(
+        '[FROM <EditGoal>] FAILED TO EDIT THE SELECTED GOAL - PLEASE LOG BACK IN'
+      )
       expect(element).toBeInTheDocument()
 
-      element = screen.getByDisplayValue(MOCK_GOAL_10.description)
-      expect(element).toBeInTheDocument()
-
-      element = screen.getByDisplayValue('[mocked] cook dinner')
-      expect(element).toBeInTheDocument()
+      expect(history.location.pathname).toEqual('/login')
     }
   )
 
@@ -915,13 +917,12 @@ describe('<App> + mocking of HTTP requests', () => {
       fireEvent.click(yesButton)
 
       /* Assert. */
-      element = await screen.findByText('FAILED TO DELETE THE SELECTED GOAL')
+      element = await screen.findByText(
+        '[FROM <DeleteGoal>] FAILED TO DELETE THE SELECTED GOAL - PLEASE LOG BACK IN'
+      )
       expect(element).toBeInTheDocument()
 
-      const descriptionOfDeletedGoal = screen.getByDisplayValue(
-        MOCK_GOAL_10.description
-      )
-      expect(descriptionOfDeletedGoal).toBeInTheDocument()
+      expect(history.location.pathname).toEqual('/login')
     }
   )
 
@@ -1084,7 +1085,9 @@ describe('<App> + mocking of HTTP requests', () => {
       /* Assert. */
       let element
 
-      element = await screen.findByText('FAILED TO FETCH GOALS')
+      element = await screen.findByText(
+        "[FROM <IntervalsOverview>'s useEffect HOOK] FAILED TO FETCH GOALS - PLEASE LOG BACK IN"
+      )
       expect(element).toBeInTheDocument()
     }
   )
@@ -1120,7 +1123,9 @@ describe('<App> + mocking of HTTP requests', () => {
       /* Assert. */
       let element
 
-      element = await screen.findByText('FAILED TO FETCH INTERVALS')
+      element = await screen.findByText(
+        "[FROM <IntervalsOverview>'s useEffect HOOK] FAILED TO FETCH INTERVALS - PLEASE LOG BACK IN"
+      )
       expect(element).toBeInTheDocument()
     }
   )
@@ -1357,8 +1362,12 @@ describe('<App> + mocking of HTTP requests', () => {
       fireEvent.click(addIntervalButton)
 
       /* Assert. */
-      const element = await screen.findByText('mocked-authentication required')
+      const element = await screen.findByText(
+        '[FROM <AddNewInterval>] FAILED TO ADD A NEW INTERVAL - PLEASE LOG BACK IN'
+      )
       expect(element).toBeInTheDocument()
+
+      expect(history.location.pathname).toEqual('/login')
     }
   )
 
@@ -1470,10 +1479,12 @@ describe('<App> + mocking of HTTP requests', () => {
       fireEvent.click(editButton)
 
       /* Assert. */
-      let element
-
-      element = await screen.findByText('mocked-authentication required')
+      const element = await screen.findByText(
+        '[FROM <EditInterval>] FAILED TO EDIT THE SELECTED INTERVAL - PLEASE LOG BACK IN'
+      )
       expect(element).toBeInTheDocument()
+
+      expect(history.location.pathname).toEqual('/login')
     }
   )
 
@@ -1617,9 +1628,11 @@ describe('<App> + mocking of HTTP requests', () => {
 
       /* Assert. */
       element = await screen.findByText(
-        'FAILED TO DELETE THE SELECTED INTERVAL'
+        '[FROM <DeleteInterval>] FAILED TO DELETE THE SELECTED INTERVAL - PLEASE LOG BACK IN'
       )
       expect(element).toBeInTheDocument()
+
+      expect(history.location.pathname).toEqual('/login')
     }
   )
 

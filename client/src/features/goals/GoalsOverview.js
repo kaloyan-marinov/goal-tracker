@@ -3,11 +3,15 @@ import { Fragment } from 'react'
 import { Link } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
 import { useEffect } from 'react'
-import { fetchGoals } from './goalsSlice'
-import { fetchIntervals } from '../intervals/intervalsSlice'
+import { fetchGoals, reinitializeGoalsSlice } from './goalsSlice'
+import {
+  fetchIntervals,
+  reinitializeIntervalsSlice,
+} from '../intervals/intervalsSlice'
 import { useSelector } from 'react-redux'
 import { selectGoalIds, selectGoalEntities } from './goalsSlice'
 import { displayAlertTemporarily } from '../alerts/alertsSlice'
+import { logout } from '../auth/authSlice'
 
 const GoalsOverview = () => {
   console.log(
@@ -31,7 +35,24 @@ const GoalsOverview = () => {
       try {
         await dispatch(fetchGoals())
       } catch (err) {
-        dispatch(displayAlertTemporarily('FAILED TO FETCH GOALS'))
+        let alertMessage
+
+        if (err.response.status === 401) {
+          dispatch(logout())
+          dispatch(reinitializeGoalsSlice())
+          dispatch(reinitializeIntervalsSlice())
+          alertMessage = 'FAILED TO FETCH GOALS - PLEASE LOG BACK IN'
+        } else {
+          alertMessage =
+            err.response.data.message ||
+            'ERROR NOT FROM BACKEND BUT FROM FRONTEND THUNK-ACTION'
+        }
+
+        dispatch(
+          displayAlertTemporarily(
+            "[FROM <GoalsOverview>'s useEffect HOOK] " + alertMessage
+          )
+        )
       }
 
       console.log(
@@ -40,7 +61,24 @@ const GoalsOverview = () => {
       try {
         await dispatch(fetchIntervals())
       } catch (err) {
-        dispatch(displayAlertTemporarily('FAILED TO FETCH INTERVALS'))
+        let alertMessage
+
+        if (err.response.status === 401) {
+          dispatch(logout())
+          dispatch(reinitializeGoalsSlice())
+          dispatch(reinitializeIntervalsSlice())
+          alertMessage = 'FAILED TO FETCH INTERVALS - PLEASE LOG BACK IN'
+        } else {
+          alertMessage =
+            err.response.data.message ||
+            'ERROR NOT FROM BACKEND BUT FROM FRONTEND THUNK-ACTION'
+        }
+
+        dispatch(
+          displayAlertTemporarily(
+            "[FROM <GoalsOverview>'s useEffect HOOK] " + alertMessage
+          )
+        )
       }
     }
 

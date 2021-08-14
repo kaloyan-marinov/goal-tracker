@@ -1,12 +1,14 @@
 // import React from 'react'
 import { Fragment } from 'react'
 import { useSelector } from 'react-redux'
-import { selectGoalEntities } from './goalsSlice'
+import { reinitializeGoalsSlice, selectGoalEntities } from './goalsSlice'
 import { useDispatch } from 'react-redux'
 import { useState } from 'react'
 import { Redirect } from 'react-router-dom'
 import { deleteGoal } from './goalsSlice'
 import { displayAlertTemporarily } from '../alerts/alertsSlice'
+import { logout } from '../auth/authSlice'
+import { reinitializeIntervalsSlice } from '../intervals/intervalsSlice'
 
 const DeleteGoal = (props) => {
   console.log(`${new Date().toISOString()} - React is rendering <DeleteGoal>`)
@@ -18,13 +20,9 @@ const DeleteGoal = (props) => {
 
   const [toGoalsOverview, setToGoalsOverview] = useState(false)
 
-  if (toGoalsOverview || goal === undefined) {
+  if (goal === undefined || toGoalsOverview) {
     const nextUrl = '/goals-overview'
-    console.log(
-      `    toGoalsOverview || goal === undefined: ${
-        toGoalsOverview || goal === undefined
-      }`
-    )
+    console.log(`    goal === undefined || toGoalsOverview: true`)
     console.log(`    >> re-directing to ${nextUrl}`)
     return <Redirect to={nextUrl} />
   }
@@ -34,7 +32,20 @@ const DeleteGoal = (props) => {
       await dispatch(deleteGoal(goal.id))
       dispatch(displayAlertTemporarily('GOAL SUCCESSFULLY DELETED'))
     } catch (err) {
-      dispatch(displayAlertTemporarily('FAILED TO DELETE THE SELECTED GOAL'))
+      let alertMessage
+
+      if (err.response.status === 401) {
+        dispatch(logout())
+        dispatch(reinitializeGoalsSlice())
+        dispatch(reinitializeIntervalsSlice())
+        alertMessage = 'FAILED TO DELETE THE SELECTED GOAL - PLEASE LOG BACK IN'
+      } else {
+        alertMessage =
+          err.response.data.message ||
+          'ERROR NOT FROM BACKEND BUT FROM FRONTEND THUNK-ACTION'
+      }
+
+      dispatch(displayAlertTemporarily('[FROM <DeleteGoal>] ' + alertMessage))
     }
   }
 

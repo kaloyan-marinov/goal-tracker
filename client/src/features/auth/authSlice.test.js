@@ -452,7 +452,9 @@ describe('thunk-action creators', () => {
     )
     const fetchUserPromise = storeMock.dispatch(fetchUser())
 
-    await expect(fetchUserPromise).rejects.toEqual('mocked-Unauthorized')
+    await expect(fetchUserPromise).rejects.toEqual(
+      new Error('Request failed with status code 401')
+    )
     expect(storeMock.getActions()).toEqual([
       { type: 'auth/fetchUser/pending' },
       {

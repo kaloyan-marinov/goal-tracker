@@ -119,11 +119,19 @@ export default function intervalsReducer(
     } /* end: intervals/deleteInterval/pending */
 
     case 'intervals/deleteInterval/fulfilled': {
-      /* TODO: rectify this as part of g-t-i-38 */
+      const idOfDeletedInterval = action.payload
+
+      const remainingIds = state.ids.filter((id) => id !== idOfDeletedInterval)
+
+      const remainingEntities = { ...state.entities }
+      delete remainingEntities[idOfDeletedInterval]
+
       return {
         ...state,
         requestStatus: 'succeeded',
         requestError: null,
+        ids: remainingIds,
+        entities: remainingEntities,
       } /* end: intervals/deleteInterval/fulfilled */
     }
 
@@ -226,10 +234,11 @@ export const createInterval =
       dispatch(createIntervalFulfilled(response.data))
       return Promise.resolve()
     } catch (err) {
-      const errorPayload = err.response.data
-      const actionError = errorPayload.message || 'ERROR NOT FROM BACKEND'
-      dispatch(createIntervalRejected(actionError))
-      return Promise.reject(actionError)
+      const responseBodyError =
+        err.response.data.error ||
+        'ERROR NOT FROM BACKEND BUT FROM FRONTEND THUNK-ACTION'
+      dispatch(createIntervalRejected(responseBodyError))
+      return Promise.reject(err)
     }
   }
 
@@ -250,10 +259,11 @@ export const fetchIntervals = () => async (dispatch) => {
     dispatch(fetchIntervalsFulfilled(response.data.intervals))
     return Promise.resolve()
   } catch (err) {
-    const errorPayload = err.response.data
-    const actionError = errorPayload.message || 'ERROR NOT FROM BACKEND'
-    dispatch(fetchIntervalsRejected(actionError))
-    return Promise.reject(actionError)
+    const responseBodyError =
+      err.response.data.error ||
+      'ERROR NOT FROM BACKEND BUT FROM FRONTEND THUNK-ACTION'
+    dispatch(fetchIntervalsRejected(responseBodyError))
+    return Promise.reject(err)
   }
 }
 
@@ -287,10 +297,11 @@ export const editInterval =
       dispatch(editIntervalFulfilled(response.data))
       return Promise.resolve()
     } catch (err) {
-      const errorPayload = err.response.data
-      const actionError = errorPayload.message || 'ERROR NOT FROM BACKEND'
-      dispatch(editIntervalRejected(actionError))
-      return Promise.reject(actionError)
+      const responseBodyError =
+        err.response.data.error ||
+        'ERROR NOT FROM BACKEND BUT FROM FRONTEND THUNK-ACTION'
+      dispatch(editIntervalRejected(responseBodyError))
+      return Promise.reject(err)
     }
   }
 
@@ -316,10 +327,11 @@ export const deleteInterval = (intervalId) => async (dispatch) => {
     dispatch(deleteIntervalFulfilled(intervalId))
     return Promise.resolve()
   } catch (err) {
-    const errorPayload = err.response.data
-    const actionError = errorPayload.message || 'ERROR NOT FROM BACKEND'
-    dispatch(deleteIntervalRejected(actionError))
-    return Promise.reject(actionError)
+    const responseBodyError =
+      err.response.data.error ||
+      'ERROR NOT FROM BACKEND BUT FROM FRONTEND THUNK-ACTION'
+    dispatch(deleteIntervalRejected(responseBodyError))
+    return Promise.reject(err)
   }
 }
 

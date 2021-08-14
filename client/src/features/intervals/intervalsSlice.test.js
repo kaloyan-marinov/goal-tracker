@@ -416,6 +416,7 @@ describe('slice reducer', () => {
     }
     const action = {
       type: 'intervals/deleteInterval/fulfilled',
+      payload: MOCK_INTERVAL_200.id,
     }
 
     const newSt = intervalsReducer(initStIntervals, action)
@@ -423,10 +424,8 @@ describe('slice reducer', () => {
     expect(newSt).toEqual({
       requestStatus: 'succeeded',
       requestError: null,
-      ids: [MOCK_INTERVAL_200.id],
-      entities: {
-        [MOCK_INTERVAL_200.id]: MOCK_INTERVAL_200,
-      },
+      ids: [],
+      entities: {},
     })
   })
 
@@ -510,13 +509,13 @@ describe('thunk-action creators', () => {
     )
 
     await expect(createIntervalPromise).rejects.toEqual(
-      'mocked-authentication required'
+      new Error('Request failed with status code 401')
     )
     expect(storeMock.getActions()).toEqual([
       { type: 'intervals/createInterval/pending' },
       {
         type: 'intervals/createInterval/rejected',
-        error: 'mocked-authentication required',
+        error: 'mocked-Unauthorized',
       },
     ])
   })
@@ -542,13 +541,13 @@ describe('thunk-action creators', () => {
     const fetchIntervalsPromise = storeMock.dispatch(fetchIntervals())
 
     await expect(fetchIntervalsPromise).rejects.toEqual(
-      'mocked-authentication required'
+      new Error('Request failed with status code 401')
     )
     expect(storeMock.getActions()).toEqual([
       { type: 'intervals/fetchIntervals/pending' },
       {
         type: 'intervals/fetchIntervals/rejected',
-        error: 'mocked-authentication required',
+        error: 'mocked-Unauthorized',
       },
     ])
   })
@@ -581,13 +580,13 @@ describe('thunk-action creators', () => {
     )
 
     await expect(editIntervalPromise).rejects.toEqual(
-      'mocked-authentication required'
+      new Error('Request failed with status code 401')
     )
     expect(storeMock.getActions()).toEqual([
       { type: 'intervals/editInterval/pending' },
       {
         type: 'intervals/editInterval/rejected',
-        error: 'mocked-authentication required',
+        error: 'mocked-Unauthorized',
       },
     ])
   })
@@ -616,13 +615,13 @@ describe('thunk-action creators', () => {
     const deleteIntervalPromise = storeMock.dispatch(deleteInterval(171717))
 
     await expect(deleteIntervalPromise).rejects.toEqual(
-      'mocked-authentication required'
+      new Error('Request failed with status code 401')
     )
     expect(storeMock.getActions()).toEqual([
       { type: 'intervals/deleteInterval/pending' },
       {
         type: 'intervals/deleteInterval/rejected',
-        error: 'mocked-authentication required',
+        error: 'mocked-Unauthorized',
       },
     ])
   })
