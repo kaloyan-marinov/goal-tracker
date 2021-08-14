@@ -3,7 +3,7 @@ import { useDispatch } from 'react-redux'
 import { useSelector } from 'react-redux'
 import { reinitializeGoalsSlice, selectGoalEntities } from './goalsSlice'
 import { useState, Fragment } from 'react'
-import { Redirect } from 'react-router-dom'
+import { Redirect, useParams } from 'react-router-dom'
 import { editGoal } from './goalsSlice'
 import { displayAlertTemporarily } from '../alerts/alertsSlice'
 import { Link } from 'react-router-dom'
@@ -15,7 +15,9 @@ const EditGoal = (props) => {
 
   const dispatch = useDispatch()
 
-  const goalId = props.match.params.id
+  const params = useParams()
+  const goalId = params.id
+
   const goal = useSelector(selectGoalEntities)[goalId]
   const [description, setDescription] = useState(goal.description)
 

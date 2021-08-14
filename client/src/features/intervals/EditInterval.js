@@ -11,7 +11,7 @@ import {
   selectGoalIds,
 } from '../goals/goalsSlice'
 import { useState } from 'react'
-import { Redirect } from 'react-router-dom'
+import { Redirect, useParams } from 'react-router-dom'
 import { editInterval } from './intervalsSlice'
 import { displayAlertTemporarily } from '../alerts/alertsSlice'
 import { Fragment } from 'react'
@@ -23,7 +23,9 @@ const EditInterval = (props) => {
 
   const dispatch = useDispatch()
 
-  const intervalId = props.match.params.id
+  const params = useParams()
+  const intervalId = params.id
+
   const interval = useSelector(selectIntervalEntities)[intervalId]
   const goalIds = useSelector(selectGoalIds)
   const goalEntities = useSelector(selectGoalEntities)
