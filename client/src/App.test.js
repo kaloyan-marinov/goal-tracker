@@ -1263,68 +1263,6 @@ describe('<App> + mocking of HTTP requests', () => {
 
   test(
     "an authenticated user clicks on 'Intervals Overview'," +
-      " then clicks on 'Add a new interval'" +
-      ' but the JWS token expires' +
-      " before <AddNewInterval>'s effect function issues its GET request for Goals",
-    async () => {
-      /* Arrange. */
-      quasiServer.use(
-        rest.get('/api/v1.0/user', requestHandlers.mockFetchUser),
-        rest.get('/api/v1.0/goals', requestHandlers.mockFetchGoals),
-        rest.get('/api/v1.0/intervals', requestHandlers.mockFetchIntervals),
-
-        rest.get('/api/v1.0/goals', requestHandlers.mockMultipleFailures),
-
-        rest.get('/api/v1.0/intervals', requestHandlers.mockFetchIntervals)
-      )
-      /*
-      Because the previous statement doesn't add a request handler for
-      GET /api/v1.0/intervals , running this test case generates the following:
-
-      console.warn
-        [MSW] Warning: captured a request without a matching request handler:
-        
-          • GET http://localhost/api/v1.0/intervals
-        
-        If you still wish to intercept this unhandled request, please create a request handler for it.
-        Read more: https://mswjs.io/docs/getting-started/mocks
-      */
-
-      const enhancer = applyMiddleware(thunkMiddleware)
-      const realStore = createStore(rootReducer, enhancer)
-
-      const history = createMemoryHistory()
-
-      render(
-        <Provider store={realStore}>
-          <Router history={history}>
-            <App />
-          </Router>
-        </Provider>
-      )
-
-      /* Act. */
-      const goalsOverviewAnchor = await screen.findByText('Intervals Overview')
-      fireEvent.click(goalsOverviewAnchor)
-
-      await waitFor(() => {
-        const rows = screen.queryAllByText('Edit')
-        expect(rows.length).toEqual(2)
-      })
-
-      const addNewIntervalAnchor = screen.getByText('Add a new interval')
-      fireEvent.click(addNewIntervalAnchor)
-
-      /* Assert. */
-      let element
-
-      element = await screen.findByText('FAILED TO FETCH GOALS')
-      expect(element).toBeInTheDocument()
-    }
-  )
-
-  test(
-    "an authenticated user clicks on 'Intervals Overview'," +
       " then clicks on 'Add a new interval'," +
       ' fills out the form and submits it' +
       ' but the JWS token expires before the POST request is issued',
@@ -1335,9 +1273,10 @@ describe('<App> + mocking of HTTP requests', () => {
         rest.get('/api/v1.0/goals', requestHandlers.mockFetchGoals),
         rest.get('/api/v1.0/intervals', requestHandlers.mockFetchIntervals),
 
-        rest.get('/api/v1.0/goals', requestHandlers.mockFetchGoals), // consumed by <AddNewInterval>'s effect function
+        rest.post('/api/v1.0/intervals', requestHandlers.mockMultipleFailures),
 
-        rest.post('/api/v1.0/intervals', requestHandlers.mockMultipleFailures)
+        rest.get('/api/v1.0/goals', requestHandlers.mockFetchGoals),
+        rest.get('/api/v1.0/intervals', requestHandlers.mockFetchIntervals)
       )
 
       const enhancer = applyMiddleware(thunkMiddleware)
