@@ -438,7 +438,6 @@ describe('<App> + mocking of HTTP requests', () => {
 
       /* Assert. */
       expect(history.location.pathname).toEqual('/dashboard')
-      // const element = screen.getByText('ninja')
     }
   )
 

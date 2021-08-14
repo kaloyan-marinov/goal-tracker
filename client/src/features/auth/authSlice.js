@@ -229,8 +229,10 @@ export const fetchUser = () => async (dispatch) => {
     dispatch(fetchUserFulfilled(response.data))
     return Promise.resolve()
   } catch (err) {
+    const responseBody = err.response.data
     const responseBodyError =
-      err.response.data.error || 'ERROR NOT FROM BACKEND'
+      responseBody.error ||
+      'ERROR NOT FROM BACKEND BUT FROM FRONTEND THUNK-ACTION'
     dispatch(fetchUserRejected(responseBodyError))
     return Promise.reject(err)
   }
