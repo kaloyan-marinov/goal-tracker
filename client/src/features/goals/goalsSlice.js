@@ -111,10 +111,9 @@ export default function goalsReducer(state = initialStateGoals, action) {
     } /* end: goals/editGoal/rejected */
 
     case 'goals/deleteGoal/pending': {
-      /* TODO: rectify this as part of g-t-i-37 */
       return {
         ...state,
-        requestStatus: 'pending',
+        requestStatus: 'loading',
       }
     } /* end: goals/deleteGoal/pending */
 

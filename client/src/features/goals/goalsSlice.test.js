@@ -420,7 +420,7 @@ describe('slice reducer', () => {
     const newSt = goalsReducer(initStGoals, action)
 
     expect(newSt).toEqual({
-      requestStatus: 'pending',
+      requestStatus: 'loading',
       requestError: null,
       ids: [],
       entities: {},
