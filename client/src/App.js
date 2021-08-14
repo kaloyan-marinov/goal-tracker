@@ -65,12 +65,18 @@ const App = () => {
   return (
     <Fragment>
       <NavigationBar />
-      <Route exact path="/" component={Landing} />
+      <Route exact path="/">
+        <Landing />
+      </Route>
       <section className="container">
         <Alert />
         <Switch>
-          <Route exact path="/register" component={Register} />
-          <Route exact path="/login" component={Login} />
+          <Route exact path="/register">
+            <Register />
+          </Route>
+          <Route exact path="/login">
+            <Login />
+          </Route>
           <PrivateRoute exact path="/dashboard">
             <Dashboard />
           </PrivateRoute>
