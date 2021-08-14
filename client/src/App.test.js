@@ -318,7 +318,7 @@ describe('<App> + mocking of HTTP requests', () => {
       fireEvent.click(loginButton)
 
       /* Assert. */
-      const element = await screen.findByText('AUTHENTICATION FAILED')
+      const element = await screen.findByText('mocked-Unauthorized')
       expect(element).toBeInTheDocument()
     }
   )

@@ -200,10 +200,12 @@ export const issueJWSToken = (email, password) => async (dispatch) => {
     dispatch(issueJWSTokenFulfilled(response.data.token))
     return Promise.resolve()
   } catch (err) {
-    const errorPayload = err.response.data
-    const actionError = errorPayload.error || 'ERROR NOT FROM BACKEND'
-    dispatch(issueJWSTokenRejected(actionError))
-    return Promise.reject(actionError)
+    const responseBody = err.response.data
+    const responseBodyError =
+      responseBody.error ||
+      'ERROR NOT FROM BACKEND BUT FROM FRONTEND THUNK-ACTION'
+    dispatch(issueJWSTokenRejected(responseBodyError))
+    return Promise.reject(responseBodyError)
   }
 }
 
