@@ -242,7 +242,7 @@ In summary:
             [open the `htmlcov/index.html` file in your web browser]       
             ```
     
-    - create an empty SQLite database and apply all database migrations:
+    - create an empty database and apply all database migrations:
         ```
         (venv) $ FLASK_APP=goal_tracker:create_app flask db upgrade
         ```
@@ -496,8 +496,6 @@ Next, we are going to document 4 different options for starting a process that s
     ```
 
 # Future plans
-
-- Transition from a SQLite database to a MySQL database
 
 - Add styling to the frontend application
 
