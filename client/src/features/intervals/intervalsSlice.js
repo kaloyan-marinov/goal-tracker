@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { GOAL_TRACKER_TOKEN } from '../auth/authSlice'
 
 export const initialStateIntervals = {
   requestStatus: 'idle', // or: 'loading', 'succeeded', 'failed'
@@ -90,11 +91,18 @@ export default function intervalsReducer(
     }
 
     case 'intervals/editInterval/fulfilled': {
-      /* TODO: rectify this as part of g-t-i-38 */
+      const editedGoal = action.payload
+
+      const newEntities = {
+        ...state.entities,
+        [editedGoal.id]: editedGoal,
+      }
+
       return {
         ...state,
         requestStatus: 'succeeded',
         requestError: null,
+        entities: newEntities,
       }
     }
 
@@ -213,11 +221,10 @@ export const createInterval =
       final: finalTimestamp,
     }
 
-    const token = localStorage.getItem('goal-tracker-token')
     const config = {
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
+        Authorization: 'Bearer ' + localStorage.getItem(GOAL_TRACKER_TOKEN),
       },
     }
 
@@ -238,11 +245,10 @@ export const createInterval =
   }
 
 export const fetchIntervals = () => async (dispatch) => {
-  const token = localStorage.getItem('goal-tracker-token')
   const config = {
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
+      Authorization: 'Bearer ' + localStorage.getItem(GOAL_TRACKER_TOKEN),
     },
   }
 
@@ -270,11 +276,10 @@ export const editInterval =
       final: finalTimestamp,
     }
 
-    const token = localStorage.getItem('goal-tracker-token')
     const config = {
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
+        Authorization: 'Bearer ' + localStorage.getItem(GOAL_TRACKER_TOKEN),
       },
     }
 
@@ -301,11 +306,10 @@ export const editInterval =
   }
 
 export const deleteInterval = (intervalId) => async (dispatch) => {
-  const token = localStorage.getItem('goal-tracker-token')
   const config = {
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
+      Authorization: 'Bearer ' + localStorage.getItem(GOAL_TRACKER_TOKEN),
     },
   }
 

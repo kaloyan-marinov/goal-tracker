@@ -353,6 +353,10 @@ describe('slice reducer', () => {
     }
     const action = {
       type: 'intervals/editInterval/fulfilled',
+      payload: {
+        ...MOCK_INTERVAL_100,
+        id: MOCK_INTERVAL_200.id,
+      },
     }
 
     const newSt = intervalsReducer(initStIntervals, action)
@@ -362,7 +366,12 @@ describe('slice reducer', () => {
       requestError: null,
       ids: [MOCK_INTERVAL_200.id],
       entities: {
-        [MOCK_INTERVAL_200.id]: MOCK_INTERVAL_200,
+        [MOCK_INTERVAL_200.id]: {
+          id: MOCK_INTERVAL_200.id,
+          goal_id: MOCK_INTERVAL_100.goal_id,
+          start: MOCK_INTERVAL_100.start,
+          final: MOCK_INTERVAL_100.final,
+        },
       },
     })
   })
