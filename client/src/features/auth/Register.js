@@ -36,9 +36,9 @@ const Register = () => {
     } else {
       try {
         await dispatch(createUser(email, password))
-        dispatch(displayAlertTemporarily('YOU HAVE SUCCESSFULLY REGISTERED'))
-      } catch (actionError) {
-        dispatch(displayAlertTemporarily(actionError))
+        dispatch(displayAlertTemporarily('YOU HAVE REGISTERED SUCCESSFULLY'))
+      } catch (thunkActionError) {
+        dispatch(displayAlertTemporarily(thunkActionError))
       }
     }
   }

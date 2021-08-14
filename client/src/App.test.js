@@ -180,7 +180,7 @@ describe('<App> + mocking of HTTP requests', () => {
 
       /* Assert. */
       const element = await screen.findByText(
-        'YOU HAVE SUCCESSFULLY REGISTERED'
+        'YOU HAVE REGISTERED SUCCESSFULLY'
       )
       expect(element).toBeInTheDocument()
 

@@ -171,10 +171,12 @@ export const createUser = (email, password) => async (dispatch) => {
     dispatch(createUserFulfilled())
     return Promise.resolve()
   } catch (err) {
-    const errorPayload = err.response.data
-    const actionError = errorPayload.message || 'ERROR NOT FROM BACKEND'
-    dispatch(createUserRejected(actionError))
-    return Promise.reject(actionError)
+    const responseBody = err.response.data
+    const responseBodyMessage =
+      responseBody.message ||
+      'ERROR NOT FROM BACKEND BUT FROM FRONTEND THUNK-ACTION'
+    dispatch(createUserRejected(responseBodyMessage))
+    return Promise.reject(responseBodyMessage)
   }
 }
 
