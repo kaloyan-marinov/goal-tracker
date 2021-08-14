@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { GOAL_TRACKER_TOKEN } from '../auth/authSlice'
 
 export const initialStateIntervals = {
   requestStatus: 'idle', // or: 'loading', 'succeeded', 'failed'
@@ -220,11 +221,10 @@ export const createInterval =
       final: finalTimestamp,
     }
 
-    const token = localStorage.getItem('goal-tracker-token')
     const config = {
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
+        Authorization: 'Bearer ' + localStorage.getItem(GOAL_TRACKER_TOKEN),
       },
     }
 
@@ -245,11 +245,10 @@ export const createInterval =
   }
 
 export const fetchIntervals = () => async (dispatch) => {
-  const token = localStorage.getItem('goal-tracker-token')
   const config = {
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
+      Authorization: 'Bearer ' + localStorage.getItem(GOAL_TRACKER_TOKEN),
     },
   }
 
@@ -277,11 +276,10 @@ export const editInterval =
       final: finalTimestamp,
     }
 
-    const token = localStorage.getItem('goal-tracker-token')
     const config = {
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
+        Authorization: 'Bearer ' + localStorage.getItem(GOAL_TRACKER_TOKEN),
       },
     }
 
@@ -308,11 +306,10 @@ export const editInterval =
   }
 
 export const deleteInterval = (intervalId) => async (dispatch) => {
-  const token = localStorage.getItem('goal-tracker-token')
   const config = {
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
+      Authorization: 'Bearer ' + localStorage.getItem(GOAL_TRACKER_TOKEN),
     },
   }
 

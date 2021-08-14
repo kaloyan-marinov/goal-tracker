@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { GOAL_TRACKER_TOKEN } from '../auth/authSlice'
 
 export const initialStateGoals = {
   requestStatus: 'idle', // or: 'loading', 'succeeded', 'failed'
@@ -212,11 +213,10 @@ export const deleteGoalRejected = (error) => ({
 export const createGoal = (description) => async (dispatch) => {
   const body = { description }
 
-  const token = localStorage.getItem('goal-tracker-token')
   const config = {
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
+      Authorization: 'Bearer ' + localStorage.getItem(GOAL_TRACKER_TOKEN),
     },
   }
 
@@ -237,11 +237,10 @@ export const createGoal = (description) => async (dispatch) => {
 }
 
 export const fetchGoals = () => async (dispatch) => {
-  const token = localStorage.getItem('goal-tracker-token')
   const config = {
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
+      Authorization: 'Bearer ' + localStorage.getItem(GOAL_TRACKER_TOKEN),
     },
   }
 
@@ -264,11 +263,10 @@ export const fetchGoals = () => async (dispatch) => {
 export const editGoal = (id, newDescription) => async (dispatch) => {
   const body = { description: newDescription }
 
-  const token = localStorage.getItem('goal-tracker-token')
   const config = {
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
+      Authorization: 'Bearer ' + localStorage.getItem(GOAL_TRACKER_TOKEN),
     },
   }
 
@@ -289,11 +287,10 @@ export const editGoal = (id, newDescription) => async (dispatch) => {
 }
 
 export const deleteGoal = (goalId) => async (dispatch) => {
-  const token = localStorage.getItem('goal-tracker-token')
   const config = {
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
+      Authorization: 'Bearer ' + localStorage.getItem(GOAL_TRACKER_TOKEN),
     },
   }
 

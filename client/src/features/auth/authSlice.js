@@ -1,9 +1,11 @@
 import axios from 'axios'
 
+export const GOAL_TRACKER_TOKEN = 'goal-tracker-token'
+
 export const initialStateAuth = {
   requestStatus: 'idle', // or: 'loading', 'succeeded', 'failed',
   requestError: null, // or: string
-  token: localStorage.getItem('goal-tracker-token'),
+  token: localStorage.getItem(GOAL_TRACKER_TOKEN),
   isAuthenticated: null,
   currentUser: null,
 }
@@ -198,7 +200,7 @@ export const issueJWSToken = (email, password) => async (dispatch) => {
     console.log('issuing the following request: POST /api/v1.0/tokens')
 
     const response = await axios.post('/api/v1.0/tokens', body, config)
-    localStorage.setItem('goal-tracker-token', response.data.token)
+    localStorage.setItem(GOAL_TRACKER_TOKEN, response.data.token)
     dispatch(issueJWSTokenFulfilled(response.data.token))
     return Promise.resolve()
   } catch (err) {
@@ -212,12 +214,10 @@ export const issueJWSToken = (email, password) => async (dispatch) => {
 }
 
 export const fetchUser = () => async (dispatch) => {
-  const token = localStorage.getItem('goal-tracker-token')
-
   const config = {
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
+      Authorization: 'Bearer ' + localStorage.getItem(GOAL_TRACKER_TOKEN),
     },
   }
 
