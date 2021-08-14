@@ -16,7 +16,7 @@ export default function alertsReducer(state = initialStateAlerts, action) {
           [alert.id]: alert,
         },
       }
-    } /* end: alerts/alertSet */
+    }
 
     case 'alerts/alertRemoved': {
       const alertId = action.payload
@@ -28,7 +28,7 @@ export default function alertsReducer(state = initialStateAlerts, action) {
         ...state,
         entities: newEntities,
       }
-    } /* end: alerts/alertRemoved */
+    }
 
     default:
       return state

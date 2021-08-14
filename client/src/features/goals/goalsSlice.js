@@ -14,7 +14,7 @@ export default function goalsReducer(state = initialStateGoals, action) {
         ...state,
         requestStatus: 'loading',
       }
-    } /* end: goals/createGoal/pending */
+    }
 
     case 'goals/createGoal/fulfilled': {
       const goal = action.payload
@@ -32,7 +32,7 @@ export default function goalsReducer(state = initialStateGoals, action) {
         ids: newIds,
         entities: newEntities,
       }
-    } /* end: goals/createGoal/fulfilled */
+    }
 
     case 'goals/createGoal/rejected': {
       return {
@@ -40,14 +40,14 @@ export default function goalsReducer(state = initialStateGoals, action) {
         requestStatus: 'failed',
         requestError: action.error,
       }
-    } /* end: goals/createGoal/rejected */
+    }
 
     case 'goals/fetchGoals/pending': {
       return {
         ...state,
         requestStatus: 'loading',
       }
-    } /* end: goals/fetchGoals/pending */
+    }
 
     case 'goals/fetchGoals/fulfilled': {
       const goals = action.payload
@@ -65,7 +65,7 @@ export default function goalsReducer(state = initialStateGoals, action) {
         ids: newIds,
         entities: newEntities,
       }
-    } /* end: goals/fetchGoals/fulfilled */
+    }
 
     case 'goals/fetchGoals/rejected': {
       return {
@@ -73,18 +73,18 @@ export default function goalsReducer(state = initialStateGoals, action) {
         requestStatus: 'failed',
         requestError: action.error,
       }
-    } /* end: goals/fetchGoals/rejected */
+    }
 
     case 'goals/reinitializeGoalsSlice': {
       return initialStateGoals
-    } /* end: goals/reinitializeGoalsSlice */
+    }
 
     case 'goals/editGoal/pending': {
       return {
         ...state,
         requestStatus: 'loading',
       }
-    } /* end: goals/editGoal/pending */
+    }
 
     case 'goals/editGoal/fulfilled': {
       const editedGoal = action.payload
@@ -100,7 +100,7 @@ export default function goalsReducer(state = initialStateGoals, action) {
         requestError: null,
         entities: newEntities,
       }
-    } /* end: goals/editGoal/fulfilled */
+    }
 
     case 'goals/editGoal/rejected': {
       return {
@@ -108,14 +108,14 @@ export default function goalsReducer(state = initialStateGoals, action) {
         requestStatus: 'failed',
         requestError: action.error,
       }
-    } /* end: goals/editGoal/rejected */
+    }
 
     case 'goals/deleteGoal/pending': {
       return {
         ...state,
         requestStatus: 'loading',
       }
-    } /* end: goals/deleteGoal/pending */
+    }
 
     case 'goals/deleteGoal/fulfilled': {
       const idOfDeletedGoal = action.payload
@@ -132,7 +132,7 @@ export default function goalsReducer(state = initialStateGoals, action) {
         ids: remainingIds,
         entities: remainingEntities,
       }
-    } /* end: goals/deleteGoal/fulfilled */
+    }
 
     case 'goals/deleteGoal/rejected': {
       return {
@@ -140,7 +140,7 @@ export default function goalsReducer(state = initialStateGoals, action) {
         requestStatus: 'failed',
         requestError: action.error,
       }
-    } /* end: goals/deleteGoal/rejected */
+    }
 
     default:
       return state
