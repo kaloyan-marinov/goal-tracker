@@ -19,39 +19,13 @@ const AddNewInterval = () => {
     `${new Date().toISOString()} - React is rendering <AddNewInterval>`
   )
 
-  /* TODO: add logic for validating the data entered into the input fields
-   */
+  /*
+  TODO: add logic for validating the data entered into the input fields
+  */
   const dispatch = useDispatch()
 
   const goalIds = useSelector(selectGoalIds)
   const goalEntities = useSelector(selectGoalEntities)
-  /* TODO: look into whether the "make <IntervalsOverview> display the Goal Description
-           (instead of the Goal ID)" commit made it possible to altogether remove the
-           following call of useEffect
-
-           restatement on 2021/08/10, 07:05
-              this component should only be rendered
-              when the user clicks 'Add a new interval' on <IntervalsOverview>
-
-              in view of that and in view of <IntervalsOverview>'s own effect function,
-              it should be possible to altogether remove the following useEffect hook
-  */
-  useEffect(() => {
-    console.log('    <AddNewInterval> is running its effect function')
-
-    const effectFn = async () => {
-      console.log(
-        "    <AddNewInterval>'s useEffect hook is dispatching fetchGoals()"
-      )
-      try {
-        await dispatch(fetchGoals())
-      } catch (err) {
-        dispatch(displayAlertTemporarily('FAILED TO FETCH GOALS'))
-      }
-    }
-
-    effectFn()
-  }, [dispatch])
 
   const [formData, setFormData] = useState({
     goalId: '0',
@@ -68,9 +42,6 @@ const AddNewInterval = () => {
   }
 
   const { goalId, startTimestamp, finalTimestamp } = formData
-  /* TODO: find out whether goalId should remain unused, or if it should be used
-           similarly to how this component's other state variables are used
-  */
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
