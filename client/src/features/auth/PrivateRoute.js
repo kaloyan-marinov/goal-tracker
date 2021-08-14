@@ -3,6 +3,7 @@ import React from 'react'
 import { useSelector } from 'react-redux'
 import { selectIsAuthenticated, selectRequestStatus } from './authSlice'
 import { Route, Redirect } from 'react-router-dom'
+import { RequestStatus } from '../../constants'
 
 const PrivateRoute = (props) => {
   console.log(`${new Date().toISOString()} - React is rendering <PrivateRoute>`)
@@ -23,8 +24,8 @@ const PrivateRoute = (props) => {
   const isAuthenticated = useSelector(selectIsAuthenticated)
   console.log(`    isAuthenticated: ${isAuthenticated}`)
 
-  if (requestStatus === 'loading') {
-    console.log(`    requestStatus: loading`)
+  if (requestStatus === RequestStatus.LOADING) {
+    console.log(`    requestStatus: ${RequestStatus.LOADING}`)
     return React.Children.map(props.children, (child) => (
       <div>{`<${child.type.name}>`} - Loading...</div>
     ))

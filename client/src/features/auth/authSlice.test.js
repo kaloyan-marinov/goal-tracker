@@ -24,6 +24,7 @@ import {
   MOCK_USER_1,
 } from '../../testHelpers'
 import { createUser, issueJWSToken, fetchUser } from './authSlice'
+import { RequestStatus } from '../../constants'
 
 describe('selectors', () => {
   test('selectIsAuthenticated', () => {
@@ -43,13 +44,13 @@ describe('selectors', () => {
     const initSt = {
       auth: {
         ...initialStateAuth,
-        requestStatus: 'loading',
+        requestStatus: RequestStatus.LOADING,
       },
     }
 
     const requestStatus = selectRequestStatus(initSt)
 
-    expect(requestStatus).toEqual('loading')
+    expect(requestStatus).toEqual(RequestStatus.LOADING)
   })
 
   test('selectCurrentUser', () => {
@@ -165,7 +166,7 @@ describe('slice reducer', () => {
     const newStAuth = authReducer(initStAuth, action)
 
     expect(newStAuth).toEqual({
-      requestStatus: 'loading',
+      requestStatus: RequestStatus.LOADING,
       requestError: null,
       token: null,
       isAuthenticated: null,
@@ -176,7 +177,7 @@ describe('slice reducer', () => {
   test('auth/createUser/fulfilled', () => {
     const initStAuth = {
       ...initialStateAuth,
-      requestStatus: 'loading',
+      requestStatus: RequestStatus.LOADING,
       requestError: 'using this value is illustrative but unrealistic',
     }
     const action = {
@@ -186,7 +187,7 @@ describe('slice reducer', () => {
     const newStAuth = authReducer(initStAuth, action)
 
     expect(newStAuth).toEqual({
-      requestStatus: 'succeeded',
+      requestStatus: RequestStatus.SUCCEEDED,
       requestError: null,
       token: null,
       isAuthenticated: null,
@@ -197,7 +198,7 @@ describe('slice reducer', () => {
   test('auth/createUser/rejected', () => {
     const initStAuth = {
       ...initialStateAuth,
-      requestStatus: 'loading',
+      requestStatus: RequestStatus.LOADING,
       requestError: 'using this value is illustrative but unrealistic',
     }
     const action = {
@@ -208,7 +209,7 @@ describe('slice reducer', () => {
     const newStAuth = authReducer(initStAuth, action)
 
     expect(newStAuth).toEqual({
-      requestStatus: 'failed',
+      requestStatus: RequestStatus.FAILED,
       requestError: 'auth-createUser-rejected',
       token: null,
       isAuthenticated: null,
@@ -227,7 +228,7 @@ describe('slice reducer', () => {
     const newStAuth = authReducer(initStAuth, action)
 
     expect(newStAuth).toEqual({
-      requestStatus: 'loading',
+      requestStatus: RequestStatus.LOADING,
       requestError: null,
       token: null,
       isAuthenticated: null,
@@ -238,7 +239,7 @@ describe('slice reducer', () => {
   test('auth/issueJWSToken/rejected', () => {
     const initStAuth = {
       ...initialStateAuth,
-      requestStatus: 'loading',
+      requestStatus: RequestStatus.LOADING,
       requestError: 'using this value is illustrative but unrealistic',
     }
     const action = {
@@ -249,7 +250,7 @@ describe('slice reducer', () => {
     const newStAuth = authReducer(initStAuth, action)
 
     expect(newStAuth).toEqual({
-      requestStatus: 'failed',
+      requestStatus: RequestStatus.FAILED,
       requestError: 'auth-issueJWSToken-rejected',
       token: null,
       isAuthenticated: null,
@@ -268,7 +269,7 @@ describe('slice reducer', () => {
     const newStAuth = authReducer(initStAuth, action)
 
     expect(newStAuth).toEqual({
-      requestStatus: 'loading',
+      requestStatus: RequestStatus.LOADING,
       requestError: null,
       token: null,
       isAuthenticated: null,
@@ -279,7 +280,7 @@ describe('slice reducer', () => {
   test('auth/fetchUser/fulfilled', () => {
     const initStAuth = {
       ...initialStateAuth,
-      requestStatus: 'loading',
+      requestStatus: RequestStatus.LOADING,
       requestError: 'using this value is illustrative but unrealistic',
     }
     const action = {
@@ -290,7 +291,7 @@ describe('slice reducer', () => {
     const newStAuth = authReducer(initStAuth, action)
 
     expect(newStAuth).toEqual({
-      requestStatus: 'succeeded',
+      requestStatus: RequestStatus.SUCCEEDED,
       requestError: null,
       token: null,
       isAuthenticated: true,
@@ -301,7 +302,7 @@ describe('slice reducer', () => {
   test('auth/fetchUser/rejected', () => {
     const initStAuth = {
       ...initialStateAuth,
-      requestStatus: 'loading',
+      requestStatus: RequestStatus.LOADING,
       requestError: 'using this value is illustrative but unrealistic',
     }
     const action = {
@@ -312,7 +313,7 @@ describe('slice reducer', () => {
     const newStAuth = authReducer(initStAuth, action)
 
     expect(newStAuth).toEqual({
-      requestStatus: 'failed',
+      requestStatus: RequestStatus.FAILED,
       requestError: 'auth-fetchUser-rejected',
       token: null,
       isAuthenticated: null,

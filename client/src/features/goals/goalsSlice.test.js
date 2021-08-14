@@ -27,6 +27,7 @@ import {
   MOCK_GOAL_20,
 } from '../../testHelpers'
 import { createGoal, fetchGoals, editGoal, deleteGoal } from './goalsSlice'
+import { RequestStatus } from '../../constants'
 
 describe('selectors', () => {
   test('selectGoalIds', () => {
@@ -198,7 +199,7 @@ describe('slice reducer', () => {
     const newSt = goalsReducer(initStGoals, action)
 
     expect(newSt).toEqual({
-      requestStatus: 'loading',
+      requestStatus: RequestStatus.LOADING,
       requestError: null,
       ids: [],
       entities: {},
@@ -208,7 +209,7 @@ describe('slice reducer', () => {
   test('goals/createGoal/fulfilled', () => {
     const initStGoals = {
       ...initialStateGoals,
-      requestStatus: 'loading',
+      requestStatus: RequestStatus.LOADING,
       ids: [MOCK_GOAL_10.id],
       entities: {
         [MOCK_GOAL_10.id]: MOCK_GOAL_10,
@@ -222,7 +223,7 @@ describe('slice reducer', () => {
     const newSt = goalsReducer(initStGoals, action)
 
     expect(newSt).toEqual({
-      requestStatus: 'succeeded',
+      requestStatus: RequestStatus.SUCCEEDED,
       requestError: null,
       ids: [10, 20],
       entities: {
@@ -241,7 +242,7 @@ describe('slice reducer', () => {
   test('goals/createGoal/rejected', () => {
     const initStGoals = {
       ...initialStateGoals,
-      requestStatus: 'loading',
+      requestStatus: RequestStatus.LOADING,
     }
     const action = {
       type: 'goals/createGoal/rejected',
@@ -252,7 +253,7 @@ describe('slice reducer', () => {
 
     expect(newSt).toEqual({
       ...initStGoals,
-      requestStatus: 'failed',
+      requestStatus: RequestStatus.FAILED,
       requestError: 'goals-createGoal-rejected',
     })
   })
@@ -268,7 +269,7 @@ describe('slice reducer', () => {
     const newSt = goalsReducer(initStGoals, action)
 
     expect(newSt).toEqual({
-      requestStatus: 'loading',
+      requestStatus: RequestStatus.LOADING,
       requestError: null,
       ids: [],
       entities: {},
@@ -278,7 +279,7 @@ describe('slice reducer', () => {
   test('goals/fetchGoals/fulfilled', () => {
     const initStGoals = {
       ...initialStateGoals,
-      requestStatus: 'loading',
+      requestStatus: RequestStatus.LOADING,
     }
     const action = {
       type: 'goals/fetchGoals/fulfilled',
@@ -288,7 +289,7 @@ describe('slice reducer', () => {
     const newSt = goalsReducer(initStGoals, action)
 
     expect(newSt).toEqual({
-      requestStatus: 'succeeded',
+      requestStatus: RequestStatus.SUCCEEDED,
       requestError: null,
       ids: [10, 20],
       entities: {
@@ -307,7 +308,7 @@ describe('slice reducer', () => {
   test('goals/fetchGoals/rejected', () => {
     const initStGoals = {
       ...initialStateGoals,
-      requestStatus: 'loading',
+      requestStatus: RequestStatus.LOADING,
     }
     const action = {
       type: 'goals/fetchGoals/rejected',
@@ -318,7 +319,7 @@ describe('slice reducer', () => {
 
     expect(newSt).toEqual({
       ...initStGoals,
-      requestStatus: 'failed',
+      requestStatus: RequestStatus.FAILED,
       requestError: 'goals-fetchGoals-rejected',
     })
   })
@@ -326,7 +327,7 @@ describe('slice reducer', () => {
   test('goals/reinitializeGoalsSlice', () => {
     const initStGoals = {
       ...initialStateGoals,
-      requestStatus: 'succeeded',
+      requestStatus: RequestStatus.SUCCEEDED,
       ids: [MOCK_GOAL_10.id, MOCK_GOAL_20.id],
       entities: {
         [MOCK_GOAL_10.id]: MOCK_GOAL_10,
@@ -351,7 +352,7 @@ describe('slice reducer', () => {
     const newSt = goalsReducer(initStGoals, action)
 
     expect(newSt).toEqual({
-      requestStatus: 'loading',
+      requestStatus: RequestStatus.LOADING,
       requestError: null,
       ids: [],
       entities: {},
@@ -361,7 +362,7 @@ describe('slice reducer', () => {
   test('goals/editGoal/fulfilled', () => {
     const initStGoals = {
       ...initialStateGoals,
-      requestStatus: 'loading',
+      requestStatus: RequestStatus.LOADING,
       ids: [MOCK_GOAL_10.id],
       entities: {
         [MOCK_GOAL_10.id]: MOCK_GOAL_10,
@@ -378,7 +379,7 @@ describe('slice reducer', () => {
     const newSt = goalsReducer(initStGoals, action)
 
     expect(newSt).toEqual({
-      requestStatus: 'succeeded',
+      requestStatus: RequestStatus.SUCCEEDED,
       requestError: null,
       ids: [10],
       entities: {
@@ -393,7 +394,7 @@ describe('slice reducer', () => {
   test('goals/editGoal/rejected', () => {
     const initStGoals = {
       ...initialStateGoals,
-      requestStatus: 'loading',
+      requestStatus: RequestStatus.LOADING,
     }
     const action = {
       type: 'goals/editGoal/rejected',
@@ -404,7 +405,7 @@ describe('slice reducer', () => {
 
     expect(newSt).toEqual({
       ...initStGoals,
-      requestStatus: 'failed',
+      requestStatus: RequestStatus.FAILED,
       requestError: 'goals-editGoal-rejected',
     })
   })
@@ -420,7 +421,7 @@ describe('slice reducer', () => {
     const newSt = goalsReducer(initStGoals, action)
 
     expect(newSt).toEqual({
-      requestStatus: 'loading',
+      requestStatus: RequestStatus.LOADING,
       requestError: null,
       ids: [],
       entities: {},
@@ -430,7 +431,7 @@ describe('slice reducer', () => {
   test('goals/deleteGoal/fulfilled', () => {
     const initStGoals = {
       ...initialStateGoals,
-      requestStatus: 'loading',
+      requestStatus: RequestStatus.LOADING,
       ids: [MOCK_GOAL_10.id],
       entities: {
         [MOCK_GOAL_10.id]: MOCK_GOAL_10,
@@ -444,7 +445,7 @@ describe('slice reducer', () => {
     const newSt = goalsReducer(initStGoals, action)
 
     expect(newSt).toEqual({
-      requestStatus: 'succeeded',
+      requestStatus: RequestStatus.SUCCEEDED,
       requestError: null,
       ids: [],
       entities: {},
@@ -454,7 +455,7 @@ describe('slice reducer', () => {
   test('goals/deleteGoal/rejected', () => {
     const initStGoals = {
       ...initialStateGoals,
-      requestStatus: 'loading',
+      requestStatus: RequestStatus.LOADING,
     }
     const action = {
       type: 'goals/deleteGoal/rejected',
@@ -465,7 +466,7 @@ describe('slice reducer', () => {
 
     expect(newSt).toEqual({
       ...initStGoals,
-      requestStatus: 'failed',
+      requestStatus: RequestStatus.FAILED,
       requestError: 'goals-deleteGoal-rejected',
     })
   })
