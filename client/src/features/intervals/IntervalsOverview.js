@@ -2,7 +2,11 @@
 import { useDispatch } from 'react-redux'
 import { useEffect } from 'react'
 import { fetchGoals, reinitializeGoalsSlice } from '../goals/goalsSlice'
-import { fetchIntervals, reinitializeIntervalsSlice } from './intervalsSlice'
+import {
+  fetchIntervals,
+  reinitializeIntervalsSlice,
+  selectIntervalsLinks,
+} from './intervalsSlice'
 import { displayAlertTemporarily } from '../alerts/alertsSlice'
 import { useSelector } from 'react-redux'
 import { selectGoalEntities } from '../goals/goalsSlice'
@@ -10,6 +14,7 @@ import { selectIntervalIds, selectIntervalEntities } from './intervalsSlice'
 import { Fragment } from 'react'
 import { Link } from 'react-router-dom'
 import { logout } from '../auth/authSlice'
+import { URL_FOR_FIRST_PAGE_OF_INTERVALS } from '../../constants'
 
 const IntervalsOverview = () => {
   console.log(
@@ -17,6 +22,12 @@ const IntervalsOverview = () => {
   )
 
   const dispatch = useDispatch()
+
+  const intervalsLinks = useSelector(selectIntervalsLinks)
+  const intervalsUrl =
+    intervalsLinks.self === null
+      ? URL_FOR_FIRST_PAGE_OF_INTERVALS
+      : intervalsLinks.self
 
   useEffect(() => {
     console.log('    <IntervalsOverview> is running its effect function')
@@ -49,10 +60,11 @@ const IntervalsOverview = () => {
       }
 
       console.log(
-        "    <IntervalsOverview>'s useEffect hook is dispatching fetchIntervals()"
+        "    <IntervalsOverview>'s useEffect hook is dispatching fetchIntervals(intervalsUrl)"
       )
+      console.log(`    with intervalsUrl: ${intervalsUrl}`)
       try {
-        await dispatch(fetchIntervals())
+        await dispatch(fetchIntervals(intervalsUrl))
       } catch (err) {
         let alertMessage
 
@@ -78,6 +90,7 @@ const IntervalsOverview = () => {
     effectFn()
   }, [dispatch])
 
+  /* TODO: look into relocating these two hooks to before the useEffect hook */
   const goalEntities = useSelector(selectGoalEntities)
   const intervalIds = useSelector(selectIntervalIds)
   const intervalEntities = useSelector(selectIntervalEntities)
