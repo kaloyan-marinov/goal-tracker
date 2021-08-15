@@ -80,6 +80,8 @@ export default function intervalsReducer(
         ...state,
         requestStatus: RequestStatus.SUCCEEDED,
         requestError: null,
+        _meta,
+        _links,
         ids: newIds,
         entities: newEntities,
       }
