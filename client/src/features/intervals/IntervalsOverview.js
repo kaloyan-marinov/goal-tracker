@@ -21,10 +21,19 @@ const IntervalsOverview = () => {
     `${new Date().toISOString()} - React is rendering <IntervalsOverview>`
   )
 
-  const dispatch = useDispatch()
+  const goalEntities = useSelector(selectGoalEntities)
+  console.log(`    goalEntities: ${JSON.stringify(goalEntities)}`)
+
+  const intervalIds = useSelector(selectIntervalIds)
+  console.log(`    intervalIds: ${intervalIds}`)
+
+  const intervalEntities = useSelector(selectIntervalEntities)
+  console.log(`    intervalEntities: ${JSON.stringify(intervalEntities)}`)
 
   const intervalsLinks = useSelector(selectIntervalsLinks)
   console.log(`    intervalsLinks: ${JSON.stringify(intervalsLinks)}`)
+
+  const dispatch = useDispatch()
 
   const intervalsUrl =
     intervalsLinks.self === null
@@ -91,11 +100,6 @@ const IntervalsOverview = () => {
 
     effectFn()
   }, [dispatch, intervalsUrl])
-
-  /* TODO: look into relocating these two hooks to before the useEffect hook */
-  const goalEntities = useSelector(selectGoalEntities)
-  const intervalIds = useSelector(selectIntervalIds)
-  const intervalEntities = useSelector(selectIntervalEntities)
 
   const intervalTableRows = intervalIds.map((intervalId) => {
     const interval = intervalEntities[intervalId]

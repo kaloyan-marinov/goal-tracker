@@ -17,6 +17,8 @@ import {
   deleteIntervalPending,
   deleteIntervalFulfilled,
   deleteIntervalRejected,
+  selectIntervalsLinks,
+  selectIntervalsMeta,
 } from './intervalsSlice'
 import intervalsReducer from './intervalsSlice'
 
@@ -36,6 +38,19 @@ describe('selectors', () => {
     intervals: {
       ...initialStateIntervals,
       requestStatus: RequestStatus.SUCCEEDED,
+      _meta: {
+        total_items: 2,
+        per_page: 10,
+        pages: 1,
+        page: 1,
+      },
+      _links: {
+        self: '/api/v1.0/intervals?per_page=10&page=1',
+        next: null,
+        prev: null,
+        first: '/api/v1.0/intervals?per_page=10&page=1',
+        last: '/api/v1.0/intervals?per_page=10&page=1',
+      },
       ids: [MOCK_INTERVAL_100.id, MOCK_INTERVAL_200.id],
       entities: {
         [MOCK_INTERVAL_100.id]: MOCK_INTERVAL_100,
@@ -66,6 +81,29 @@ describe('selectors', () => {
         start: '2021-08-05 19:53',
         final: '2021-08-05 20:41',
       },
+    })
+  })
+
+  test('selectIntervalsMeta', () => {
+    const intervalsMeta = selectIntervalsMeta(initSt)
+
+    expect(intervalsMeta).toEqual({
+      total_items: 2,
+      per_page: 10,
+      pages: 1,
+      page: 1,
+    })
+  })
+
+  test('selectIntervalsLinks', () => {
+    const intervalsLinks = selectIntervalsLinks(initSt)
+
+    expect(intervalsLinks).toEqual({
+      self: '/api/v1.0/intervals?per_page=10&page=1',
+      next: null,
+      prev: null,
+      first: '/api/v1.0/intervals?per_page=10&page=1',
+      last: '/api/v1.0/intervals?per_page=10&page=1',
     })
   })
 })

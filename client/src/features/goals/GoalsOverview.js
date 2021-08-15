@@ -20,7 +20,11 @@ const GoalsOverview = () => {
     `${new Date().toISOString()} - React is rendering <GoalsOverview>`
   )
 
-  const dispatch = useDispatch()
+  const goalIds = useSelector(selectGoalIds)
+  console.log(`    goalIds: ${goalIds}`)
+
+  const goalEntities = useSelector(selectGoalEntities)
+  console.log(`    goalEntities: ${JSON.stringify(goalEntities)}`)
 
   const intervalsLinks = useSelector(selectIntervalsLinks)
   console.log(`    intervalsLinks: ${JSON.stringify(intervalsLinks)}`)
@@ -29,6 +33,8 @@ const GoalsOverview = () => {
     intervalsLinks.self === null
       ? URL_FOR_FIRST_PAGE_OF_INTERVALS
       : intervalsLinks.self
+
+  const dispatch = useDispatch()
 
   useEffect(() => {
     console.log('    <GoalsOverview> is running its effect function')
@@ -95,10 +101,6 @@ const GoalsOverview = () => {
 
     effectFn()
   }, [dispatch, intervalsUrl])
-
-  /* TODO: look into relocating these two hooks to before the useEffect hook */
-  const goalIds = useSelector(selectGoalIds)
-  const goalEntities = useSelector(selectGoalEntities)
 
   const goalTableRows = goalIds.map((goalId) => {
     const goal = goalEntities[goalId]
