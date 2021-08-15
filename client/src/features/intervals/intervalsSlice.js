@@ -5,6 +5,19 @@ import { GOAL_TRACKER_TOKEN } from '../auth/authSlice'
 export const initialStateIntervals = {
   requestStatus: RequestStatus.IDLE,
   requestError: null,
+  _meta: {
+    total_items: null,
+    per_page: null,
+    total_pages: null,
+    page: null,
+  },
+  _links: {
+    self: null,
+    next: null,
+    prev: null,
+    first: null,
+    last: null,
+  },
   ids: [],
   entities: {},
 }

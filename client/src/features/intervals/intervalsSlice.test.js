@@ -201,6 +201,19 @@ describe('slice reducer', () => {
     expect(newSt).toEqual({
       requestStatus: RequestStatus.LOADING,
       requestError: null,
+      _meta: {
+        total_items: null,
+        per_page: null,
+        total_pages: null,
+        page: null,
+      },
+      _links: {
+        self: null,
+        next: null,
+        prev: null,
+        first: null,
+        last: null,
+      },
       ids: [],
       entities: {},
     })
@@ -220,6 +233,19 @@ describe('slice reducer', () => {
     expect(newSt).toEqual({
       requestStatus: RequestStatus.SUCCEEDED,
       requestError: null,
+      _meta: {
+        total_items: null,
+        per_page: null,
+        total_pages: null,
+        page: null,
+      },
+      _links: {
+        self: null,
+        next: null,
+        prev: null,
+        first: null,
+        last: null,
+      },
       ids: [MOCK_INTERVAL_100.id],
       entities: {
         [MOCK_INTERVAL_100.id]: MOCK_INTERVAL_100,
@@ -241,6 +267,19 @@ describe('slice reducer', () => {
     expect(newSt).toEqual({
       requestStatus: RequestStatus.FAILED,
       requestError: 'intervals-createInterval-rejected',
+      _meta: {
+        total_items: null,
+        per_page: null,
+        total_pages: null,
+        page: null,
+      },
+      _links: {
+        self: null,
+        next: null,
+        prev: null,
+        first: null,
+        last: null,
+      },
       ids: [],
       entities: {},
     })
@@ -259,6 +298,19 @@ describe('slice reducer', () => {
     expect(newSt).toEqual({
       requestStatus: RequestStatus.LOADING,
       requestError: null,
+      _meta: {
+        total_items: null,
+        per_page: null,
+        total_pages: null,
+        page: null,
+      },
+      _links: {
+        self: null,
+        next: null,
+        prev: null,
+        first: null,
+        last: null,
+      },
       ids: [],
       entities: {},
     })
@@ -278,6 +330,19 @@ describe('slice reducer', () => {
     expect(newSt).toEqual({
       requestStatus: RequestStatus.SUCCEEDED,
       requestError: null,
+      _meta: {
+        total_items: null,
+        per_page: null,
+        total_pages: null,
+        page: null,
+      },
+      _links: {
+        self: null,
+        next: null,
+        prev: null,
+        first: null,
+        last: null,
+      },
       ids: [MOCK_INTERVAL_100.id, MOCK_INTERVAL_200.id],
       entities: {
         [MOCK_INTERVAL_100.id]: MOCK_INTERVAL_100,
@@ -300,6 +365,19 @@ describe('slice reducer', () => {
     expect(newSt).toEqual({
       requestStatus: RequestStatus.FAILED,
       requestError: 'intervals-fetchIntervals-rejected',
+      _meta: {
+        total_items: null,
+        per_page: null,
+        total_pages: null,
+        page: null,
+      },
+      _links: {
+        self: null,
+        next: null,
+        prev: null,
+        first: null,
+        last: null,
+      },
       ids: [],
       entities: {},
     })
@@ -310,6 +388,19 @@ describe('slice reducer', () => {
       ...initialStateIntervals,
       requestStatus: RequestStatus.SUCCEEDED,
       requestError: null,
+      _meta: {
+        total_items: null,
+        per_page: null,
+        total_pages: null,
+        page: null,
+      },
+      _links: {
+        self: null,
+        next: null,
+        prev: null,
+        first: null,
+        last: null,
+      },
       ids: [MOCK_INTERVAL_200.id],
       entities: {
         [MOCK_INTERVAL_200.id]: MOCK_INTERVAL_200,
@@ -337,6 +428,19 @@ describe('slice reducer', () => {
     expect(newSt).toEqual({
       requestStatus: RequestStatus.LOADING,
       requestError: null,
+      _meta: {
+        total_items: null,
+        per_page: null,
+        total_pages: null,
+        page: null,
+      },
+      _links: {
+        self: null,
+        next: null,
+        prev: null,
+        first: null,
+        last: null,
+      },
       ids: [],
       entities: {},
     })
@@ -365,6 +469,19 @@ describe('slice reducer', () => {
     expect(newSt).toEqual({
       requestStatus: RequestStatus.SUCCEEDED,
       requestError: null,
+      _meta: {
+        total_items: null,
+        per_page: null,
+        total_pages: null,
+        page: null,
+      },
+      _links: {
+        self: null,
+        next: null,
+        prev: null,
+        first: null,
+        last: null,
+      },
       ids: [MOCK_INTERVAL_200.id],
       entities: {
         [MOCK_INTERVAL_200.id]: {
@@ -391,6 +508,19 @@ describe('slice reducer', () => {
     expect(newSt).toEqual({
       requestStatus: RequestStatus.FAILED,
       requestError: 'intervals-editInterval-rejected',
+      _meta: {
+        total_items: null,
+        per_page: null,
+        total_pages: null,
+        page: null,
+      },
+      _links: {
+        self: null,
+        next: null,
+        prev: null,
+        first: null,
+        last: null,
+      },
       ids: [],
       entities: {},
     })
@@ -409,6 +539,19 @@ describe('slice reducer', () => {
     expect(newSt).toEqual({
       requestStatus: RequestStatus.LOADING,
       requestError: null,
+      _meta: {
+        total_items: null,
+        per_page: null,
+        total_pages: null,
+        page: null,
+      },
+      _links: {
+        self: null,
+        next: null,
+        prev: null,
+        first: null,
+        last: null,
+      },
       ids: [],
       entities: {},
     })
@@ -434,6 +577,19 @@ describe('slice reducer', () => {
     expect(newSt).toEqual({
       requestStatus: RequestStatus.SUCCEEDED,
       requestError: null,
+      _meta: {
+        total_items: null,
+        per_page: null,
+        total_pages: null,
+        page: null,
+      },
+      _links: {
+        self: null,
+        next: null,
+        prev: null,
+        first: null,
+        last: null,
+      },
       ids: [],
       entities: {},
     })
@@ -453,6 +609,19 @@ describe('slice reducer', () => {
     expect(newSt).toEqual({
       requestStatus: RequestStatus.FAILED,
       requestError: 'intervals-deleteInterval-rejected',
+      _meta: {
+        total_items: null,
+        per_page: null,
+        total_pages: null,
+        page: null,
+      },
+      _links: {
+        self: null,
+        next: null,
+        prev: null,
+        first: null,
+        last: null,
+      },
       ids: [],
       entities: {},
     })
