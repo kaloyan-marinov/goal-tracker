@@ -12,18 +12,26 @@ from goal_tracker.utils import format_time, parse_time
 @token_auth.login_required
 def get_intervals():
     goal_ids = [g.id for g in token_auth.current_user().goals.all()]
-    intervals = Interval.query.filter(Interval.goal_id.in_(goal_ids))
-    return {
-        "intervals": [
-            {
-                "id": i.id,
-                "start": i.start.strftime("%Y-%m-%d %H:%M"),
-                "final": i.final.strftime("%Y-%m-%d %H:%M"),
-                "goal_id": i.goal_id,
-            }
-            for i in intervals
-        ]
-    }
+    intervals_query = Interval.query.filter(Interval.goal_id.in_(goal_ids))
+
+    per_page = min(
+        100,
+        request.args.get("per_page", default=10, type=int),
+    )
+    page = request.args.get("page", default=1, type=int)
+
+    # With regard to the `endpoint` parameter passed in to the next method call,
+    # here is what the Flask documentation says:
+    # "In case blueprints are active you can shortcut references
+    # to the same blueprint by prefixing the local endpoint with
+    # a dot (.)."
+    intervals_collection = Interval.to_collection_dict(
+        intervals_query,
+        per_page,
+        page,
+        ".get_intervals",
+    )
+    return intervals_collection
 
 
 @api_bp.route("/intervals/<int:interval_id>", methods=["GET"])
