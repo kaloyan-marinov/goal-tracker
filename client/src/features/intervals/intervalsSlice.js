@@ -184,9 +184,13 @@ export const fetchIntervalsPending = () => ({
   type: 'intervals/fetchIntervals/pending',
 })
 
-export const fetchIntervalsFulfilled = (intervals) => ({
+export const fetchIntervalsFulfilled = (_meta, _links, items) => ({
   type: 'intervals/fetchIntervals/fulfilled',
-  payload: intervals,
+  payload: {
+    _meta,
+    _links,
+    items,
+  },
 })
 
 export const fetchIntervalsRejected = (error) => ({
@@ -271,7 +275,13 @@ export const fetchIntervals = () => async (dispatch) => {
     console.log(`issuing the following request: GET /api/v1.0/intervals`)
 
     const response = await axios.get('/api/v1.0/intervals', config)
-    dispatch(fetchIntervalsFulfilled(response.data.items))
+    dispatch(
+      fetchIntervalsFulfilled(
+        response.data._meta,
+        response.data._links,
+        response.data.items
+      )
+    )
     return Promise.resolve()
   } catch (err) {
     const responseBodyError =

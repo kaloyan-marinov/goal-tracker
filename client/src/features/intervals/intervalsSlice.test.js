@@ -106,14 +106,33 @@ describe('action creators', () => {
   })
 
   test('fetchIntervalsFulfilled', () => {
-    const action = fetchIntervalsFulfilled([
-      MOCK_INTERVAL_100,
-      MOCK_INTERVAL_200,
-    ])
+    /* Arrange. */
+    const _meta = {
+      total_items: null,
+      per_page: null,
+      total_pages: null,
+      page: null,
+    }
+    const _links = {
+      self: null,
+      next: null,
+      prev: null,
+      first: null,
+      last: null,
+    }
+    const items = [MOCK_INTERVAL_100, MOCK_INTERVAL_200]
 
+    /* Act. */
+    const action = fetchIntervalsFulfilled(_meta, _links, items)
+
+    /* Assert. */
     expect(action).toEqual({
       type: 'intervals/fetchIntervals/fulfilled',
-      payload: [MOCK_INTERVAL_100, MOCK_INTERVAL_200],
+      payload: {
+        _meta,
+        _links,
+        items,
+      },
     })
   })
 
@@ -707,7 +726,22 @@ describe('thunk-action creators', () => {
       { type: 'intervals/fetchIntervals/pending' },
       {
         type: 'intervals/fetchIntervals/fulfilled',
-        payload: [MOCK_INTERVAL_100, MOCK_INTERVAL_200],
+        payload: {
+          items: [MOCK_INTERVAL_100, MOCK_INTERVAL_200],
+          _meta: {
+            total_items: 2,
+            per_page: 10,
+            total_pages: 1,
+            page: 1,
+          },
+          _links: {
+            self: '/api/v1.0/intervals?per_page=10&page=1',
+            next: null,
+            prev: null,
+            first: '/api/v1.0/intervals?per_page=10&page=1',
+            last: '/api/v1.0/intervals?per_page=10&page=1',
+          },
+        },
       },
     ])
   })
