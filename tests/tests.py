@@ -629,14 +629,27 @@ class TestIntervals(TestBase):
         self.assertEqual(
             r,
             {
-                "intervals": [
+                "_meta": {
+                    "total_items": 1,
+                    "per_page": 10,
+                    "total_pages": 1,
+                    "page": 1,
+                },
+                "_links": {
+                    "self": "/api/v1.0/intervals?per_page=10&page=1",
+                    "next": None,
+                    "prev": None,
+                    "first": "/api/v1.0/intervals?per_page=10&page=1",
+                    "last": "/api/v1.0/intervals?per_page=10&page=1",
+                },
+                "items": [
                     {
                         "id": 1,
                         "start": req_payload["start"],
                         "final": req_payload["final"],
                         "goal_id": req_payload["goal_id"],
                     }
-                ]
+                ],
             },
         )
 
