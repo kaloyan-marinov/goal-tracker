@@ -118,7 +118,13 @@ export const mockFetchIntervals = (req, res, ctx) => {
   return res.once(
     ctx.status(200),
     ctx.json({
-      intervals: [MOCK_INTERVAL_100, MOCK_INTERVAL_200],
+      items: [MOCK_INTERVAL_100, MOCK_INTERVAL_200],
+      _meta: {
+        total_items: 2,
+        per_page: 10,
+        total_pages: 1,
+        page: 1,
+      },
     })
   )
 }

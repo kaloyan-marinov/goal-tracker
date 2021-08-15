@@ -258,7 +258,7 @@ export const fetchIntervals = () => async (dispatch) => {
     console.log(`issuing the following request: GET /api/v1.0/intervals`)
 
     const response = await axios.get('/api/v1.0/intervals', config)
-    dispatch(fetchIntervalsFulfilled(response.data.intervals))
+    dispatch(fetchIntervalsFulfilled(response.data.items))
     return Promise.resolve()
   } catch (err) {
     const responseBodyError =
