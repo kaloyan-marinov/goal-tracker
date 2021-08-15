@@ -88,7 +88,7 @@ const IntervalsOverview = () => {
     }
 
     effectFn()
-  }, [dispatch])
+  }, [dispatch, intervalsUrl])
 
   /* TODO: look into relocating these two hooks to before the useEffect hook */
   const goalEntities = useSelector(selectGoalEntities)

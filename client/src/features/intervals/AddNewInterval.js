@@ -8,8 +8,6 @@ import {
   selectGoalEntities,
   reinitializeGoalsSlice,
 } from '../goals/goalsSlice'
-import { useEffect } from 'react'
-import { fetchGoals } from '../goals/goalsSlice'
 import { Redirect } from 'react-router-dom'
 import { createInterval, reinitializeIntervalsSlice } from './intervalsSlice'
 import { logout } from '../auth/authSlice'
