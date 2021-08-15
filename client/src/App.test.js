@@ -442,6 +442,8 @@ describe('<App> + mocking of HTTP requests', () => {
   )
 
   test("an authenticated user clicks on 'Goals Overview'", async () => {
+    console.log("an authenticated user clicks on 'Goals Overview'")
+
     /* Arrange. */
     quasiServer.use(
       rest.get('/api/v1.0/user', requestHandlers.mockFetchUser),

@@ -23,6 +23,8 @@ const GoalsOverview = () => {
   const dispatch = useDispatch()
 
   const intervalsLinks = useSelector(selectIntervalsLinks)
+  console.log(`    intervalsLinks: ${JSON.stringify(intervalsLinks)}`)
+
   const intervalsUrl =
     intervalsLinks.self === null
       ? URL_FOR_FIRST_PAGE_OF_INTERVALS
