@@ -341,7 +341,22 @@ describe('slice reducer', () => {
     }
     const action = {
       type: 'intervals/fetchIntervals/fulfilled',
-      payload: [MOCK_INTERVAL_100, MOCK_INTERVAL_200],
+      payload: {
+        _meta: {
+          total_items: null,
+          per_page: null,
+          total_pages: null,
+          page: null,
+        },
+        _links: {
+          self: null,
+          next: null,
+          prev: null,
+          first: null,
+          last: null,
+        },
+        items: [MOCK_INTERVAL_100, MOCK_INTERVAL_200],
+      },
     }
 
     const newSt = intervalsReducer(initStIntervals, action)
