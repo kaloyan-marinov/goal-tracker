@@ -264,38 +264,38 @@ export const createInterval =
     }
   }
 
-export const fetchIntervals = () => async (dispatch) => {
-  const config = {
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: 'Bearer ' + localStorage.getItem(GOAL_TRACKER_TOKEN),
-    },
-  }
+export const fetchIntervals =
+  (urlForOnePageOfIntervals) => async (dispatch) => {
+    const config = {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + localStorage.getItem(GOAL_TRACKER_TOKEN),
+      },
+    }
 
-  dispatch(fetchIntervalsPending())
-  try {
-    console.log(`issuing the following request: GET /api/v1.0/intervals`)
-
-    const response = await axios.get('/api/v1.0/intervals', config)
-    dispatch(
-      fetchIntervalsFulfilled(
-        response.data._meta,
-        response.data._links,
-        response.data.items
+    dispatch(fetchIntervalsPending())
+    try {
+      console.log(
+        `issuing the following request: GET ${urlForOnePageOfIntervals}`
       )
-    )
-    return Promise.resolve()
-  } catch (err) {
-    console.error('inspecting fetchIntervals() >> err')
-    console.error(err)
 
-    const responseBodyError =
-      err.response.data.error ||
-      'ERROR NOT FROM BACKEND BUT FROM FRONTEND THUNK-ACTION'
-    dispatch(fetchIntervalsRejected(responseBodyError))
-    return Promise.reject(err)
+      const response = await axios.get(urlForOnePageOfIntervals, config)
+      dispatch(
+        fetchIntervalsFulfilled(
+          response.data._meta,
+          response.data._links,
+          response.data.items
+        )
+      )
+      return Promise.resolve()
+    } catch (err) {
+      const responseBodyError =
+        err.response.data.error ||
+        'ERROR NOT FROM BACKEND BUT FROM FRONTEND THUNK-ACTION'
+      dispatch(fetchIntervalsRejected(responseBodyError))
+      return Promise.reject(err)
+    }
   }
-}
 
 export const editInterval =
   (intervalId, goalId, startTimestamp, finalTimestamp) => async (dispatch) => {

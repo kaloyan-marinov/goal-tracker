@@ -29,7 +29,7 @@ import {
   editInterval,
   deleteInterval,
 } from './intervalsSlice'
-import { RequestStatus } from '../../constants'
+import { RequestStatus, URL_FOR_FIRST_PAGE_OF_INTERVALS } from '../../constants'
 
 describe('selectors', () => {
   const initSt = {
@@ -734,7 +734,9 @@ describe('thunk-action creators', () => {
   })
 
   test('fetchIntervals + its HTTP request is mocked to succeed', async () => {
-    const fetchIntervalsPromise = storeMock.dispatch(fetchIntervals())
+    const fetchIntervalsPromise = storeMock.dispatch(
+      fetchIntervals(URL_FOR_FIRST_PAGE_OF_INTERVALS)
+    )
 
     await expect(fetchIntervalsPromise).resolves.toEqual(undefined)
     expect(storeMock.getActions()).toEqual([
@@ -766,7 +768,9 @@ describe('thunk-action creators', () => {
       rest.get('/api/v1.0/intervals', requestHandlers.mockMultipleFailures)
     )
 
-    const fetchIntervalsPromise = storeMock.dispatch(fetchIntervals())
+    const fetchIntervalsPromise = storeMock.dispatch(
+      fetchIntervals(URL_FOR_FIRST_PAGE_OF_INTERVALS)
+    )
 
     await expect(fetchIntervalsPromise).rejects.toEqual(
       new Error('Request failed with status code 401')

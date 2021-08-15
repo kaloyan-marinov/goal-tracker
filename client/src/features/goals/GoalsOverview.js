@@ -63,9 +63,6 @@ const GoalsOverview = () => {
       } catch (err) {
         let alertMessage
 
-        console.error('inspecting <GO> >> err')
-        console.error(err)
-
         if (err.response.status === 401) {
           dispatch(logout())
           dispatch(reinitializeGoalsSlice())
