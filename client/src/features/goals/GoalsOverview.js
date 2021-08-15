@@ -7,11 +7,13 @@ import { fetchGoals, reinitializeGoalsSlice } from './goalsSlice'
 import {
   fetchIntervals,
   reinitializeIntervalsSlice,
+  selectIntervalsLinks,
 } from '../intervals/intervalsSlice'
 import { useSelector } from 'react-redux'
 import { selectGoalIds, selectGoalEntities } from './goalsSlice'
 import { displayAlertTemporarily } from '../alerts/alertsSlice'
 import { logout } from '../auth/authSlice'
+import { URL_FOR_FIRST_PAGE_OF_INTERVALS } from '../../constants'
 
 const GoalsOverview = () => {
   console.log(
@@ -19,6 +21,12 @@ const GoalsOverview = () => {
   )
 
   const dispatch = useDispatch()
+
+  const intervalsLinks = useSelector(selectIntervalsLinks)
+  const intervalsUrl =
+    intervalsLinks.self === null
+      ? URL_FOR_FIRST_PAGE_OF_INTERVALS
+      : intervalsLinks.self
 
   useEffect(() => {
     console.log('    <GoalsOverview> is running its effect function')
@@ -56,10 +64,11 @@ const GoalsOverview = () => {
       }
 
       console.log(
-        "    <GoalsOverview>'s useEffect hook is dispatching fetchIntervals()"
+        "    <GoalsOverview>'s useEffect hook is dispatching fetchIntervals(intervalsUrl)"
       )
+      console.log(`    with intervalsUrl: ${intervalsUrl}`)
       try {
-        await dispatch(fetchIntervals())
+        await dispatch(fetchIntervals(intervalsUrl))
       } catch (err) {
         let alertMessage
 
@@ -85,6 +94,7 @@ const GoalsOverview = () => {
     effectFn()
   }, [dispatch])
 
+  /* TODO: look into relocating these two hooks to before the useEffect hook */
   const goalIds = useSelector(selectGoalIds)
   const goalEntities = useSelector(selectGoalEntities)
 

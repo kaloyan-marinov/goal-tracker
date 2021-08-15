@@ -366,3 +366,8 @@ export const deleteInterval = (intervalId) => async (dispatch) => {
 export const selectIntervalIds = (state) => state.intervals.ids
 
 export const selectIntervalEntities = (state) => state.intervals.entities
+
+/* TODO: write tests for these selectors */
+export const selectIntervalsMeta = (state) => state.intervals._meta
+
+export const selectIntervalsLinks = (state) => state.intervals._links
