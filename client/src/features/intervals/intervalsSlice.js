@@ -68,7 +68,7 @@ export default function intervalsReducer(
     }
 
     case 'intervals/fetchIntervals/fulfilled': {
-      const intervals = action.payload
+      const { _meta, _links, items: intervals } = action.payload
 
       const newIds = intervals.map((interval) => interval.id)
       const newEntities = intervals.reduce((intervalsObj, interval) => {
@@ -284,6 +284,9 @@ export const fetchIntervals = () => async (dispatch) => {
     )
     return Promise.resolve()
   } catch (err) {
+    console.error('inspecting fetchIntervals() >> err')
+    console.error(err)
+
     const responseBodyError =
       err.response.data.error ||
       'ERROR NOT FROM BACKEND BUT FROM FRONTEND THUNK-ACTION'
