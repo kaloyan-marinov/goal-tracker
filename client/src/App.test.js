@@ -1488,7 +1488,20 @@ describe('<App> + mocking of HTTP requests', () => {
           return res.once(
             ctx.status(200),
             ctx.json({
-              intervals: [MOCK_INTERVAL_200],
+              items: [MOCK_INTERVAL_200],
+              _meta: {
+                total_items: 1,
+                per_page: 10,
+                total_pages: 1,
+                page: 1,
+              },
+              _links: {
+                self: '/api/v1.0/intervals?per_page=10&page=1',
+                next: null,
+                prev: null,
+                first: '/api/v1.0/intervals?per_page=10&page=1',
+                last: '/api/v1.0/intervals?per_page=10&page=1',
+              },
             })
           )
         })

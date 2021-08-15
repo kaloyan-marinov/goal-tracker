@@ -125,6 +125,13 @@ export const mockFetchIntervals = (req, res, ctx) => {
         total_pages: 1,
         page: 1,
       },
+      _links: {
+        self: '/api/v1.0/intervals?per_page=10&page=1',
+        next: null,
+        prev: null,
+        first: '/api/v1.0/intervals?per_page=10&page=1',
+        last: '/api/v1.0/intervals?per_page=10&page=1',
+      },
     })
   )
 }
