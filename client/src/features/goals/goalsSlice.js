@@ -250,13 +250,9 @@ export const fetchGoals = () => async (dispatch) => {
     console.log('issuing the following request: GET /api/v1.0/goals')
 
     const response = await axios.get('/api/v1.0/goals', config)
-    console.log('inspecting response')
-    console.log(response)
     dispatch(fetchGoalsFulfilled(response.data.goals))
     return Promise.resolve()
   } catch (err) {
-    console.error('inspecting err')
-    console.error(err)
     const responseBodyError =
       err.response.data.error ||
       'ERROR NOT FROM BACKEND BUT FROM FRONTEND THUNK-ACTION'
