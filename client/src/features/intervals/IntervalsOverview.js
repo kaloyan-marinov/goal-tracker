@@ -23,13 +23,13 @@ const IntervalsOverview = () => {
   )
 
   const goalEntities = useSelector(selectGoalEntities)
-  // console.log(`    goalEntities: ${JSON.stringify(goalEntities)}`)
+  console.log(`    goalEntities: ${JSON.stringify(goalEntities)}`)
 
   const intervalIds = useSelector(selectIntervalIds)
   console.log(`    intervalIds: ${intervalIds}`)
 
   const intervalEntities = useSelector(selectIntervalEntities)
-  // console.log(`    intervalEntities: ${JSON.stringify(intervalEntities)}`)
+  console.log(`    intervalEntities: ${JSON.stringify(intervalEntities)}`)
 
   const intervalsMeta = useSelector(selectIntervalsMeta)
   console.log(`    intervalsMeta: ${JSON.stringify(intervalsMeta)}`)
@@ -57,6 +57,9 @@ const IntervalsOverview = () => {
         await dispatch(fetchGoals())
       } catch (err) {
         let alertMessage
+
+        console.error('inspectin err')
+        console.error(err)
 
         if (err.response.status === 401) {
           dispatch(logout())

@@ -21,6 +21,7 @@ import {
   MOCK_INTERVAL_101,
   MOCK_GOAL_20,
   MOCK_GOAL_30,
+  MOCK_INTERVALS,
 } from './testHelpers'
 
 const requestHandlersToMock = [
@@ -1489,7 +1490,7 @@ describe('<App> + mocking of HTTP requests', () => {
           return res.once(
             ctx.status(200),
             ctx.json({
-              goals: [MOCK_GOAL_20],
+              goals: [MOCK_GOAL_10, MOCK_GOAL_20, MOCK_GOAL_30],
             })
           )
         }),
@@ -1497,7 +1498,9 @@ describe('<App> + mocking of HTTP requests', () => {
           return res.once(
             ctx.status(200),
             ctx.json({
-              items: [MOCK_INTERVAL_101],
+              items: MOCK_INTERVALS.filter(
+                (interval) => interval.goal_id !== MOCK_INTERVALS[1].goal_id
+              ).slice(1, 10),
               _meta: {
                 total_items: 1,
                 per_page: 10,
@@ -1538,7 +1541,7 @@ describe('<App> + mocking of HTTP requests', () => {
       const deleteAnchors = await screen.findAllByText('Delete')
       expect(deleteAnchors.length).toEqual(10)
 
-      const deleteAnchor = deleteAnchors[0]
+      const deleteAnchor = deleteAnchors[1]
       fireEvent.click(deleteAnchor)
 
       let element
@@ -1549,7 +1552,7 @@ describe('<App> + mocking of HTTP requests', () => {
       element = screen.getByText('Do you want to delete the selected interval?')
       expect(element).toBeInTheDocument()
 
-      const descriptionInput = screen.getByText(MOCK_GOAL_10.description)
+      const descriptionInput = screen.getByText(MOCK_GOAL_20.description)
       expect(descriptionInput).toBeInTheDocument()
 
       const yesButton = screen.getByText('Yes')
@@ -1561,7 +1564,7 @@ describe('<App> + mocking of HTTP requests', () => {
 
       await waitFor(() => {
         const descriptionOfDeletedGoal = screen.queryByText(
-          MOCK_GOAL_10.description
+          MOCK_GOAL_20.description
         )
         expect(descriptionOfDeletedGoal).not.toBeInTheDocument()
       })
