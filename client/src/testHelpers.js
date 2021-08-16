@@ -73,7 +73,7 @@ export const mockFetchGoals = (req, res, ctx) => {
   return res.once(
     ctx.status(200),
     ctx.json({
-      goals: [MOCK_GOAL_10, MOCK_GOAL_20],
+      goals: [MOCK_GOAL_10, MOCK_GOAL_20, MOCK_GOAL_30],
     })
   )
 }
