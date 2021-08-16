@@ -24,10 +24,12 @@
   // Helps to avoid ambiguity between inserting new lines or accepting suggestions.
   "editor.acceptSuggestionOnEnter": "off",
 
+  "editor.acceptSuggestionOnCommitCharacter": false,
+
   "[javascript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "editor.formatOnSave": true,
     
     "editor.tabSize": 2
-}
+  }
 }
