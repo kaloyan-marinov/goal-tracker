@@ -24,7 +24,7 @@ const GoalsOverview = () => {
   console.log(`    goalIds: ${goalIds}`)
 
   const goalEntities = useSelector(selectGoalEntities)
-  console.log(`    goalEntities: ${JSON.stringify(goalEntities)}`)
+  // console.log(`    goalEntities: ${JSON.stringify(goalEntities)}`)
 
   const intervalsLinks = useSelector(selectIntervalsLinks)
   console.log(`    intervalsLinks: ${JSON.stringify(intervalsLinks)}`)
