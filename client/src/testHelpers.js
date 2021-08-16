@@ -60,6 +60,11 @@ export const MOCK_GOAL_20 = {
   description: '[mocked] build a frontend application',
 }
 
+export const MOCK_GOAL_30 = {
+  id: 30,
+  description: '[mocked] fix a typo',
+}
+
 export const mockCreateGoal = (req, res, ctx) => {
   return res.once(ctx.status(201), ctx.json(MOCK_GOAL_10))
 }
@@ -89,7 +94,7 @@ export const mockDeleteGoal = (req, res, ctx) => {
   return res.once(ctx.status(204))
 }
 
-const MOCK_INTERVALS = [
+const MOCK_INTERVALS_PART_1 = [
   {
     id: 100,
     goal_id: 10,
@@ -108,55 +113,23 @@ const MOCK_INTERVALS = [
     start: '1999-08-05 18:54',
     final: '1999-08-05 19:46',
   },
-  {
-    id: 103,
-    goal_id: 10,
-    start: '2021-03-03 03:03',
-    final: '2021-03-03 04:00',
-  },
-  {
-    id: 104,
-    goal_id: 10,
-    start: '2021-04-04 04:04',
-    final: '2021-04-04 05:00',
-  },
-  {
-    id: 105,
-    goal_id: 10,
-    start: '2021-05-05 05:05',
-    final: '2021-05-05 06:00',
-  },
-  {
-    id: 106,
-    goal_id: 10,
-    start: '2021-06-06 06:06',
-    final: '2021-06-06 07:00',
-  },
-  {
-    id: 107,
-    goal_id: 10,
-    start: '2021-07-07 07:07',
-    final: '2021-07-07 08:00',
-  },
-  {
-    id: 108,
-    goal_id: 10,
-    start: '2021-08-08 08:08',
-    final: '2021-08-08 09:00',
-  },
-  {
-    id: 109,
-    goal_id: 10,
-    start: '2021-09-09 09:09',
-    final: '2021-09-09 10:00',
-  },
-  {
-    id: 110,
-    goal_id: 10,
-    start: '2021-10-10 10:10',
-    final: '2021-10-10 11:00',
-  },
 ]
+
+const MOCK_INTERVALS_PART_2 = Array.from({ length: 50 }).map((_, index) => {
+  const startMinute = index.toString().padStart(2, '0')
+  const finalMinute = (index + 1).toString().padStart(2, '0')
+
+  return {
+    id: 200 + index,
+    goal_id: 30,
+    start: `2021-08-16 00:${startMinute}`,
+    final: `2021-08-16 00:${finalMinute}`,
+  }
+})
+
+export const MOCK_INTERVALS = MOCK_INTERVALS_PART_1.concat(
+  MOCK_INTERVALS_PART_2
+)
 
 export const MOCK_INTERVAL_100 = {
   ...MOCK_INTERVALS[0],
@@ -176,7 +149,7 @@ export const mockCreateInterval = (req, res, ctx) => {
 
 export const mockFetchIntervals = (req, res, ctx) => {
   const totalItems = MOCK_INTERVALS.length
-  const perPage = 2
+  const perPage = 10
   const totalPages = Math.ceil(totalItems / perPage)
   const page = parseInt(req.url.searchParams.get('page') || '1')
 

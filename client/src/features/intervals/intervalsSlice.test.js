@@ -1,4 +1,8 @@
-import { MOCK_INTERVAL_100, MOCK_INTERVAL_101 } from '../../testHelpers'
+import {
+  MOCK_INTERVALS,
+  MOCK_INTERVAL_100,
+  MOCK_INTERVAL_101,
+} from '../../testHelpers'
 
 import {
   initialStateIntervals,
@@ -782,19 +786,19 @@ describe('thunk-action creators', () => {
       {
         type: 'intervals/fetchIntervals/fulfilled',
         payload: {
-          items: [MOCK_INTERVAL_100, MOCK_INTERVAL_101],
+          items: MOCK_INTERVALS.slice(0, 10),
           _meta: {
-            total_items: 11,
-            per_page: 2,
+            total_items: 53, // i.e. MOCK_INTERVALS.length
+            per_page: 10,
             total_pages: 6,
             page: 1,
           },
           _links: {
-            self: '/api/v1.0/intervals?per_page=2&page=1',
-            next: '/api/v1.0/intervals?per_page=2&page=2',
+            self: '/api/v1.0/intervals?per_page=10&page=1',
+            next: '/api/v1.0/intervals?per_page=10&page=2',
             prev: null,
-            first: '/api/v1.0/intervals?per_page=2&page=1',
-            last: '/api/v1.0/intervals?per_page=2&page=6',
+            first: '/api/v1.0/intervals?per_page=10&page=1',
+            last: '/api/v1.0/intervals?per_page=10&page=6',
           },
         },
       },
