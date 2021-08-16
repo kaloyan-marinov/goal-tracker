@@ -175,23 +175,40 @@ export const mockCreateInterval = (req, res, ctx) => {
 }
 
 export const mockFetchIntervals = (req, res, ctx) => {
+  const totalItems = MOCK_INTERVALS.length
+  const perPage = 2
+  const totalPages = Math.ceil(totalItems / perPage)
+  const page = parseInt(req.url.searchParams.get('page') || '1')
+
+  const start = (page - 1) * perPage
+  const end = start + perPage
+  const items = MOCK_INTERVALS.slice(start, end)
+
+  const _links = {
+    self: `/api/v1.0/intervals?per_page=${perPage}&page=${page}`,
+    next:
+      page >= totalPages
+        ? null
+        : `/api/v1.0/intervals?per_page=${perPage}&page=${page + 1}`,
+    prev:
+      page <= 1
+        ? null
+        : `/api/v1.0/intervals?per_page=${perPage}&page=${page - 1}`,
+    first: `/api/v1.0/intervals?per_page=${perPage}&page=1`,
+    last: `/api/v1.0/intervals?per_page=${perPage}&page=${totalPages}`,
+  }
+
   return res.once(
     ctx.status(200),
     ctx.json({
-      items: [MOCK_INTERVAL_100, MOCK_INTERVAL_101],
+      items,
       _meta: {
-        total_items: 2,
-        per_page: 10,
-        total_pages: 1,
-        page: 1,
+        total_items: totalItems,
+        per_page: perPage,
+        total_pages: totalPages,
+        page,
       },
-      _links: {
-        self: '/api/v1.0/intervals?per_page=10&page=1',
-        next: null,
-        prev: null,
-        first: '/api/v1.0/intervals?per_page=10&page=1',
-        last: '/api/v1.0/intervals?per_page=10&page=1',
-      },
+      _links,
     })
   )
 }
