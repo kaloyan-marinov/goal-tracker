@@ -1,4 +1,4 @@
-import { MOCK_INTERVAL_100, MOCK_INTERVAL_200 } from '../../testHelpers'
+import { MOCK_INTERVAL_100, MOCK_INTERVAL_101 } from '../../testHelpers'
 
 import {
   initialStateIntervals,
@@ -51,10 +51,10 @@ describe('selectors', () => {
         first: '/api/v1.0/intervals?per_page=10&page=1',
         last: '/api/v1.0/intervals?per_page=10&page=1',
       },
-      ids: [MOCK_INTERVAL_100.id, MOCK_INTERVAL_200.id],
+      ids: [MOCK_INTERVAL_100.id, MOCK_INTERVAL_101.id],
       entities: {
         [MOCK_INTERVAL_100.id]: MOCK_INTERVAL_100,
-        [MOCK_INTERVAL_200.id]: MOCK_INTERVAL_200,
+        [MOCK_INTERVAL_101.id]: MOCK_INTERVAL_101,
       },
     },
   }
@@ -62,7 +62,7 @@ describe('selectors', () => {
   test('selectIntervalIds', () => {
     const intervalIds = selectIntervalIds(initSt)
 
-    expect(intervalIds).toEqual([100, 200])
+    expect(intervalIds).toEqual([100, 101])
   })
 
   test('selectIntervalEntities', () => {
@@ -75,8 +75,8 @@ describe('selectors', () => {
         start: '2021-08-05 18:54',
         final: '2021-08-05 19:46',
       },
-      200: {
-        id: 200,
+      101: {
+        id: 101,
         goal_id: 20,
         start: '2021-08-05 19:53',
         final: '2021-08-05 20:41',
@@ -158,7 +158,7 @@ describe('action creators', () => {
       first: null,
       last: null,
     }
-    const items = [MOCK_INTERVAL_100, MOCK_INTERVAL_200]
+    const items = [MOCK_INTERVAL_100, MOCK_INTERVAL_101]
 
     /* Act. */
     const action = fetchIntervalsFulfilled(_meta, _links, items)
@@ -226,11 +226,11 @@ describe('action creators', () => {
   })
 
   test('deleteIntervalFulfilled', () => {
-    const action = deleteIntervalFulfilled(MOCK_INTERVAL_200.id)
+    const action = deleteIntervalFulfilled(MOCK_INTERVAL_101.id)
 
     expect(action).toEqual({
       type: 'intervals/deleteInterval/fulfilled',
-      payload: MOCK_INTERVAL_200.id,
+      payload: MOCK_INTERVAL_101.id,
     })
   })
 
@@ -393,7 +393,7 @@ describe('slice reducer', () => {
           first: '/api/v1.0/intervals?per_page=10',
           last: '/api/v1.0/intervals?per_page=10',
         },
-        items: [MOCK_INTERVAL_100, MOCK_INTERVAL_200],
+        items: [MOCK_INTERVAL_100, MOCK_INTERVAL_101],
       },
     }
 
@@ -415,10 +415,10 @@ describe('slice reducer', () => {
         first: '/api/v1.0/intervals?per_page=10',
         last: '/api/v1.0/intervals?per_page=10',
       },
-      ids: [MOCK_INTERVAL_100.id, MOCK_INTERVAL_200.id],
+      ids: [MOCK_INTERVAL_100.id, MOCK_INTERVAL_101.id],
       entities: {
         [MOCK_INTERVAL_100.id]: MOCK_INTERVAL_100,
-        [MOCK_INTERVAL_200.id]: MOCK_INTERVAL_200,
+        [MOCK_INTERVAL_101.id]: MOCK_INTERVAL_101,
       },
     })
   })
@@ -473,9 +473,9 @@ describe('slice reducer', () => {
         first: null,
         last: null,
       },
-      ids: [MOCK_INTERVAL_200.id],
+      ids: [MOCK_INTERVAL_101.id],
       entities: {
-        [MOCK_INTERVAL_200.id]: MOCK_INTERVAL_200,
+        [MOCK_INTERVAL_101.id]: MOCK_INTERVAL_101,
       },
     }
     const action = {
@@ -523,16 +523,16 @@ describe('slice reducer', () => {
       ...initialStateIntervals,
       requestStatus: 'using this value is illustrative but unrealistic',
       requestError: 'using this value is illustrative but unrealistic',
-      ids: [MOCK_INTERVAL_200.id],
+      ids: [MOCK_INTERVAL_101.id],
       entities: {
-        [MOCK_INTERVAL_200.id]: MOCK_INTERVAL_200,
+        [MOCK_INTERVAL_101.id]: MOCK_INTERVAL_101,
       },
     }
     const action = {
       type: 'intervals/editInterval/fulfilled',
       payload: {
         ...MOCK_INTERVAL_100,
-        id: MOCK_INTERVAL_200.id,
+        id: MOCK_INTERVAL_101.id,
       },
     }
 
@@ -554,10 +554,10 @@ describe('slice reducer', () => {
         first: null,
         last: null,
       },
-      ids: [MOCK_INTERVAL_200.id],
+      ids: [MOCK_INTERVAL_101.id],
       entities: {
-        [MOCK_INTERVAL_200.id]: {
-          id: MOCK_INTERVAL_200.id,
+        [MOCK_INTERVAL_101.id]: {
+          id: MOCK_INTERVAL_101.id,
           goal_id: MOCK_INTERVAL_100.goal_id,
           start: MOCK_INTERVAL_100.start,
           final: MOCK_INTERVAL_100.final,
@@ -634,14 +634,14 @@ describe('slice reducer', () => {
       ...initialStateIntervals,
       requestStatus: 'using this value is illustrative but unrealistic',
       requestError: 'using this value is illustrative but unrealistic',
-      ids: [MOCK_INTERVAL_200.id],
+      ids: [MOCK_INTERVAL_101.id],
       entities: {
-        [MOCK_INTERVAL_200.id]: MOCK_INTERVAL_200,
+        [MOCK_INTERVAL_101.id]: MOCK_INTERVAL_101,
       },
     }
     const action = {
       type: 'intervals/deleteInterval/fulfilled',
-      payload: MOCK_INTERVAL_200.id,
+      payload: MOCK_INTERVAL_101.id,
     }
 
     const newSt = intervalsReducer(initStIntervals, action)
@@ -782,7 +782,7 @@ describe('thunk-action creators', () => {
       {
         type: 'intervals/fetchIntervals/fulfilled',
         payload: {
-          items: [MOCK_INTERVAL_100, MOCK_INTERVAL_200],
+          items: [MOCK_INTERVAL_100, MOCK_INTERVAL_101],
           _meta: {
             total_items: 2,
             per_page: 10,

@@ -16,9 +16,9 @@ import { setupServer } from 'msw/node'
 import {
   requestHandlers,
   MOCK_GOAL_10,
-  MOCK_INTERVAL_300,
+  MOCK_INTERVAL_102,
   MOCK_INTERVAL_100,
-  MOCK_INTERVAL_200,
+  MOCK_INTERVAL_101,
   MOCK_GOAL_20,
 } from './testHelpers'
 
@@ -1246,10 +1246,10 @@ describe('<App> + mocking of HTTP requests', () => {
       const [startTimestampInput, finalTimestampInput] = timestampInputs
 
       fireEvent.change(startTimestampInput, {
-        target: { value: MOCK_INTERVAL_300.start },
+        target: { value: MOCK_INTERVAL_102.start },
       })
       fireEvent.change(finalTimestampInput, {
-        target: { value: MOCK_INTERVAL_300.final },
+        target: { value: MOCK_INTERVAL_102.final },
       })
 
       const addIntervalButton = screen.getByRole('button', {
@@ -1324,10 +1324,10 @@ describe('<App> + mocking of HTTP requests', () => {
       const [startTimestampInput, finalTimestampInput] = timestampInputs
 
       fireEvent.change(startTimestampInput, {
-        target: { value: MOCK_INTERVAL_300.start },
+        target: { value: MOCK_INTERVAL_102.start },
       })
       fireEvent.change(finalTimestampInput, {
-        target: { value: MOCK_INTERVAL_300.final },
+        target: { value: MOCK_INTERVAL_102.final },
       })
 
       const addIntervalButton = screen.getByRole('button', {
@@ -1490,7 +1490,7 @@ describe('<App> + mocking of HTTP requests', () => {
           return res.once(
             ctx.status(200),
             ctx.json({
-              items: [MOCK_INTERVAL_200],
+              items: [MOCK_INTERVAL_101],
               _meta: {
                 total_items: 1,
                 per_page: 10,
