@@ -65,6 +65,8 @@ export const MOCK_GOAL_30 = {
   description: '[mocked] fix a typo',
 }
 
+export const MOCK_GOALS = [MOCK_GOAL_10, MOCK_GOAL_20, MOCK_GOAL_30]
+
 export const mockCreateGoal = (req, res, ctx) => {
   return res.once(ctx.status(201), ctx.json(MOCK_GOAL_10))
 }

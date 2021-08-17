@@ -21,6 +21,7 @@ import {
   MOCK_GOAL_20,
   MOCK_GOAL_30,
   MOCK_INTERVALS,
+  MOCK_GOALS,
 } from './testHelpers'
 
 const requestHandlersToMock = [
@@ -1474,6 +1475,22 @@ describe('<App> + mocking of HTTP requests', () => {
       " then clicks on the 1st 'Delete' anchor tag," +
       " and finally clicks on the 'Yes' button",
     async () => {
+      /*
+      Assumptions that this test case makes and is dependent on:
+
+      (a) from among the 1st page of Intervals that is returned to the client,
+          the very 1st Interval will be deleted, and
+
+      (b) after that deletion has been processed,
+          from among the 1st page of Intervals that is returned to the client,
+          there doesn't exist any Interval
+          that is associated with the same Goal as the deleted Interval.
+      */
+      const idxOfIntervalToDelete = 0
+      const goalAssociatedWithDeletedInterval = MOCK_GOALS.find(
+        (goal) => goal.id === MOCK_INTERVALS[idxOfIntervalToDelete].goal_id
+      )
+
       /* Arrange. */
       quasiServer.use(
         rest.get('/api/v1.0/user', requestHandlers.mockFetchUser),
@@ -1485,31 +1502,30 @@ describe('<App> + mocking of HTTP requests', () => {
           requestHandlers.mockDeleteInterval
         ),
 
-        rest.get('/api/v1.0/goals', (req, res, ctx) => {
-          return res.once(
-            ctx.status(200),
-            ctx.json({
-              goals: [MOCK_GOAL_10, MOCK_GOAL_20, MOCK_GOAL_30],
-            })
-          )
-        }),
+        /* No Goals were deleted. */
+        rest.get('/api/v1.0/goals', requestHandlers.mockFetchGoals),
+        /* Update the 1st page of Intervals. */
         rest.get('/api/v1.0/intervals', (req, res, ctx) => {
+          const start = idxOfIntervalToDelete + 1
+          const remainingIntervals = MOCK_INTERVALS.slice(start)
+          const perPage = 10
+
           return res.once(
             ctx.status(200),
             ctx.json({
-              items: MOCK_INTERVALS.slice(1, 1 + 10),
+              items: remainingIntervals.slice(0, perPage),
               _meta: {
                 total_items: 1,
-                per_page: 10,
+                per_page: perPage,
                 total_pages: 1,
                 page: 1,
               },
               _links: {
-                self: '/api/v1.0/intervals?per_page=10&page=1',
+                self: `/api/v1.0/intervals?per_page=${perPage}&page=1`,
                 next: null,
                 prev: null,
-                first: '/api/v1.0/intervals?per_page=10&page=1',
-                last: '/api/v1.0/intervals?per_page=10&page=1',
+                first: `/api/v1.0/intervals?per_page=${perPage}&page=1`,
+                last: `/api/v1.0/intervals?per_page=${perPage}&page=1`,
               },
             })
           )
@@ -1538,7 +1554,7 @@ describe('<App> + mocking of HTTP requests', () => {
       const deleteAnchors = await screen.findAllByText('Delete')
       expect(deleteAnchors.length).toEqual(10)
 
-      const deleteAnchor = deleteAnchors[0]
+      const deleteAnchor = deleteAnchors[idxOfIntervalToDelete]
       fireEvent.click(deleteAnchor)
 
       let element
@@ -1549,7 +1565,9 @@ describe('<App> + mocking of HTTP requests', () => {
       element = screen.getByText('Do you want to delete the selected interval?')
       expect(element).toBeInTheDocument()
 
-      const descriptionInput = screen.getByText(MOCK_GOAL_10.description)
+      const descriptionInput = screen.getByText(
+        goalAssociatedWithDeletedInterval.description
+      )
       expect(descriptionInput).toBeInTheDocument()
 
       const yesButton = screen.getByText('Yes')
@@ -1560,8 +1578,12 @@ describe('<App> + mocking of HTTP requests', () => {
       expect(element).toBeInTheDocument()
 
       await waitFor(() => {
+        /*
+        In view of Assumption (b) described above,
+        the following assertions should be true.
+        */
         const descriptionOfDeletedGoal = screen.queryByText(
-          MOCK_GOAL_10.description
+          goalAssociatedWithDeletedInterval.description
         )
         expect(descriptionOfDeletedGoal).not.toBeInTheDocument()
       })
