@@ -152,7 +152,8 @@ const IntervalsOverview = () => {
       )
 
     const paginationCtrlButtonFirst =
-      intervalsLinks.first !== null ? (
+      intervalsLinks.first !== null &&
+      intervalsLinks.first !== intervalsLinks.self ? (
         <button onClick={(e) => setIntervalsUrl(intervalsLinks.first)}>
           First page
         </button>
@@ -161,7 +162,8 @@ const IntervalsOverview = () => {
       )
 
     const paginationCtrlButtonLast =
-      intervalsLinks.last !== null ? (
+      intervalsLinks.last !== null &&
+      intervalsLinks.last !== intervalsLinks.self ? (
         <button onClick={(e) => setIntervalsUrl(intervalsLinks.last)}>
           Last page
         </button>
