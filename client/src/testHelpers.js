@@ -109,9 +109,9 @@ const MOCK_INTERVALS_PART_1 = [
   },
   {
     id: 102,
-    goal_id: 10,
-    start: '1999-08-05 18:54',
-    final: '1999-08-05 19:46',
+    goal_id: 20,
+    start: '2021-08-07 18:54',
+    final: '2021-08-07 19:46',
   },
 ]
 
