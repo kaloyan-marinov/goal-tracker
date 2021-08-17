@@ -1192,6 +1192,68 @@ describe('<App> + mocking of HTTP requests', () => {
   )
 
   test(
+    "an authenticated user clicks on 'Intervals Overview'" +
+      " and then interacts with <IntervalsOverview>'s pagination-controlloing buttons",
+    async () => {
+      /* Arrange. */
+      quasiServer.use(
+        rest.get('/api/v1.0/user', requestHandlers.mockFetchUser),
+        rest.get('/api/v1.0/goals', requestHandlers.mockFetchGoals),
+        rest.get('/api/v1.0/intervals', requestHandlers.mockFetchIntervals),
+
+        rest.get('/api/v1.0/goals', requestHandlers.mockFetchGoals),
+        rest.get('/api/v1.0/intervals', requestHandlers.mockFetchIntervals)
+      )
+
+      const enhancer = applyMiddleware(thunkMiddleware)
+      const realStore = createStore(rootReducer, enhancer)
+
+      const history = createMemoryHistory()
+
+      render(
+        <Provider store={realStore}>
+          <Router history={history}>
+            <App />
+          </Router>
+        </Provider>
+      )
+
+      /* Act. */
+      const intervalsOverviewAnchor = await screen.findByText(
+        'Intervals Overview'
+      )
+      fireEvent.click(intervalsOverviewAnchor)
+
+      /* Assert. */
+      let intervalsForGoal1 = await screen.findAllByText(
+        MOCK_GOAL_10.description
+      )
+      expect(intervalsForGoal1.length).toEqual(1)
+
+      let intervalsForGoal2 = screen.getAllByText(MOCK_GOAL_20.description)
+      expect(intervalsForGoal2.length).toEqual(2)
+
+      let intervalsForGoal3 = screen.getAllByText(MOCK_GOAL_30.description)
+      expect(intervalsForGoal3.length).toEqual(7)
+
+      /* prep */
+      let firstIntervalStart
+      let lastIntervalFinal
+
+      /* Act. */
+      const lastPageButton = screen.getByRole('button', { name: 'Last page' })
+      fireEvent.click(lastPageButton)
+
+      /* Assert. */
+      firstIntervalStart = await screen.findByText('2021-08-16 00:47')
+      expect(firstIntervalStart).toBeInTheDocument()
+
+      lastIntervalFinal = screen.getByText('2021-08-16 00:50')
+      expect(lastIntervalFinal).toBeInTheDocument()
+    }
+  )
+
+  test(
     "an authenticated user clicks on 'Intervals Overview'," +
       " then clicks on 'Add a new interval'," +
       ' and finally fills out the form and submits it',
