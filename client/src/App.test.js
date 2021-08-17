@@ -482,7 +482,7 @@ describe('<App> + mocking of HTTP requests', () => {
 
   test(
     "an authenticated user clicks on 'Goals Overview'," +
-      ' but JWS token expires before the GET request for Goals is issued',
+      ' but the JWS token expires before the GET request for Goals is issued',
     async () => {
       /* Arrange. */
       quasiServer.use(
@@ -531,7 +531,7 @@ describe('<App> + mocking of HTTP requests', () => {
 
   test(
     "an authenticated user clicks on 'Goals Overview'," +
-      ' but JWS token expires before the GET request for Intervals is issued',
+      ' but the JWS token expires before the GET request for Intervals is issued',
     async () => {
       /* Arrange. */
       quasiServer.use(
@@ -1057,8 +1057,10 @@ describe('<App> + mocking of HTTP requests', () => {
     )
 
     /* Act. */
-    const goalsOverviewAnchor = await screen.findByText('Intervals Overview')
-    fireEvent.click(goalsOverviewAnchor)
+    const intervalsOverviewAnchor = await screen.findByText(
+      'Intervals Overview'
+    )
+    fireEvent.click(intervalsOverviewAnchor)
 
     /* Assert. */
     let intervalsForGoal1 = await screen.findAllByText(MOCK_GOAL_10.description)
@@ -1088,7 +1090,7 @@ describe('<App> + mocking of HTTP requests', () => {
 
   test(
     "an authenticated user clicks on 'Intervals Overview'," +
-      ' but JWS token expires before the GET request for Goals is issued',
+      ' but the JWS token expires before the GET request for Goals is issued',
     async () => {
       /* Arrange. */
       quasiServer.use(
@@ -1122,8 +1124,10 @@ describe('<App> + mocking of HTTP requests', () => {
       )
 
       /* Act. */
-      const goalsOverviewAnchor = await screen.findByText('Intervals Overview')
-      fireEvent.click(goalsOverviewAnchor)
+      const intervalsOverviewAnchor = await screen.findByText(
+        'Intervals Overview'
+      )
+      fireEvent.click(intervalsOverviewAnchor)
 
       /* Assert. */
       let element
@@ -1137,7 +1141,7 @@ describe('<App> + mocking of HTTP requests', () => {
 
   test(
     "an authenticated user clicks on 'Intervals Overview'," +
-      ' but JWS token expires before the GET request for Intervals is issued',
+      ' but the JWS token expires before the GET request for Intervals is issued',
     async () => {
       /* Arrange. */
       quasiServer.use(
@@ -1160,8 +1164,10 @@ describe('<App> + mocking of HTTP requests', () => {
       )
 
       /* Act. */
-      const goalsOverviewAnchor = await screen.findByText('Intervals Overview')
-      fireEvent.click(goalsOverviewAnchor)
+      const intervalsOverviewAnchor = await screen.findByText(
+        'Intervals Overview'
+      )
+      fireEvent.click(intervalsOverviewAnchor)
 
       /* Assert. */
       let element
@@ -1224,8 +1230,10 @@ describe('<App> + mocking of HTTP requests', () => {
         </Provider>
       )
 
-      const goalsOverviewAnchor = await screen.findByText('Intervals Overview')
-      fireEvent.click(goalsOverviewAnchor)
+      const intervalsOverviewAnchor = await screen.findByText(
+        'Intervals Overview'
+      )
+      fireEvent.click(intervalsOverviewAnchor)
 
       await waitFor(() => {
         const rows = screen.queryAllByText('Edit')
@@ -1302,8 +1310,10 @@ describe('<App> + mocking of HTTP requests', () => {
         </Provider>
       )
 
-      const goalsOverviewAnchor = await screen.findByText('Intervals Overview')
-      fireEvent.click(goalsOverviewAnchor)
+      const intervalsOverviewAnchor = await screen.findByText(
+        'Intervals Overview'
+      )
+      fireEvent.click(intervalsOverviewAnchor)
 
       await waitFor(() => {
         const rows = screen.queryAllByText('Edit')
