@@ -1246,6 +1246,7 @@ describe('<App> + mocking of HTTP requests', () => {
       expect(intervalsForGoal3.length).toEqual(7)
 
       /* prep */
+      let currentPageSpan
       let firstIntervalStart
       let lastIntervalFinal
 
@@ -1254,7 +1255,10 @@ describe('<App> + mocking of HTTP requests', () => {
       fireEvent.click(lastPageButton)
 
       /* Assert. */
-      firstIntervalStart = await screen.findByText('2021-08-16 00:47')
+      currentPageSpan = await screen.findByText('Current page: 6')
+      expect(currentPageSpan).toBeInTheDocument()
+
+      firstIntervalStart = screen.getByText('2021-08-16 00:47')
       expect(firstIntervalStart).toBeInTheDocument()
 
       lastIntervalFinal = screen.getByText('2021-08-16 00:50')
@@ -1267,7 +1271,10 @@ describe('<App> + mocking of HTTP requests', () => {
       fireEvent.click(previousPageButton)
 
       /* Assert. */
-      firstIntervalStart = await screen.findByText('2021-08-16 00:37')
+      currentPageSpan = await screen.findByText('Current page: 5')
+      expect(currentPageSpan).toBeInTheDocument()
+
+      firstIntervalStart = screen.getByText('2021-08-16 00:37')
       expect(firstIntervalStart).toBeInTheDocument()
 
       lastIntervalFinal = screen.getByText('2021-08-16 00:47')
@@ -1280,7 +1287,10 @@ describe('<App> + mocking of HTTP requests', () => {
       fireEvent.click(firstPageButton)
 
       /* Assert. */
-      firstIntervalStart = await screen.findByText('2021-08-05 18:54')
+      currentPageSpan = await screen.findByText('Current page: 1')
+      expect(currentPageSpan).toBeInTheDocument()
+
+      firstIntervalStart = screen.getByText('2021-08-05 18:54')
       expect(firstIntervalStart).toBeInTheDocument()
 
       lastIntervalFinal = screen.getByText('2021-08-16 00:07')
@@ -1293,9 +1303,10 @@ describe('<App> + mocking of HTTP requests', () => {
       fireEvent.click(nextPageButton)
 
       /* Assert. */
-      await screen.findByText('Current page: 2')
+      currentPageSpan = await screen.findByText('Current page: 2')
+      expect(currentPageSpan).toBeInTheDocument()
 
-      firstIntervalStart = await screen.findByText('2021-08-16 00:07')
+      firstIntervalStart = screen.getByText('2021-08-16 00:07')
       expect(firstIntervalStart).toBeInTheDocument()
 
       lastIntervalFinal = screen.getByText('2021-08-16 00:17')
