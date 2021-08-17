@@ -1208,6 +1208,9 @@ describe('<App> + mocking of HTTP requests', () => {
         rest.get('/api/v1.0/intervals', requestHandlers.mockFetchIntervals),
 
         rest.get('/api/v1.0/goals', requestHandlers.mockFetchGoals),
+        rest.get('/api/v1.0/intervals', requestHandlers.mockFetchIntervals),
+
+        rest.get('/api/v1.0/goals', requestHandlers.mockFetchGoals),
         rest.get('/api/v1.0/intervals', requestHandlers.mockFetchIntervals)
       )
 
@@ -1281,6 +1284,21 @@ describe('<App> + mocking of HTTP requests', () => {
       expect(firstIntervalStart).toBeInTheDocument()
 
       lastIntervalFinal = screen.getByText('2021-08-16 00:07')
+      expect(lastIntervalFinal).toBeInTheDocument()
+
+      /* Act. */
+      const nextPageButton = screen.getByRole('button', {
+        name: 'Next page',
+      })
+      fireEvent.click(nextPageButton)
+
+      /* Assert. */
+      await screen.findByText('Current page: 2')
+
+      firstIntervalStart = await screen.findByText('2021-08-16 00:07')
+      expect(firstIntervalStart).toBeInTheDocument()
+
+      lastIntervalFinal = screen.getByText('2021-08-16 00:17')
       expect(lastIntervalFinal).toBeInTheDocument()
     }
   )
