@@ -1042,6 +1042,18 @@ describe('<App> + mocking of HTTP requests', () => {
       rest.get('/api/v1.0/goals', requestHandlers.mockFetchGoals),
       rest.get('/api/v1.0/intervals', requestHandlers.mockFetchIntervals)
     )
+    /*
+    (The following remark dates back to before the addition of this comment.)
+
+    This test case should be able to do without the 2nd set of request matchers.
+    However:
+    - running this file's tests with the 2nd set of request handlers
+      results in a PASS
+    - running this file's tests without them
+      results in a FAILure of this test case
+    - running this file's tests without them plus adding `.only` to this test case
+      results in a PASS
+    */
 
     const enhancer = applyMiddleware(thunkMiddleware)
     const realStore = createStore(rootReducer, enhancer)
