@@ -1,4 +1,8 @@
-import { MOCK_INTERVAL_100, MOCK_INTERVAL_200 } from '../../testHelpers'
+import {
+  MOCK_INTERVALS,
+  MOCK_INTERVAL_100,
+  MOCK_INTERVAL_101,
+} from '../../testHelpers'
 
 import {
   initialStateIntervals,
@@ -17,6 +21,8 @@ import {
   deleteIntervalPending,
   deleteIntervalFulfilled,
   deleteIntervalRejected,
+  selectIntervalsLinks,
+  selectIntervalsMeta,
 } from './intervalsSlice'
 import intervalsReducer from './intervalsSlice'
 
@@ -29,17 +35,30 @@ import {
   editInterval,
   deleteInterval,
 } from './intervalsSlice'
-import { RequestStatus } from '../../constants'
+import { RequestStatus, URL_FOR_FIRST_PAGE_OF_INTERVALS } from '../../constants'
 
 describe('selectors', () => {
   const initSt = {
     intervals: {
       ...initialStateIntervals,
       requestStatus: RequestStatus.SUCCEEDED,
-      ids: [MOCK_INTERVAL_100.id, MOCK_INTERVAL_200.id],
+      _meta: {
+        total_items: 2,
+        per_page: 10,
+        pages: 1,
+        page: 1,
+      },
+      _links: {
+        self: '/api/v1.0/intervals?per_page=10&page=1',
+        next: null,
+        prev: null,
+        first: '/api/v1.0/intervals?per_page=10&page=1',
+        last: '/api/v1.0/intervals?per_page=10&page=1',
+      },
+      ids: [MOCK_INTERVAL_100.id, MOCK_INTERVAL_101.id],
       entities: {
         [MOCK_INTERVAL_100.id]: MOCK_INTERVAL_100,
-        [MOCK_INTERVAL_200.id]: MOCK_INTERVAL_200,
+        [MOCK_INTERVAL_101.id]: MOCK_INTERVAL_101,
       },
     },
   }
@@ -47,7 +66,7 @@ describe('selectors', () => {
   test('selectIntervalIds', () => {
     const intervalIds = selectIntervalIds(initSt)
 
-    expect(intervalIds).toEqual([100, 200])
+    expect(intervalIds).toEqual([100, 101])
   })
 
   test('selectIntervalEntities', () => {
@@ -60,12 +79,35 @@ describe('selectors', () => {
         start: '2021-08-05 18:54',
         final: '2021-08-05 19:46',
       },
-      200: {
-        id: 200,
+      101: {
+        id: 101,
         goal_id: 20,
         start: '2021-08-05 19:53',
         final: '2021-08-05 20:41',
       },
+    })
+  })
+
+  test('selectIntervalsMeta', () => {
+    const intervalsMeta = selectIntervalsMeta(initSt)
+
+    expect(intervalsMeta).toEqual({
+      total_items: 2,
+      per_page: 10,
+      pages: 1,
+      page: 1,
+    })
+  })
+
+  test('selectIntervalsLinks', () => {
+    const intervalsLinks = selectIntervalsLinks(initSt)
+
+    expect(intervalsLinks).toEqual({
+      self: '/api/v1.0/intervals?per_page=10&page=1',
+      next: null,
+      prev: null,
+      first: '/api/v1.0/intervals?per_page=10&page=1',
+      last: '/api/v1.0/intervals?per_page=10&page=1',
     })
   })
 })
@@ -106,14 +148,33 @@ describe('action creators', () => {
   })
 
   test('fetchIntervalsFulfilled', () => {
-    const action = fetchIntervalsFulfilled([
-      MOCK_INTERVAL_100,
-      MOCK_INTERVAL_200,
-    ])
+    /* Arrange. */
+    const _meta = {
+      total_items: null,
+      per_page: null,
+      total_pages: null,
+      page: null,
+    }
+    const _links = {
+      self: null,
+      next: null,
+      prev: null,
+      first: null,
+      last: null,
+    }
+    const items = [MOCK_INTERVAL_100, MOCK_INTERVAL_101]
 
+    /* Act. */
+    const action = fetchIntervalsFulfilled(_meta, _links, items)
+
+    /* Assert. */
     expect(action).toEqual({
       type: 'intervals/fetchIntervals/fulfilled',
-      payload: [MOCK_INTERVAL_100, MOCK_INTERVAL_200],
+      payload: {
+        _meta,
+        _links,
+        items,
+      },
     })
   })
 
@@ -169,11 +230,11 @@ describe('action creators', () => {
   })
 
   test('deleteIntervalFulfilled', () => {
-    const action = deleteIntervalFulfilled(MOCK_INTERVAL_200.id)
+    const action = deleteIntervalFulfilled(MOCK_INTERVAL_101.id)
 
     expect(action).toEqual({
       type: 'intervals/deleteInterval/fulfilled',
-      payload: MOCK_INTERVAL_200.id,
+      payload: MOCK_INTERVAL_101.id,
     })
   })
 
@@ -201,6 +262,19 @@ describe('slice reducer', () => {
     expect(newSt).toEqual({
       requestStatus: RequestStatus.LOADING,
       requestError: null,
+      _meta: {
+        total_items: null,
+        per_page: null,
+        total_pages: null,
+        page: null,
+      },
+      _links: {
+        self: null,
+        next: null,
+        prev: null,
+        first: null,
+        last: null,
+      },
       ids: [],
       entities: {},
     })
@@ -220,6 +294,19 @@ describe('slice reducer', () => {
     expect(newSt).toEqual({
       requestStatus: RequestStatus.SUCCEEDED,
       requestError: null,
+      _meta: {
+        total_items: null,
+        per_page: null,
+        total_pages: null,
+        page: null,
+      },
+      _links: {
+        self: null,
+        next: null,
+        prev: null,
+        first: null,
+        last: null,
+      },
       ids: [MOCK_INTERVAL_100.id],
       entities: {
         [MOCK_INTERVAL_100.id]: MOCK_INTERVAL_100,
@@ -241,6 +328,19 @@ describe('slice reducer', () => {
     expect(newSt).toEqual({
       requestStatus: RequestStatus.FAILED,
       requestError: 'intervals-createInterval-rejected',
+      _meta: {
+        total_items: null,
+        per_page: null,
+        total_pages: null,
+        page: null,
+      },
+      _links: {
+        self: null,
+        next: null,
+        prev: null,
+        first: null,
+        last: null,
+      },
       ids: [],
       entities: {},
     })
@@ -259,6 +359,19 @@ describe('slice reducer', () => {
     expect(newSt).toEqual({
       requestStatus: RequestStatus.LOADING,
       requestError: null,
+      _meta: {
+        total_items: null,
+        per_page: null,
+        total_pages: null,
+        page: null,
+      },
+      _links: {
+        self: null,
+        next: null,
+        prev: null,
+        first: null,
+        last: null,
+      },
       ids: [],
       entities: {},
     })
@@ -270,7 +383,22 @@ describe('slice reducer', () => {
     }
     const action = {
       type: 'intervals/fetchIntervals/fulfilled',
-      payload: [MOCK_INTERVAL_100, MOCK_INTERVAL_200],
+      payload: {
+        _meta: {
+          total_items: 2,
+          per_page: 10,
+          total_pages: 1,
+          page: 1,
+        },
+        _links: {
+          self: '/api/v1.0/intervals?per_page=10',
+          next: null,
+          prev: null,
+          first: '/api/v1.0/intervals?per_page=10',
+          last: '/api/v1.0/intervals?per_page=10',
+        },
+        items: [MOCK_INTERVAL_100, MOCK_INTERVAL_101],
+      },
     }
 
     const newSt = intervalsReducer(initStIntervals, action)
@@ -278,10 +406,23 @@ describe('slice reducer', () => {
     expect(newSt).toEqual({
       requestStatus: RequestStatus.SUCCEEDED,
       requestError: null,
-      ids: [MOCK_INTERVAL_100.id, MOCK_INTERVAL_200.id],
+      _meta: {
+        total_items: 2,
+        per_page: 10,
+        total_pages: 1,
+        page: 1,
+      },
+      _links: {
+        self: '/api/v1.0/intervals?per_page=10',
+        next: null,
+        prev: null,
+        first: '/api/v1.0/intervals?per_page=10',
+        last: '/api/v1.0/intervals?per_page=10',
+      },
+      ids: [MOCK_INTERVAL_100.id, MOCK_INTERVAL_101.id],
       entities: {
         [MOCK_INTERVAL_100.id]: MOCK_INTERVAL_100,
-        [MOCK_INTERVAL_200.id]: MOCK_INTERVAL_200,
+        [MOCK_INTERVAL_101.id]: MOCK_INTERVAL_101,
       },
     })
   })
@@ -300,6 +441,19 @@ describe('slice reducer', () => {
     expect(newSt).toEqual({
       requestStatus: RequestStatus.FAILED,
       requestError: 'intervals-fetchIntervals-rejected',
+      _meta: {
+        total_items: null,
+        per_page: null,
+        total_pages: null,
+        page: null,
+      },
+      _links: {
+        self: null,
+        next: null,
+        prev: null,
+        first: null,
+        last: null,
+      },
       ids: [],
       entities: {},
     })
@@ -310,9 +464,22 @@ describe('slice reducer', () => {
       ...initialStateIntervals,
       requestStatus: RequestStatus.SUCCEEDED,
       requestError: null,
-      ids: [MOCK_INTERVAL_200.id],
+      _meta: {
+        total_items: null,
+        per_page: null,
+        total_pages: null,
+        page: null,
+      },
+      _links: {
+        self: null,
+        next: null,
+        prev: null,
+        first: null,
+        last: null,
+      },
+      ids: [MOCK_INTERVAL_101.id],
       entities: {
-        [MOCK_INTERVAL_200.id]: MOCK_INTERVAL_200,
+        [MOCK_INTERVAL_101.id]: MOCK_INTERVAL_101,
       },
     }
     const action = {
@@ -337,6 +504,19 @@ describe('slice reducer', () => {
     expect(newSt).toEqual({
       requestStatus: RequestStatus.LOADING,
       requestError: null,
+      _meta: {
+        total_items: null,
+        per_page: null,
+        total_pages: null,
+        page: null,
+      },
+      _links: {
+        self: null,
+        next: null,
+        prev: null,
+        first: null,
+        last: null,
+      },
       ids: [],
       entities: {},
     })
@@ -347,16 +527,16 @@ describe('slice reducer', () => {
       ...initialStateIntervals,
       requestStatus: 'using this value is illustrative but unrealistic',
       requestError: 'using this value is illustrative but unrealistic',
-      ids: [MOCK_INTERVAL_200.id],
+      ids: [MOCK_INTERVAL_101.id],
       entities: {
-        [MOCK_INTERVAL_200.id]: MOCK_INTERVAL_200,
+        [MOCK_INTERVAL_101.id]: MOCK_INTERVAL_101,
       },
     }
     const action = {
       type: 'intervals/editInterval/fulfilled',
       payload: {
         ...MOCK_INTERVAL_100,
-        id: MOCK_INTERVAL_200.id,
+        id: MOCK_INTERVAL_101.id,
       },
     }
 
@@ -365,10 +545,23 @@ describe('slice reducer', () => {
     expect(newSt).toEqual({
       requestStatus: RequestStatus.SUCCEEDED,
       requestError: null,
-      ids: [MOCK_INTERVAL_200.id],
+      _meta: {
+        total_items: null,
+        per_page: null,
+        total_pages: null,
+        page: null,
+      },
+      _links: {
+        self: null,
+        next: null,
+        prev: null,
+        first: null,
+        last: null,
+      },
+      ids: [MOCK_INTERVAL_101.id],
       entities: {
-        [MOCK_INTERVAL_200.id]: {
-          id: MOCK_INTERVAL_200.id,
+        [MOCK_INTERVAL_101.id]: {
+          id: MOCK_INTERVAL_101.id,
           goal_id: MOCK_INTERVAL_100.goal_id,
           start: MOCK_INTERVAL_100.start,
           final: MOCK_INTERVAL_100.final,
@@ -391,6 +584,19 @@ describe('slice reducer', () => {
     expect(newSt).toEqual({
       requestStatus: RequestStatus.FAILED,
       requestError: 'intervals-editInterval-rejected',
+      _meta: {
+        total_items: null,
+        per_page: null,
+        total_pages: null,
+        page: null,
+      },
+      _links: {
+        self: null,
+        next: null,
+        prev: null,
+        first: null,
+        last: null,
+      },
       ids: [],
       entities: {},
     })
@@ -409,6 +615,19 @@ describe('slice reducer', () => {
     expect(newSt).toEqual({
       requestStatus: RequestStatus.LOADING,
       requestError: null,
+      _meta: {
+        total_items: null,
+        per_page: null,
+        total_pages: null,
+        page: null,
+      },
+      _links: {
+        self: null,
+        next: null,
+        prev: null,
+        first: null,
+        last: null,
+      },
       ids: [],
       entities: {},
     })
@@ -419,14 +638,14 @@ describe('slice reducer', () => {
       ...initialStateIntervals,
       requestStatus: 'using this value is illustrative but unrealistic',
       requestError: 'using this value is illustrative but unrealistic',
-      ids: [MOCK_INTERVAL_200.id],
+      ids: [MOCK_INTERVAL_101.id],
       entities: {
-        [MOCK_INTERVAL_200.id]: MOCK_INTERVAL_200,
+        [MOCK_INTERVAL_101.id]: MOCK_INTERVAL_101,
       },
     }
     const action = {
       type: 'intervals/deleteInterval/fulfilled',
-      payload: MOCK_INTERVAL_200.id,
+      payload: MOCK_INTERVAL_101.id,
     }
 
     const newSt = intervalsReducer(initStIntervals, action)
@@ -434,6 +653,19 @@ describe('slice reducer', () => {
     expect(newSt).toEqual({
       requestStatus: RequestStatus.SUCCEEDED,
       requestError: null,
+      _meta: {
+        total_items: null,
+        per_page: null,
+        total_pages: null,
+        page: null,
+      },
+      _links: {
+        self: null,
+        next: null,
+        prev: null,
+        first: null,
+        last: null,
+      },
       ids: [],
       entities: {},
     })
@@ -453,6 +685,19 @@ describe('slice reducer', () => {
     expect(newSt).toEqual({
       requestStatus: RequestStatus.FAILED,
       requestError: 'intervals-deleteInterval-rejected',
+      _meta: {
+        total_items: null,
+        per_page: null,
+        total_pages: null,
+        page: null,
+      },
+      _links: {
+        self: null,
+        next: null,
+        prev: null,
+        first: null,
+        last: null,
+      },
       ids: [],
       entities: {},
     })
@@ -531,14 +776,31 @@ describe('thunk-action creators', () => {
   })
 
   test('fetchIntervals + its HTTP request is mocked to succeed', async () => {
-    const fetchIntervalsPromise = storeMock.dispatch(fetchIntervals())
+    const fetchIntervalsPromise = storeMock.dispatch(
+      fetchIntervals(URL_FOR_FIRST_PAGE_OF_INTERVALS)
+    )
 
     await expect(fetchIntervalsPromise).resolves.toEqual(undefined)
     expect(storeMock.getActions()).toEqual([
       { type: 'intervals/fetchIntervals/pending' },
       {
         type: 'intervals/fetchIntervals/fulfilled',
-        payload: [MOCK_INTERVAL_100, MOCK_INTERVAL_200],
+        payload: {
+          items: MOCK_INTERVALS.slice(0, 10),
+          _meta: {
+            total_items: 53, // i.e. MOCK_INTERVALS.length
+            per_page: 10,
+            total_pages: 6,
+            page: 1,
+          },
+          _links: {
+            self: '/api/v1.0/intervals?per_page=10&page=1',
+            next: '/api/v1.0/intervals?per_page=10&page=2',
+            prev: null,
+            first: '/api/v1.0/intervals?per_page=10&page=1',
+            last: '/api/v1.0/intervals?per_page=10&page=6',
+          },
+        },
       },
     ])
   })
@@ -548,7 +810,9 @@ describe('thunk-action creators', () => {
       rest.get('/api/v1.0/intervals', requestHandlers.mockMultipleFailures)
     )
 
-    const fetchIntervalsPromise = storeMock.dispatch(fetchIntervals())
+    const fetchIntervalsPromise = storeMock.dispatch(
+      fetchIntervals(URL_FOR_FIRST_PAGE_OF_INTERVALS)
+    )
 
     await expect(fetchIntervalsPromise).rejects.toEqual(
       new Error('Request failed with status code 401')

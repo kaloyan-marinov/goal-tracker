@@ -16,10 +16,12 @@ import { setupServer } from 'msw/node'
 import {
   requestHandlers,
   MOCK_GOAL_10,
-  MOCK_INTERVAL_300,
+  MOCK_INTERVAL_102,
   MOCK_INTERVAL_100,
-  MOCK_INTERVAL_200,
   MOCK_GOAL_20,
+  MOCK_GOAL_30,
+  MOCK_INTERVALS,
+  MOCK_GOALS,
 } from './testHelpers'
 
 const requestHandlersToMock = [
@@ -442,6 +444,8 @@ describe('<App> + mocking of HTTP requests', () => {
   )
 
   test("an authenticated user clicks on 'Goals Overview'", async () => {
+    console.log("an authenticated user clicks on 'Goals Overview'")
+
     /* Arrange. */
     quasiServer.use(
       rest.get('/api/v1.0/user', requestHandlers.mockFetchUser),
@@ -478,7 +482,7 @@ describe('<App> + mocking of HTTP requests', () => {
 
   test(
     "an authenticated user clicks on 'Goals Overview'," +
-      ' but JWS token expires before the GET request for Goals is issued',
+      ' but the JWS token expires before the GET request for Goals is issued',
     async () => {
       /* Arrange. */
       quasiServer.use(
@@ -527,7 +531,7 @@ describe('<App> + mocking of HTTP requests', () => {
 
   test(
     "an authenticated user clicks on 'Goals Overview'," +
-      ' but JWS token expires before the GET request for Intervals is issued',
+      ' but the JWS token expires before the GET request for Intervals is issued',
     async () => {
       /* Arrange. */
       quasiServer.use(
@@ -725,7 +729,7 @@ describe('<App> + mocking of HTTP requests', () => {
 
       /* Act. */
       const editAnchorTags = await screen.findAllByText('Edit')
-      expect(editAnchorTags.length).toEqual(2)
+      expect(editAnchorTags.length).toEqual(3)
       const editAnchorTag = editAnchorTags[0]
       fireEvent.click(editAnchorTag)
 
@@ -862,7 +866,7 @@ describe('<App> + mocking of HTTP requests', () => {
 
       /* Act. */
       const deleteAnchors = await screen.findAllByText('Delete')
-      expect(deleteAnchors.length).toEqual(2)
+      expect(deleteAnchors.length).toEqual(3)
 
       const deleteAnchor = deleteAnchors[0]
       fireEvent.click(deleteAnchor)
@@ -928,7 +932,7 @@ describe('<App> + mocking of HTTP requests', () => {
 
       /* Act. */
       const deleteAnchors = await screen.findAllByText('Delete')
-      expect(deleteAnchors.length).toEqual(2)
+      expect(deleteAnchors.length).toEqual(3)
 
       const deleteAnchor = deleteAnchors[0]
       fireEvent.click(deleteAnchor)
@@ -1001,7 +1005,7 @@ describe('<App> + mocking of HTTP requests', () => {
 
       /* Act. */
       const deleteAnchors = await screen.findAllByText('Delete')
-      expect(deleteAnchors.length).toEqual(2)
+      expect(deleteAnchors.length).toEqual(3)
 
       const deleteAnchor = deleteAnchors[0]
       fireEvent.click(deleteAnchor)
@@ -1024,7 +1028,7 @@ describe('<App> + mocking of HTTP requests', () => {
 
       /* Assert. */
       const deleteAnchorElements = await screen.findAllByText('Delete')
-      expect(deleteAnchorElements.length).toEqual(2)
+      expect(deleteAnchorElements.length).toEqual(3)
     }
   )
 
@@ -1038,6 +1042,18 @@ describe('<App> + mocking of HTTP requests', () => {
       rest.get('/api/v1.0/goals', requestHandlers.mockFetchGoals),
       rest.get('/api/v1.0/intervals', requestHandlers.mockFetchIntervals)
     )
+    /*
+    (The following remark dates back to before the addition of this comment.)
+
+    This test case should be able to do without the 2nd set of request matchers.
+    However:
+    - running this file's tests with the 2nd set of request handlers
+      results in a PASS
+    - running this file's tests without them
+      results in a FAILure of this test case
+    - running this file's tests without them plus adding `.only` to this test case
+      results in a PASS
+    */
 
     const enhancer = applyMiddleware(thunkMiddleware)
     const realStore = createStore(rootReducer, enhancer)
@@ -1053,32 +1069,40 @@ describe('<App> + mocking of HTTP requests', () => {
     )
 
     /* Act. */
-    const goalsOverviewAnchor = await screen.findByText('Intervals Overview')
-    fireEvent.click(goalsOverviewAnchor)
+    const intervalsOverviewAnchor = await screen.findByText(
+      'Intervals Overview'
+    )
+    fireEvent.click(intervalsOverviewAnchor)
 
     /* Assert. */
-    let elementForInterval1
+    let intervalsForGoal1 = await screen.findAllByText(MOCK_GOAL_10.description)
+    expect(intervalsForGoal1.length).toEqual(1)
 
-    elementForInterval1 = await screen.findByText(MOCK_GOAL_10.description)
-    expect(elementForInterval1).toBeInTheDocument()
-    elementForInterval1 = screen.getByText('2021-08-05 18:54')
+    let intervalsForGoal2 = screen.getAllByText(MOCK_GOAL_20.description)
+    expect(intervalsForGoal2.length).toEqual(2)
+
+    let intervalsForGoal3 = screen.getAllByText(MOCK_GOAL_30.description)
+    expect(intervalsForGoal3.length).toEqual(7)
+
+    let elementForInterval1 = screen.getByText('2021-08-05 18:54')
     expect(elementForInterval1).toBeInTheDocument()
     elementForInterval1 = screen.getByText('2021-08-05 19:46')
     expect(elementForInterval1).toBeInTheDocument()
 
-    let elementForInterval2
-
-    elementForInterval2 = await screen.findByText(MOCK_GOAL_20.description)
-    expect(elementForInterval2).toBeInTheDocument()
-    elementForInterval2 = screen.getByText('2021-08-05 19:53')
+    let elementForInterval2 = screen.getByText('2021-08-05 19:53')
     expect(elementForInterval2).toBeInTheDocument()
     elementForInterval2 = screen.getByText('2021-08-05 20:41')
     expect(elementForInterval2).toBeInTheDocument()
+
+    let elementForInterval3 = screen.getByText('2021-08-07 18:54')
+    expect(elementForInterval3).toBeInTheDocument()
+    elementForInterval3 = screen.getByText('2021-08-07 19:46')
+    expect(elementForInterval3).toBeInTheDocument()
   })
 
   test(
     "an authenticated user clicks on 'Intervals Overview'," +
-      ' but JWS token expires before the GET request for Goals is issued',
+      ' but the JWS token expires before the GET request for Goals is issued',
     async () => {
       /* Arrange. */
       quasiServer.use(
@@ -1112,8 +1136,10 @@ describe('<App> + mocking of HTTP requests', () => {
       )
 
       /* Act. */
-      const goalsOverviewAnchor = await screen.findByText('Intervals Overview')
-      fireEvent.click(goalsOverviewAnchor)
+      const intervalsOverviewAnchor = await screen.findByText(
+        'Intervals Overview'
+      )
+      fireEvent.click(intervalsOverviewAnchor)
 
       /* Assert. */
       let element
@@ -1127,7 +1153,7 @@ describe('<App> + mocking of HTTP requests', () => {
 
   test(
     "an authenticated user clicks on 'Intervals Overview'," +
-      ' but JWS token expires before the GET request for Intervals is issued',
+      ' but the JWS token expires before the GET request for Intervals is issued',
     async () => {
       /* Arrange. */
       quasiServer.use(
@@ -1150,8 +1176,10 @@ describe('<App> + mocking of HTTP requests', () => {
       )
 
       /* Act. */
-      const goalsOverviewAnchor = await screen.findByText('Intervals Overview')
-      fireEvent.click(goalsOverviewAnchor)
+      const intervalsOverviewAnchor = await screen.findByText(
+        'Intervals Overview'
+      )
+      fireEvent.click(intervalsOverviewAnchor)
 
       /* Assert. */
       let element
@@ -1160,6 +1188,129 @@ describe('<App> + mocking of HTTP requests', () => {
         "[FROM <IntervalsOverview>'s useEffect HOOK] FAILED TO FETCH INTERVALS - PLEASE LOG BACK IN"
       )
       expect(element).toBeInTheDocument()
+    }
+  )
+
+  test(
+    "an authenticated user clicks on 'Intervals Overview'" +
+      " and then interacts with <IntervalsOverview>'s pagination-controlling buttons",
+    async () => {
+      /* Arrange. */
+      quasiServer.use(
+        rest.get('/api/v1.0/user', requestHandlers.mockFetchUser),
+        rest.get('/api/v1.0/goals', requestHandlers.mockFetchGoals),
+        rest.get('/api/v1.0/intervals', requestHandlers.mockFetchIntervals),
+
+        rest.get('/api/v1.0/goals', requestHandlers.mockFetchGoals),
+        rest.get('/api/v1.0/intervals', requestHandlers.mockFetchIntervals),
+
+        rest.get('/api/v1.0/goals', requestHandlers.mockFetchGoals),
+        rest.get('/api/v1.0/intervals', requestHandlers.mockFetchIntervals),
+
+        rest.get('/api/v1.0/goals', requestHandlers.mockFetchGoals),
+        rest.get('/api/v1.0/intervals', requestHandlers.mockFetchIntervals),
+
+        rest.get('/api/v1.0/goals', requestHandlers.mockFetchGoals),
+        rest.get('/api/v1.0/intervals', requestHandlers.mockFetchIntervals)
+      )
+
+      const enhancer = applyMiddleware(thunkMiddleware)
+      const realStore = createStore(rootReducer, enhancer)
+
+      const history = createMemoryHistory()
+
+      render(
+        <Provider store={realStore}>
+          <Router history={history}>
+            <App />
+          </Router>
+        </Provider>
+      )
+
+      /* Act. */
+      const intervalsOverviewAnchor = await screen.findByText(
+        'Intervals Overview'
+      )
+      fireEvent.click(intervalsOverviewAnchor)
+
+      /* Assert. */
+      let intervalsForGoal1 = await screen.findAllByText(
+        MOCK_GOAL_10.description
+      )
+      expect(intervalsForGoal1.length).toEqual(1)
+
+      let intervalsForGoal2 = screen.getAllByText(MOCK_GOAL_20.description)
+      expect(intervalsForGoal2.length).toEqual(2)
+
+      let intervalsForGoal3 = screen.getAllByText(MOCK_GOAL_30.description)
+      expect(intervalsForGoal3.length).toEqual(7)
+
+      /* prep */
+      let currentPageSpan
+      let firstIntervalStart
+      let lastIntervalFinal
+
+      /* Act. */
+      const lastPageButton = screen.getByRole('button', { name: 'Last page' })
+      fireEvent.click(lastPageButton)
+
+      /* Assert. */
+      currentPageSpan = await screen.findByText('Current page: 6')
+      expect(currentPageSpan).toBeInTheDocument()
+
+      firstIntervalStart = screen.getByText('2021-08-16 00:47')
+      expect(firstIntervalStart).toBeInTheDocument()
+
+      lastIntervalFinal = screen.getByText('2021-08-16 00:50')
+      expect(lastIntervalFinal).toBeInTheDocument()
+
+      /* Act. */
+      const previousPageButton = screen.getByRole('button', {
+        name: 'Previous page',
+      })
+      fireEvent.click(previousPageButton)
+
+      /* Assert. */
+      currentPageSpan = await screen.findByText('Current page: 5')
+      expect(currentPageSpan).toBeInTheDocument()
+
+      firstIntervalStart = screen.getByText('2021-08-16 00:37')
+      expect(firstIntervalStart).toBeInTheDocument()
+
+      lastIntervalFinal = screen.getByText('2021-08-16 00:47')
+      expect(lastIntervalFinal).toBeInTheDocument()
+
+      /* Act. */
+      const firstPageButton = screen.getByRole('button', {
+        name: 'First page',
+      })
+      fireEvent.click(firstPageButton)
+
+      /* Assert. */
+      currentPageSpan = await screen.findByText('Current page: 1')
+      expect(currentPageSpan).toBeInTheDocument()
+
+      firstIntervalStart = screen.getByText('2021-08-05 18:54')
+      expect(firstIntervalStart).toBeInTheDocument()
+
+      lastIntervalFinal = screen.getByText('2021-08-16 00:07')
+      expect(lastIntervalFinal).toBeInTheDocument()
+
+      /* Act. */
+      const nextPageButton = screen.getByRole('button', {
+        name: 'Next page',
+      })
+      fireEvent.click(nextPageButton)
+
+      /* Assert. */
+      currentPageSpan = await screen.findByText('Current page: 2')
+      expect(currentPageSpan).toBeInTheDocument()
+
+      firstIntervalStart = screen.getByText('2021-08-16 00:07')
+      expect(firstIntervalStart).toBeInTheDocument()
+
+      lastIntervalFinal = screen.getByText('2021-08-16 00:17')
+      expect(lastIntervalFinal).toBeInTheDocument()
     }
   )
 
@@ -1214,12 +1365,14 @@ describe('<App> + mocking of HTTP requests', () => {
         </Provider>
       )
 
-      const goalsOverviewAnchor = await screen.findByText('Intervals Overview')
-      fireEvent.click(goalsOverviewAnchor)
+      const intervalsOverviewAnchor = await screen.findByText(
+        'Intervals Overview'
+      )
+      fireEvent.click(intervalsOverviewAnchor)
 
       await waitFor(() => {
         const rows = screen.queryAllByText('Edit')
-        expect(rows.length).toEqual(2)
+        expect(rows.length).toEqual(10)
       })
 
       const addNewIntervalAnchor = screen.getByText('Add a new interval')
@@ -1244,10 +1397,10 @@ describe('<App> + mocking of HTTP requests', () => {
       const [startTimestampInput, finalTimestampInput] = timestampInputs
 
       fireEvent.change(startTimestampInput, {
-        target: { value: MOCK_INTERVAL_300.start },
+        target: { value: MOCK_INTERVAL_102.start },
       })
       fireEvent.change(finalTimestampInput, {
-        target: { value: MOCK_INTERVAL_300.final },
+        target: { value: MOCK_INTERVAL_102.final },
       })
 
       const addIntervalButton = screen.getByRole('button', {
@@ -1292,12 +1445,14 @@ describe('<App> + mocking of HTTP requests', () => {
         </Provider>
       )
 
-      const goalsOverviewAnchor = await screen.findByText('Intervals Overview')
-      fireEvent.click(goalsOverviewAnchor)
+      const intervalsOverviewAnchor = await screen.findByText(
+        'Intervals Overview'
+      )
+      fireEvent.click(intervalsOverviewAnchor)
 
       await waitFor(() => {
         const rows = screen.queryAllByText('Edit')
-        expect(rows.length).toEqual(2)
+        expect(rows.length).toEqual(10)
       })
 
       const addNewIntervalAnchor = screen.getByText('Add a new interval')
@@ -1322,10 +1477,10 @@ describe('<App> + mocking of HTTP requests', () => {
       const [startTimestampInput, finalTimestampInput] = timestampInputs
 
       fireEvent.change(startTimestampInput, {
-        target: { value: MOCK_INTERVAL_300.start },
+        target: { value: MOCK_INTERVAL_102.start },
       })
       fireEvent.change(finalTimestampInput, {
-        target: { value: MOCK_INTERVAL_300.final },
+        target: { value: MOCK_INTERVAL_102.final },
       })
 
       const addIntervalButton = screen.getByRole('button', {
@@ -1378,7 +1533,7 @@ describe('<App> + mocking of HTTP requests', () => {
 
       /* Act. */
       const editAnchorTags = await screen.findAllByText('Edit')
-      expect(editAnchorTags.length).toEqual(2)
+      expect(editAnchorTags.length).toEqual(10)
       const editAnchorTag = editAnchorTags[0]
       fireEvent.click(editAnchorTag)
 
@@ -1436,7 +1591,7 @@ describe('<App> + mocking of HTTP requests', () => {
 
       /* Act. */
       const editAnchorTags = await screen.findAllByText('Edit')
-      expect(editAnchorTags.length).toEqual(2)
+      expect(editAnchorTags.length).toEqual(10)
       const editAnchorTag = editAnchorTags[0]
       fireEvent.click(editAnchorTag)
 
@@ -1465,6 +1620,22 @@ describe('<App> + mocking of HTTP requests', () => {
       " then clicks on the 1st 'Delete' anchor tag," +
       " and finally clicks on the 'Yes' button",
     async () => {
+      /*
+      Assumptions that this test case makes and is dependent on:
+
+      (a) from among the 1st page of Intervals that is returned to the client,
+          the very 1st Interval will be deleted, and
+
+      (b) after that deletion has been processed,
+          from among the 1st page of Intervals that is returned to the client,
+          there doesn't exist any Interval
+          that is associated with the same Goal as the deleted Interval.
+      */
+      const idxOfIntervalToDelete = 0
+      const goalAssociatedWithDeletedInterval = MOCK_GOALS.find(
+        (goal) => goal.id === MOCK_INTERVALS[idxOfIntervalToDelete].goal_id
+      )
+
       /* Arrange. */
       quasiServer.use(
         rest.get('/api/v1.0/user', requestHandlers.mockFetchUser),
@@ -1476,19 +1647,31 @@ describe('<App> + mocking of HTTP requests', () => {
           requestHandlers.mockDeleteInterval
         ),
 
-        rest.get('/api/v1.0/goals', (req, res, ctx) => {
-          return res.once(
-            ctx.status(200),
-            ctx.json({
-              goals: [MOCK_GOAL_20],
-            })
-          )
-        }),
+        /* No Goals were deleted. */
+        rest.get('/api/v1.0/goals', requestHandlers.mockFetchGoals),
+        /* Update the 1st page of Intervals. */
         rest.get('/api/v1.0/intervals', (req, res, ctx) => {
+          const start = idxOfIntervalToDelete + 1
+          const remainingIntervals = MOCK_INTERVALS.slice(start)
+          const perPage = 10
+
           return res.once(
             ctx.status(200),
             ctx.json({
-              intervals: [MOCK_INTERVAL_200],
+              items: remainingIntervals.slice(0, perPage),
+              _meta: {
+                total_items: 1,
+                per_page: perPage,
+                total_pages: 1,
+                page: 1,
+              },
+              _links: {
+                self: `/api/v1.0/intervals?per_page=${perPage}&page=1`,
+                next: null,
+                prev: null,
+                first: `/api/v1.0/intervals?per_page=${perPage}&page=1`,
+                last: `/api/v1.0/intervals?per_page=${perPage}&page=1`,
+              },
             })
           )
         })
@@ -1514,9 +1697,9 @@ describe('<App> + mocking of HTTP requests', () => {
 
       /* Act. */
       const deleteAnchors = await screen.findAllByText('Delete')
-      expect(deleteAnchors.length).toEqual(2)
+      expect(deleteAnchors.length).toEqual(10)
 
-      const deleteAnchor = deleteAnchors[0]
+      const deleteAnchor = deleteAnchors[idxOfIntervalToDelete]
       fireEvent.click(deleteAnchor)
 
       let element
@@ -1527,7 +1710,9 @@ describe('<App> + mocking of HTTP requests', () => {
       element = screen.getByText('Do you want to delete the selected interval?')
       expect(element).toBeInTheDocument()
 
-      const descriptionInput = screen.getByText(MOCK_GOAL_10.description)
+      const descriptionInput = screen.getByText(
+        goalAssociatedWithDeletedInterval.description
+      )
       expect(descriptionInput).toBeInTheDocument()
 
       const yesButton = screen.getByText('Yes')
@@ -1538,8 +1723,12 @@ describe('<App> + mocking of HTTP requests', () => {
       expect(element).toBeInTheDocument()
 
       await waitFor(() => {
+        /*
+        In view of Assumption (b) described above,
+        the following assertions should be true.
+        */
         const descriptionOfDeletedGoal = screen.queryByText(
-          MOCK_GOAL_10.description
+          goalAssociatedWithDeletedInterval.description
         )
         expect(descriptionOfDeletedGoal).not.toBeInTheDocument()
       })
@@ -1579,7 +1768,7 @@ describe('<App> + mocking of HTTP requests', () => {
 
       /* Act. */
       const deleteAnchors = await screen.findAllByText('Delete')
-      expect(deleteAnchors.length).toEqual(2)
+      expect(deleteAnchors.length).toEqual(10)
 
       const deleteAnchor = deleteAnchors[0]
       fireEvent.click(deleteAnchor)
@@ -1643,7 +1832,7 @@ describe('<App> + mocking of HTTP requests', () => {
 
       /* Act. */
       const deleteAnchors = await screen.findAllByText('Delete')
-      expect(deleteAnchors.length).toEqual(2)
+      expect(deleteAnchors.length).toEqual(10)
 
       const deleteAnchor = deleteAnchors[0]
       fireEvent.click(deleteAnchor)
@@ -1663,14 +1852,16 @@ describe('<App> + mocking of HTTP requests', () => {
       fireEvent.click(noButton)
 
       /* Assert. */
-      const deleteAnchorElements = await screen.findAllByText('Delete')
-      expect(deleteAnchorElements.length).toEqual(2)
+      let intervalsForGoal1 = await screen.findAllByText(
+        MOCK_GOAL_10.description
+      )
+      expect(intervalsForGoal1.length).toEqual(1)
 
-      element = await screen.findByText(MOCK_GOAL_10.description)
-      expect(element).toBeInTheDocument()
+      let intervalsForGoal2 = screen.getAllByText(MOCK_GOAL_20.description)
+      expect(intervalsForGoal2.length).toEqual(2)
 
-      element = await screen.findByText(MOCK_GOAL_20.description)
-      expect(element).toBeInTheDocument()
+      let intervalsForGoal3 = screen.getAllByText(MOCK_GOAL_30.description)
+      expect(intervalsForGoal3.length).toEqual(7)
     }
   )
 })

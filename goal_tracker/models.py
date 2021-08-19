@@ -1,7 +1,57 @@
-from flask import current_app
+from flask import current_app, url_for
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from goal_tracker import db
+
+
+class PaginatedAPIMixin(object):
+    """
+    This is a "mixin" class, which implements generic functionality for
+    generating a representation for a collection of resources.
+    """
+
+    @staticmethod
+    def to_collection_dict(query, per_page, page, endpoint, **kwargs):
+        pagination_obj = query.paginate(page=page, per_page=per_page, error_out=False)
+
+        # With regard to the `endpoint` parameter passed in to the calls of `url_for`
+        # that appear below, here is what the Flask documentation says:
+        #   "`endpoint` (str) – the endpoint of the URL (name of the function)"
+        link_to_self = url_for(endpoint, per_page=per_page, page=page, **kwargs)
+        link_to_next = (
+            url_for(endpoint, per_page=per_page, page=page + 1, **kwargs)
+            if pagination_obj.has_next
+            else None
+        )
+        link_to_prev = (
+            url_for(endpoint, per_page=per_page, page=page - 1, **kwargs)
+            if pagination_obj.has_prev
+            else None
+        )
+        link_to_first = url_for(endpoint, per_page=per_page, page=1, **kwargs)
+        link_to_last = (
+            url_for(endpoint, per_page=per_page, page=pagination_obj.pages, **kwargs)
+            if pagination_obj.pages > 0
+            else None
+        )
+
+        resource_representations = {
+            "items": [resource.to_dict() for resource in pagination_obj.items],
+            "_meta": {
+                "total_items": pagination_obj.total,
+                "per_page": per_page,
+                "total_pages": pagination_obj.pages,
+                "page": page,
+            },
+            "_links": {
+                "self": link_to_self,
+                "next": link_to_next,
+                "prev": link_to_prev,
+                "first": link_to_first,
+                "last": link_to_last,
+            },
+        }
+        return resource_representations
 
 
 class User(db.Model):
@@ -43,7 +93,7 @@ class Goal(db.Model):
         return f"<Goal '{self.description}'>"
 
 
-class Interval(db.Model):
+class Interval(PaginatedAPIMixin, db.Model):
     __tablename__ = "intervals"
     id = db.Column(db.Integer, primary_key=True)
     start = db.Column(db.DateTime)  # TODO: consider adding `nullable=False`
@@ -53,3 +103,11 @@ class Interval(db.Model):
 
     def __repr__(self):
         return f"<Interval {self.id} (goal={self.goal})>"
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "goal_id": self.goal_id,
+            "start": self.start.strftime("%Y-%m-%d %H:%M"),
+            "final": self.final.strftime("%Y-%m-%d %H:%M"),
+        }

@@ -5,6 +5,19 @@ import { GOAL_TRACKER_TOKEN } from '../auth/authSlice'
 export const initialStateIntervals = {
   requestStatus: RequestStatus.IDLE,
   requestError: null,
+  _meta: {
+    total_items: null,
+    per_page: null,
+    total_pages: null,
+    page: null,
+  },
+  _links: {
+    self: null,
+    next: null,
+    prev: null,
+    first: null,
+    last: null,
+  },
   ids: [],
   entities: {},
 }
@@ -55,7 +68,7 @@ export default function intervalsReducer(
     }
 
     case 'intervals/fetchIntervals/fulfilled': {
-      const intervals = action.payload
+      const { _meta, _links, items: intervals } = action.payload
 
       const newIds = intervals.map((interval) => interval.id)
       const newEntities = intervals.reduce((intervalsObj, interval) => {
@@ -67,6 +80,8 @@ export default function intervalsReducer(
         ...state,
         requestStatus: RequestStatus.SUCCEEDED,
         requestError: null,
+        _meta,
+        _links,
         ids: newIds,
         entities: newEntities,
       }
@@ -171,9 +186,13 @@ export const fetchIntervalsPending = () => ({
   type: 'intervals/fetchIntervals/pending',
 })
 
-export const fetchIntervalsFulfilled = (intervals) => ({
+export const fetchIntervalsFulfilled = (_meta, _links, items) => ({
   type: 'intervals/fetchIntervals/fulfilled',
-  payload: intervals,
+  payload: {
+    _meta,
+    _links,
+    items,
+  },
 })
 
 export const fetchIntervalsRejected = (error) => ({
@@ -245,29 +264,38 @@ export const createInterval =
     }
   }
 
-export const fetchIntervals = () => async (dispatch) => {
-  const config = {
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: 'Bearer ' + localStorage.getItem(GOAL_TRACKER_TOKEN),
-    },
-  }
+export const fetchIntervals =
+  (urlForOnePageOfIntervals) => async (dispatch) => {
+    const config = {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + localStorage.getItem(GOAL_TRACKER_TOKEN),
+      },
+    }
 
-  dispatch(fetchIntervalsPending())
-  try {
-    console.log(`issuing the following request: GET /api/v1.0/intervals`)
+    dispatch(fetchIntervalsPending())
+    try {
+      console.log(
+        `issuing the following request: GET ${urlForOnePageOfIntervals}`
+      )
 
-    const response = await axios.get('/api/v1.0/intervals', config)
-    dispatch(fetchIntervalsFulfilled(response.data.intervals))
-    return Promise.resolve()
-  } catch (err) {
-    const responseBodyError =
-      err.response.data.error ||
-      'ERROR NOT FROM BACKEND BUT FROM FRONTEND THUNK-ACTION'
-    dispatch(fetchIntervalsRejected(responseBodyError))
-    return Promise.reject(err)
+      const response = await axios.get(urlForOnePageOfIntervals, config)
+      dispatch(
+        fetchIntervalsFulfilled(
+          response.data._meta,
+          response.data._links,
+          response.data.items
+        )
+      )
+      return Promise.resolve()
+    } catch (err) {
+      const responseBodyError =
+        err.response.data.error ||
+        'ERROR NOT FROM BACKEND BUT FROM FRONTEND THUNK-ACTION'
+      dispatch(fetchIntervalsRejected(responseBodyError))
+      return Promise.reject(err)
+    }
   }
-}
 
 export const editInterval =
   (intervalId, goalId, startTimestamp, finalTimestamp) => async (dispatch) => {
@@ -338,3 +366,7 @@ export const deleteInterval = (intervalId) => async (dispatch) => {
 export const selectIntervalIds = (state) => state.intervals.ids
 
 export const selectIntervalEntities = (state) => state.intervals.entities
+
+export const selectIntervalsMeta = (state) => state.intervals._meta
+
+export const selectIntervalsLinks = (state) => state.intervals._links

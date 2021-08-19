@@ -1,8 +1,13 @@
 // import React from 'react'
 import { useDispatch } from 'react-redux'
-import { useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { fetchGoals, reinitializeGoalsSlice } from '../goals/goalsSlice'
-import { fetchIntervals, reinitializeIntervalsSlice } from './intervalsSlice'
+import {
+  fetchIntervals,
+  reinitializeIntervalsSlice,
+  selectIntervalsLinks,
+  selectIntervalsMeta,
+} from './intervalsSlice'
 import { displayAlertTemporarily } from '../alerts/alertsSlice'
 import { useSelector } from 'react-redux'
 import { selectGoalEntities } from '../goals/goalsSlice'
@@ -10,13 +15,36 @@ import { selectIntervalIds, selectIntervalEntities } from './intervalsSlice'
 import { Fragment } from 'react'
 import { Link } from 'react-router-dom'
 import { logout } from '../auth/authSlice'
+import { URL_FOR_FIRST_PAGE_OF_INTERVALS } from '../../constants'
 
 const IntervalsOverview = () => {
   console.log(
     `${new Date().toISOString()} - React is rendering <IntervalsOverview>`
   )
 
+  const goalEntities = useSelector(selectGoalEntities)
+  // console.log(`    goalEntities: ${JSON.stringify(goalEntities)}`)
+
+  const intervalIds = useSelector(selectIntervalIds)
+  console.log(`    intervalIds: ${JSON.stringify(intervalIds)}`)
+
+  const intervalEntities = useSelector(selectIntervalEntities)
+  // console.log(`    intervalEntities: ${JSON.stringify(intervalEntities)}`)
+
+  const intervalsMeta = useSelector(selectIntervalsMeta)
+  console.log(`    intervalsMeta: ${JSON.stringify(intervalsMeta)}`)
+
+  const intervalsLinks = useSelector(selectIntervalsLinks)
+  console.log(`    intervalsLinks: ${JSON.stringify(intervalsLinks)}`)
+
   const dispatch = useDispatch()
+
+  const initialIntervalsUrl =
+    intervalsLinks.self === null
+      ? URL_FOR_FIRST_PAGE_OF_INTERVALS
+      : intervalsLinks.self
+
+  const [intervalsUrl, setIntervalsUrl] = useState(initialIntervalsUrl)
 
   useEffect(() => {
     console.log('    <IntervalsOverview> is running its effect function')
@@ -49,10 +77,11 @@ const IntervalsOverview = () => {
       }
 
       console.log(
-        "    <IntervalsOverview>'s useEffect hook is dispatching fetchIntervals()"
+        "    <IntervalsOverview>'s useEffect hook is dispatching fetchIntervals(intervalsUrl)"
       )
+      console.log(`    with intervalsUrl: ${intervalsUrl}`)
       try {
-        await dispatch(fetchIntervals())
+        await dispatch(fetchIntervals(intervalsUrl))
       } catch (err) {
         let alertMessage
 
@@ -76,11 +105,7 @@ const IntervalsOverview = () => {
     }
 
     effectFn()
-  }, [dispatch])
-
-  const goalEntities = useSelector(selectGoalEntities)
-  const intervalIds = useSelector(selectIntervalIds)
-  const intervalEntities = useSelector(selectIntervalEntities)
+  }, [dispatch, intervalsUrl])
 
   const intervalTableRows = intervalIds.map((intervalId) => {
     const interval = intervalEntities[intervalId]
@@ -102,6 +127,63 @@ const IntervalsOverview = () => {
     )
   })
 
+  let paginationControllingButtons
+  if (intervalsMeta.page === null) {
+    paginationControllingButtons = (
+      <div>Building pagination-controlling buttons...</div>
+    )
+  } else {
+    const paginationCtrlButtonPrev =
+      intervalsLinks.prev !== null ? (
+        <button onClick={(e) => setIntervalsUrl(intervalsLinks.prev)}>
+          Previous page
+        </button>
+      ) : (
+        <button disabled>Previous page</button>
+      )
+
+    const paginationCtrlButtonNext =
+      intervalsLinks.next !== null ? (
+        <button onClick={(e) => setIntervalsUrl(intervalsLinks.next)}>
+          Next page
+        </button>
+      ) : (
+        <button disabled>Next page</button>
+      )
+
+    const paginationCtrlButtonFirst =
+      intervalsLinks.first !== null &&
+      intervalsLinks.first !== intervalsLinks.self ? (
+        <button onClick={(e) => setIntervalsUrl(intervalsLinks.first)}>
+          First page
+        </button>
+      ) : (
+        <button disabled>First page</button>
+      )
+
+    const paginationCtrlButtonLast =
+      intervalsLinks.last !== null &&
+      intervalsLinks.last !== intervalsLinks.self ? (
+        <button onClick={(e) => setIntervalsUrl(intervalsLinks.last)}>
+          Last page
+        </button>
+      ) : (
+        <button disabled>Last page</button>
+      )
+
+    paginationControllingButtons = (
+      <Fragment>
+        <div>
+          {paginationCtrlButtonFirst} {paginationCtrlButtonPrev}{' '}
+          <span style={{ color: 'red' }}>
+            Current page: {intervalsMeta.page}
+          </span>{' '}
+          {paginationCtrlButtonNext} {paginationCtrlButtonLast}
+        </div>
+      </Fragment>
+    )
+  }
+
   return (
     <Fragment>
       [IntervalsOverview]
@@ -111,6 +193,7 @@ const IntervalsOverview = () => {
           <Link to="/add-new-interval">Add a new interval</Link>
         </div>
         <br />
+        {paginationControllingButtons}
         <table border="1">
           <thead>
             <tr>

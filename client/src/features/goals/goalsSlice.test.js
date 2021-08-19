@@ -563,6 +563,10 @@ describe('thunk-action creators', () => {
             id: 20,
             description: '[mocked] build a frontend application',
           },
+          {
+            id: 30,
+            description: '[mocked] fix a typo',
+          },
         ],
       },
     ])

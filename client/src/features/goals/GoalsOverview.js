@@ -7,16 +7,32 @@ import { fetchGoals, reinitializeGoalsSlice } from './goalsSlice'
 import {
   fetchIntervals,
   reinitializeIntervalsSlice,
+  selectIntervalsLinks,
 } from '../intervals/intervalsSlice'
 import { useSelector } from 'react-redux'
 import { selectGoalIds, selectGoalEntities } from './goalsSlice'
 import { displayAlertTemporarily } from '../alerts/alertsSlice'
 import { logout } from '../auth/authSlice'
+import { URL_FOR_FIRST_PAGE_OF_INTERVALS } from '../../constants'
 
 const GoalsOverview = () => {
   console.log(
     `${new Date().toISOString()} - React is rendering <GoalsOverview>`
   )
+
+  const goalIds = useSelector(selectGoalIds)
+  console.log(`    goalIds: ${JSON.stringify(goalIds)}`)
+
+  const goalEntities = useSelector(selectGoalEntities)
+  // console.log(`    goalEntities: ${JSON.stringify(goalEntities)}`)
+
+  const intervalsLinks = useSelector(selectIntervalsLinks)
+  console.log(`    intervalsLinks: ${JSON.stringify(intervalsLinks)}`)
+
+  const intervalsUrl =
+    intervalsLinks.self === null
+      ? URL_FOR_FIRST_PAGE_OF_INTERVALS
+      : intervalsLinks.self
 
   const dispatch = useDispatch()
 
@@ -56,10 +72,11 @@ const GoalsOverview = () => {
       }
 
       console.log(
-        "    <GoalsOverview>'s useEffect hook is dispatching fetchIntervals()"
+        "    <GoalsOverview>'s useEffect hook is dispatching fetchIntervals(intervalsUrl)"
       )
+      console.log(`    with intervalsUrl: ${intervalsUrl}`)
       try {
-        await dispatch(fetchIntervals())
+        await dispatch(fetchIntervals(intervalsUrl))
       } catch (err) {
         let alertMessage
 
@@ -83,10 +100,7 @@ const GoalsOverview = () => {
     }
 
     effectFn()
-  }, [dispatch])
-
-  const goalIds = useSelector(selectGoalIds)
-  const goalEntities = useSelector(selectGoalEntities)
+  }, [dispatch, intervalsUrl])
 
   const goalTableRows = goalIds.map((goalId) => {
     const goal = goalEntities[goalId]
