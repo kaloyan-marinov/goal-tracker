@@ -1193,7 +1193,7 @@ describe('<App> + mocking of HTTP requests', () => {
 
   test(
     "an authenticated user clicks on 'Intervals Overview'" +
-      " and then interacts with <IntervalsOverview>'s pagination-controlloing buttons",
+      " and then interacts with <IntervalsOverview>'s pagination-controlling buttons",
     async () => {
       /* Arrange. */
       quasiServer.use(

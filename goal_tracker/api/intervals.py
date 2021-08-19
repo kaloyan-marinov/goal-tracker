@@ -22,9 +22,9 @@ def get_intervals():
 
     # With regard to the `endpoint` parameter passed in to the next method call,
     # here is what the Flask documentation says:
-    # "In case blueprints are active you can shortcut references
-    # to the same blueprint by prefixing the local endpoint with
-    # a dot (.)."
+    #   "In case blueprints are active
+    #   you can shortcut references to the same blueprint
+    #   by prefixing the local endpoint with a dot (.)."
     intervals_collection = Interval.to_collection_dict(
         intervals_query,
         per_page,

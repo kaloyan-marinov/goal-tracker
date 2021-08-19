@@ -14,6 +14,9 @@ class PaginatedAPIMixin(object):
     def to_collection_dict(query, per_page, page, endpoint, **kwargs):
         pagination_obj = query.paginate(page=page, per_page=per_page, error_out=False)
 
+        # With regard to the `endpoint` parameter passed in to the calls of `url_for`
+        # that appear below, here is what the Flask documentation says:
+        #   "`endpoint` (str) – the endpoint of the URL (name of the function)"
         link_to_self = url_for(endpoint, per_page=per_page, page=page, **kwargs)
         link_to_next = (
             url_for(endpoint, per_page=per_page, page=page + 1, **kwargs)
