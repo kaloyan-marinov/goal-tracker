@@ -31,5 +31,7 @@
     "editor.formatOnSave": true,
     
     "editor.tabSize": 2
-  }
+  },
+
+  "restructuredtext.confPath": ""
 }
