@@ -34,11 +34,11 @@ v0.2 (2021/08/20)
 
 - implement a test suite for the frontend sub-project using Jest
 
-- add ``dispatch`` to dependency arrays of ``React.useEffect`` calls
+- add ``dispatch`` to the dependency array of each ``React.useEffect`` call
 
 - switch from handling JavaScript ``Promise``-s by means of ``.then()`` / ``.catch()`` chains to handling them by means of "the ``try``-``await``-``catch`` pattern"
 
-- relocate the following side effects out of the ``authReducer``: ``localStorage.setItem('goal-tracker-token', token)`` and ``localStorage.removeItem('goal-tracker-token')``
+- convert the ``authReducer`` reducer into a pure function, by relocating the following side effects out of that reducer: ``localStorage.setItem('goal-tracker-token', token)`` and ``localStorage.removeItem('goal-tracker-token')``
 
 - prevent a successful registration from immediately logging the user in
 
@@ -46,9 +46,9 @@ v0.2 (2021/08/20)
 
 - fix the way in which the ``intervalsReducer`` handles certain actions
 
-- change ``<PrivateRoute>`` to use ``children`` instead of ``component``
+- change ``<PrivateRoute>`` to use the ``children`` instead of the ``component`` prop
 
-- Implement pagination of ``Interval`` resources
+- implement pagination of ``Interval`` resources
 
 v0.3 (2021/08/22)
 -----------------
