@@ -32,7 +32,9 @@ The frontend sub-project uses the following technologies:
 v0.2 (2021/08/20)
 -----------------
 
-- implement a test suite for the frontend sub-project using Jest
+- implement a test suite for the frontend sub-project using Jest (which was a major omission in the previous version)
+
+-------
 
 - add ``dispatch`` to the dependency array of each ``React.useEffect`` call
 
@@ -47,6 +49,8 @@ v0.2 (2021/08/20)
 - fix the way in which the ``intervalsReducer`` handles certain actions
 
 - change ``<PrivateRoute>`` to use the ``children`` instead of the ``component`` prop
+
+-------
 
 - implement pagination of ``Interval`` resources
 
