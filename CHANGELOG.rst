@@ -9,7 +9,7 @@ The backend sub-project uses the following technologies:
 
 - Python
 
-- Flask, Flask-Migrate, Flask-HTTPAuth, ``werkzeug.security``, Flask-Mail
+- Flask, Flask-Migrate, Flask-HTTPAuth, ``werkzeug.security``
 
 - the Python Standard Library's ``unittest`` module, the ``coverage`` package
 
