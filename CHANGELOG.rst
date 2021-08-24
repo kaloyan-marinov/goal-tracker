@@ -1,7 +1,7 @@
 v0.1 (2021/04/04)
 -----------------
 
-``GoalTracker`` is a web application, which aims to help you keep track of how much time you spend in pursuit of your goals.
+``GoalTracker`` is a web application, which helps you keep track of how much time you spend in pursuit of your goals.
 
 Its implementation is composed of a backend sub-project and a frontend sub-project.
 
@@ -54,7 +54,7 @@ v0.2 (2021/08/20)
 
 - implement pagination of ``Interval`` resources
 
-v0.3 (2021/08/22)
+v0.3 (2021/08/24)
 -----------------
 
 - add ``CHANGELOG.rst``
