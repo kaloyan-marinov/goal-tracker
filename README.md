@@ -497,6 +497,12 @@ Next, we are going to document 4 different options for starting a process that s
 
 # Future plans
 
+- implement a password-reset functionality
+
+- allow each user to export their personal data in JSON format
+
+- require every newly-created user to confirm their email address
+
 - Add styling to the frontend application
 
 - Implement a "mobile client" (i.e. a mobile application that consumes the backend API)
