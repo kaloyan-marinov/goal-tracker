@@ -54,7 +54,7 @@ v0.2 (2021/08/20)
 
 - implement pagination of ``Interval`` resources
 
-v0.3 (2021/08/22)
+v0.3 (2021/08/24)
 -----------------
 
 - add ``CHANGELOG.rst``
