@@ -16,7 +16,7 @@ This repository's documentation is organized as follows.
 
 # Introduction
 
-`GoalTracker` is a web application, which aims to help you keep track of how much time you spend in pursuit of your goals.
+`GoalTracker` is a web application, which helps you keep track of how much time you spend in pursuit of your goals.
 
 I decided to build such an application after watching a video titled "Seneca - How To Manage Your Time (Stoicism)". That video was posted on August 26, 2019 in the "Philosophies for Life" channel on YouTube. More specifically, my motivation for building `GoalTracker` came about as a combination of (a) thoughts about work-life balance that are at the forefront of my mind, and (b) ideas that are presented in the video.
 
