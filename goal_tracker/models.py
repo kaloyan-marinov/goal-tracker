@@ -1,3 +1,4 @@
+from datetime import datetime
 from flask import current_app, url_for
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -56,9 +57,16 @@ class PaginatedAPIMixin(object):
 
 class User(db.Model):
     __tablename__ = "users"
+
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(128), index=True, unique=True)
     password_hash = db.Column(db.String(128))
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(
+        db.DateTime,
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow,
+    )
 
     goals = db.relationship(
         "Goal", lazy="dynamic", backref="user", cascade="all, delete, delete-orphan"
@@ -80,8 +88,15 @@ class User(db.Model):
 
 class Goal(db.Model):
     __tablename__ = "goals"
+
     id = db.Column(db.Integer, primary_key=True)
     description = db.Column(db.String(256))
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(
+        db.DateTime,
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow,
+    )
 
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"))
 
@@ -95,9 +110,16 @@ class Goal(db.Model):
 
 class Interval(PaginatedAPIMixin, db.Model):
     __tablename__ = "intervals"
+
     id = db.Column(db.Integer, primary_key=True)
     start = db.Column(db.DateTime)  # TODO: consider adding `nullable=False`
     final = db.Column(db.DateTime)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(
+        db.DateTime,
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow,
+    )
 
     goal_id = db.Column(db.Integer, db.ForeignKey("goals.id"))
 
