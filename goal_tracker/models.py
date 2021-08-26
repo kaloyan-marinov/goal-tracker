@@ -69,7 +69,10 @@ class User(db.Model):
     )
 
     goals = db.relationship(
-        "Goal", lazy="dynamic", backref="user", cascade="all, delete, delete-orphan"
+        "Goal",
+        lazy="dynamic",
+        backref="user",
+        cascade="all, delete, delete-orphan",
     )
 
     def set_password_hash(self, password):
@@ -101,7 +104,10 @@ class Goal(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"))
 
     intervals = db.relationship(
-        "Interval", lazy="dynamic", backref="goal", cascade="all, delete, delete-orphan"
+        "Interval",
+        lazy="dynamic",
+        backref="goal",
+        cascade="all, delete, delete-orphan",
     )
 
     def __repr__(self):
