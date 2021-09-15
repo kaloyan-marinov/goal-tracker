@@ -157,6 +157,7 @@ In summary:
         Bye
         $
         ```
+
     - log in to the MySQL Server as the created user in order to verify that (1) the new user is able to `USE` the new database as well as (2) that the new database does not contain any tables:
         ```
         $ mysql -u <goal-tracker-username> -p
@@ -242,7 +243,7 @@ In summary:
             [open the `htmlcov/index.html` file in your web browser]       
             ```
     
-    - create an empty database and apply all database migrations:
+    - apply all database migrations to the database, which was created a few steps ago (and is still empty):
         ```
         (venv) $ FLASK_APP=goal_tracker:create_app flask db upgrade
         ```
