@@ -70,7 +70,7 @@ In summary:
 
     - download MySQL Server, install it on your system, and secure the installation (all of which can be accomplished by following the instructions given in [this article](https://linuxize.com/post/how-to-install-mysql-on-ubuntu-18-04/))
 
-    - log in to MySQL Server as the root user in order to: create a new database; create a new user and set an associated password; and grant the new user all privileges on the new database;
+    - log in to MySQL Server as the root user in order to: create a new database; create a new user and set an associated password; and grant the new user all privileges on the new database:
         ```
         $ sudo mysql
         [sudo] password for <your-OS-user>
@@ -207,7 +207,6 @@ In summary:
     - run the tests:
 
         - option A - without coverage (which, obviously, can't and won't produce a coverage report in HTML format)
-
             ```
             (venv) $ python -m unittest discover -v tests/
             
@@ -217,7 +216,6 @@ In summary:
             ```
 
         - option B - with coverage but don't produce an HTML report
-
             ```
             (venv) $ FLASK_APP=dev_server.py flask test
             [
@@ -227,7 +225,6 @@ In summary:
             ```
         
         - option C - with coverage and produce an HTML report
-
             ```
             (venv) $ coverage run \
                 --source=./ \
@@ -261,11 +258,6 @@ In summary:
 
         mysql> USE <goal-tracker-database>;
         Database changed
-        mysql> SHOW TABLES;
-        Empty set (0.00 sec)
-
-        mysql> SHOW TABLES;
-        Empty set (0.01 sec)
 
         mysql> SHOW TABLES;
         +---------------------------------+
@@ -342,7 +334,6 @@ In summary:
 4. set up the frontend
 
     - download the Node.js runtime and install it on your system:
-
         ```
         $ node --version
         v14.15.0
@@ -351,7 +342,6 @@ In summary:
         ```
 
     - install the Node.js dependenies:
-
         ```
         $ cd client
         client $ npm install
@@ -359,7 +349,6 @@ In summary:
         ```
 
     - ensure that running the tests results in a PASS:
-
         ```
         $ npm test -- \
             --watchAll \
@@ -370,7 +359,6 @@ In summary:
 5. start serving the backend application and the frontend application
 
     - launch a terminal instance and, in it, start a process responsible for serving the backend application:
-
         ```
         $ source venv/bin/activate
         (venv) $ FLASK_APP=dev_server.py flask run
@@ -409,14 +397,12 @@ In summary:
         ```
 
     - launch a separate terminal instance and, in it, start a process responsible for serving the frontend application:
-
         ```
         $ cd client
         client $ npm start
 
         > client@0.1.0 start <absolute-path-to-your-local-clone-of-this-repo>/client
         > react-scripts start
-
         ```
         and a tab in your operating system's default web browser should open up and load the address localhost:3000/
 
