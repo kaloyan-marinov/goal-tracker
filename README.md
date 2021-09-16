@@ -70,7 +70,7 @@ In summary:
 
     - download MySQL Server, install it on your system, and secure the installation (all of which can be accomplished by following the instructions given in [this article](https://linuxize.com/post/how-to-install-mysql-on-ubuntu-18-04/))
 
-    - log in to MySQL Server as the root user in order to: create a new database; create a new user and set an associated password; and grant the new user all privileges on the new database;
+    - log in to MySQL Server as the root user in order to: create a new database; create a new user and set an associated password; and grant the new user all privileges on the new database:
         ```
         $ sudo mysql
         [sudo] password for <your-OS-user>
@@ -157,6 +157,7 @@ In summary:
         Bye
         $
         ```
+
     - log in to the MySQL Server as the created user in order to verify that (1) the new user is able to `USE` the new database as well as (2) that the new database does not contain any tables:
         ```
         $ mysql -u <goal-tracker-username> -p
@@ -193,9 +194,15 @@ In summary:
 
     - create a Python virtual environment, activate it, and install all dependencies:
         ```
+        # But first, make sure that you have Python on your system.
+
+        # The version used to develop this project is specified below:
+
         $ python3 --version
         Python 3.8.3
+        ```
 
+        ```
         $ python3 -m venv venv
 
         $ source venv/bin/activate
@@ -206,7 +213,6 @@ In summary:
     - run the tests:
 
         - option A - without coverage (which, obviously, can't and won't produce a coverage report in HTML format)
-
             ```
             (venv) $ python -m unittest discover -v tests/
             
@@ -216,7 +222,6 @@ In summary:
             ```
 
         - option B - with coverage but don't produce an HTML report
-
             ```
             (venv) $ FLASK_APP=dev_server.py flask test
             [
@@ -226,7 +231,6 @@ In summary:
             ```
         
         - option C - with coverage and produce an HTML report
-
             ```
             (venv) $ coverage run \
                 --source=./ \
@@ -242,7 +246,7 @@ In summary:
             [open the `htmlcov/index.html` file in your web browser]       
             ```
     
-    - create an empty database and apply all database migrations:
+    - apply all database migrations to the database, which was created a few steps ago (and is still empty):
         ```
         (venv) $ FLASK_APP=goal_tracker:create_app flask db upgrade
         ```
@@ -260,11 +264,6 @@ In summary:
 
         mysql> USE <goal-tracker-database>;
         Database changed
-        mysql> SHOW TABLES;
-        Empty set (0.00 sec)
-
-        mysql> SHOW TABLES;
-        Empty set (0.01 sec)
 
         mysql> SHOW TABLES;
         +---------------------------------+
@@ -278,48 +277,54 @@ In summary:
         4 rows in set (0.01 sec)
 
         mysql> SHOW CREATE TABLE users;
-        +-------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-        | Table | Create Table                                                                                                                                                                                                                                                                  |
-        +-------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+        +-------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+        | Table | Create Table                                                                                                                                                                                                                                                                                                                                              |
+        +-------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
         | users | CREATE TABLE `users` (
           `id` int NOT NULL AUTO_INCREMENT,
           `email` varchar(128) DEFAULT NULL,
           `password_hash` varchar(128) DEFAULT NULL,
+          `created_at` datetime DEFAULT NULL,
+          `updated_at` datetime DEFAULT NULL,
           PRIMARY KEY (`id`),
           UNIQUE KEY `ix_users_email` (`email`)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci |
-        +-------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-        1 row in set (0.01 sec)
+        +-------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+        1 row in set (0.00 sec)
 
         mysql> SHOW CREATE TABLE goals;
-        +-------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-        | Table | Create Table                                                                                                                                                                                                                                                                                                                            |
-        +-------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+        +-------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+        | Table | Create Table                                                                                                                                                                                                                                                                                                                                                                                                        |
+        +-------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
         | goals | CREATE TABLE `goals` (
           `id` int NOT NULL AUTO_INCREMENT,
           `description` varchar(256) DEFAULT NULL,
           `user_id` int DEFAULT NULL,
+          `created_at` datetime DEFAULT NULL,
+          `updated_at` datetime DEFAULT NULL,
           PRIMARY KEY (`id`),
           KEY `user_id` (`user_id`),
           CONSTRAINT `goals_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci |
-        +-------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-        1 row in set (0.01 sec)
+        +-------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+        1 row in set (0.00 sec)
 
         mysql> SHOW CREATE TABLE intervals;
-        +-----------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-        | Table     | Create Table                                                                                                                                                                                                                                                                                                                                                                            |
-        +-----------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+        +-----------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+        | Table     | Create Table                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+        +-----------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
         | intervals | CREATE TABLE `intervals` (
           `id` int NOT NULL AUTO_INCREMENT,
           `start` datetime DEFAULT NULL,
           `final` datetime DEFAULT NULL,
           `goal_id` int DEFAULT NULL,
+          `created_at` datetime DEFAULT NULL,
+          `updated_at` datetime DEFAULT NULL,
           PRIMARY KEY (`id`),
           KEY `goal_id` (`goal_id`),
           CONSTRAINT `intervals_ibfk_1` FOREIGN KEY (`goal_id`) REFERENCES `goals` (`id`)
-        ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci |
-        +-----------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci |
+        +-----------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
         1 row in set (0.00 sec)
 
         mysql> SELECT * FROM users;
@@ -340,16 +345,17 @@ In summary:
 
 4. set up the frontend
 
-    - download the Node.js runtime and install it on your system:
-
+    - install the Node.js dependencies:
         ```
+        # But first, make sure that you have downloaded the Node.js runtime
+        # and installed it on your system.
+
+        # The version used to develop this project is specified below:
         $ node --version
         v14.15.0
         $ npm --version
         6.14.8
         ```
-
-    - install the Node.js dependenies:
 
         ```
         $ cd client
@@ -358,7 +364,6 @@ In summary:
         ```
 
     - ensure that running the tests results in a PASS:
-
         ```
         $ npm test -- \
             --watchAll \
@@ -369,7 +374,6 @@ In summary:
 5. start serving the backend application and the frontend application
 
     - launch a terminal instance and, in it, start a process responsible for serving the backend application:
-
         ```
         $ source venv/bin/activate
         (venv) $ FLASK_APP=dev_server.py flask run
@@ -408,14 +412,12 @@ In summary:
         ```
 
     - launch a separate terminal instance and, in it, start a process responsible for serving the frontend application:
-
         ```
         $ cd client
         client $ npm start
 
         > client@0.1.0 start <absolute-path-to-your-local-clone-of-this-repo>/client
         > react-scripts start
-
         ```
         and a tab in your operating system's default web browser should open up and load the address localhost:3000/
 
