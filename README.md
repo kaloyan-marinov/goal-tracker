@@ -194,9 +194,15 @@ In summary:
 
     - create a Python virtual environment, activate it, and install all dependencies:
         ```
+        # But first, make sure that you have Python on your system.
+
+        # The version used to develop this project is specified below:
+
         $ python3 --version
         Python 3.8.3
+        ```
 
+        ```
         $ python3 -m venv venv
 
         $ source venv/bin/activate
@@ -339,15 +345,18 @@ In summary:
 
 4. set up the frontend
 
-    - download the Node.js runtime and install it on your system:
+    - install the Node.js dependenies:
         ```
+        # But first, make sure that you have downloaded the Node.js runtime
+        # and installed it on your system.
+
+        # The version used to develop this project is specified below:
         $ node --version
         v14.15.0
         $ npm --version
         6.14.8
         ```
 
-    - install the Node.js dependenies:
         ```
         $ cd client
         client $ npm install
