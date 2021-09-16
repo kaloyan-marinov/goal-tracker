@@ -345,7 +345,7 @@ In summary:
 
 4. set up the frontend
 
-    - install the Node.js dependenies:
+    - install the Node.js dependencies:
         ```
         # But first, make sure that you have downloaded the Node.js runtime
         # and installed it on your system.
